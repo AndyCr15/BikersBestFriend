@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -30,6 +31,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
@@ -60,19 +63,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
-    public void centerMapOnLocation(Location location, String title) {
+    public void centerMapOnLocation(LatLng latLng, String title) {
 
-        LatLng userLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        Log.i("Maps Activity", "Center on map - latLng");
 
         mMap.clear();
 
         if (title != "Your location") {
 
-            mMap.addMarker(new MarkerOptions().position(userLocation).title(title));
+            mMap.addMarker(new MarkerOptions().position(latLng).title(title));
 
         }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 10));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+
+    }
+
+    public void centerMapOnLocation(Location location, String title) {
+
+        Log.i("Maps Activity", "Center on map - location");
+
+        LatLng selectedLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        mMap.clear();
+
+        if (title != "Your location") {
+
+            mMap.addMarker(new MarkerOptions().position(selectedLatLng).title(title));
+
+        }
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 14));
+
+    }
+
+    public void centerMapOnUser(View view) {
+        Log.i("Center View on User", "called");
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            centerMapOnLocation(lastKnownLocation, "Your location");
+        }
+
+
 
     }
 
@@ -80,6 +117,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        Log.i("Maps Activity", "onCreate");
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -103,75 +143,71 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMapLongClickListener(this);
 
         Intent intent = getIntent();
+        int favItem = intent.getIntExtra("placeNumber", 9999);
+        if (favItem != 9999) {
+            markedLocation temp = favouriteLocations.get(favItem);
+            centerMapOnLocation(temp.location, temp.name);
+            Log.i("Fav selected", "" + temp.name);
+        }
 
-        if (intent.getIntExtra("placeNumber", 0) == 0) {
+        // zoom in on user's location
 
-            // zoom in on user's location
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-            locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
 
-            locationListener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
+                centerMapOnLocation(location, "Your location");
 
-                    centerMapOnLocation(location, "Your location");
+            }
 
-                }
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
 
-                @Override
-                public void onStatusChanged(String s, int i, Bundle bundle) {
+            }
 
-                }
+            @Override
+            public void onProviderEnabled(String s) {
 
-                @Override
-                public void onProviderEnabled(String s) {
+            }
 
-                }
+            @Override
+            public void onProviderDisabled(String s) {
 
-                @Override
-                public void onProviderDisabled(String s) {
+            }
+        };
 
-                }
-            };
+        if (Build.VERSION.SDK_INT < 23) {
 
-            if (Build.VERSION.SDK_INT < 23) {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+        } else {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
+//                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//
+//                centerMapOnLocation(lastKnownLocation, "Your location");
+
             } else {
 
-                if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-                    Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                    centerMapOnLocation(lastKnownLocation, "Your location");
-
-                } else {
-
-                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-
-                }
-
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
 
             }
 
 
-        } else {
-
-            Location placeLocation = new Location(LocationManager.GPS_PROVIDER);
-            markedLocation here = MainActivity.favouriteLocations.get(0);
-            Log.i("Marker", here);
-
-//            double latitude = here.latitude;
-//            placeLocation.setLatitude(here.location);
-////            placeLocation.setLatitude(Favourites.locations.get(intent.getIntExtra("placeNumber", 0)).latitude);
-////            placeLocation.setLongitude(Favourites.locations.get(intent.getIntExtra("placeNumber", 0)).longitude);
-//
-//            centerMapOnLocation(placeLocation, Favourites.favouritePlaces.get(intent.getIntExtra("placeNumber", 0)));
-
         }
+
+
+//        Location placeLocation = new Location(LocationManager.GPS_PROVIDER);
+//        LatLng latLng = new LatLng(placeLocation.getLatitude(), placeLocation.getLongitude());
+//        markedLocation here = new markedLocation("Here", latLng , "");
+//        Log.i("Adding", "here to favourites");
+//        Favourites.favouriteLocations.add(here);
+
 
     }
 
@@ -216,12 +252,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.addMarker(new MarkerOptions().position(latLng).title(address));
 
-//        Favourites.favouritePlaces.add(address);
-//        Favourites.locations.add(latLng);
-//
-//        Favourites.arrayAdapter.notifyDataSetChanged();
+        markedLocation newFav = new markedLocation(address, address, latLng, "");
 
-        Toast.makeText(this, "Location Saved", Toast.LENGTH_SHORT).show();
+        favouriteLocations.add(newFav);
 
+        Favourites.arrayAdapter.notifyDataSetChanged();
+
+        Toast.makeText(this, "Location " + address + " saved", Toast.LENGTH_SHORT).show();
     }
 }
