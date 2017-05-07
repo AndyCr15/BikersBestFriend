@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.MainActivity.geocoder;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
@@ -53,7 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-                centerMapOnLocation(lastKnownLocation, "Your location");
+                //centerMapOnLocation(lastKnownLocation, "Your location");
 
             }
 
@@ -193,7 +194,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onLocationChanged(Location location) {
 
-                centerMapOnLocation(location, "Your location");
+                //centerMapOnLocation(location, "Your location");
 
             }
 
@@ -242,7 +243,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapLongClick(LatLng latLng) {
         Log.i("Maps Activity", "On Long Click");
 
-        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+        geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
 
         String address = "Unknown";
         String locality = "Unknown";
@@ -278,7 +279,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mMap.addMarker(new MarkerOptions().position(latLng).title(address));
 
-        markedLocation newFav = new markedLocation(locality, address, latLng, "");
+        markedLocation newFav = new markedLocation(locality, latLng, "");
 
         favouriteLocations.add(newFav);
 
@@ -286,8 +287,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Favourites.arrayAdapter.notifyDataSetChanged();
 
-        Toast.makeText(this, "Location " + address + " saved", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Location " + locality + " saved", Toast.LENGTH_SHORT).show();
     }
+
+
 
     @Override
     protected void onPause() {

@@ -1,9 +1,15 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
+import java.util.Locale;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.user;
 
@@ -24,6 +30,14 @@ public class markedLocation implements Comparable<markedLocation> {
         this.address = address;
         this.location = location;
         this.comment = comment;
+    }
+
+    public markedLocation(String name, LatLng location, String comment) {
+        Log.i("New markedLocation", name);
+        this.name = name;
+        this.location = location;
+        this.comment = comment;
+        this.address = getAddress();
     }
 
     public double getDistance(markedLocation o) {
@@ -48,6 +62,35 @@ public class markedLocation implements Comparable<markedLocation> {
         return 0;
     }
 
+    public String getAddress() {
+        String strAdd = "";
+        Context context = App.getContext();
+
+        double LATITUDE = this.location.latitude;
+        double LONGITUDE = this.location.longitude;
+
+        Geocoder geocoder = new Geocoder(context, Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(LATITUDE, LONGITUDE, 1);
+            if (addresses != null) {
+                Address returnedAddress = addresses.get(0);
+                StringBuilder strReturnedAddress = new StringBuilder("");
+
+                for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+                }
+                strAdd = strReturnedAddress.toString();
+                Log.i("Current loction address", "" + strReturnedAddress.toString());
+            } else {
+                Log.i("Current loction address", "No Address returned!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.i("Current loction address", "Canont get Address!");
+        }
+        return strAdd;
+    }
+
 
     public LatLng getLocation() {
 
@@ -70,6 +113,6 @@ public class markedLocation implements Comparable<markedLocation> {
 
     @Override
     public int compareTo(@NonNull markedLocation o) {
-        return (int)this.getDistance(MainActivity.user) - (int)o.getDistance(MainActivity.user);
+        return (int) this.getDistance(MainActivity.user) - (int) o.getDistance(MainActivity.user);
     }
 }

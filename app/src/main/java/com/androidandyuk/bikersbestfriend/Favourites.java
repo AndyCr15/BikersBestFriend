@@ -89,40 +89,44 @@ public class Favourites extends AppCompatActivity {
 
         listView.setAdapter(arrayAdapter);
 
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("Removing", "" + favouriteLocations.get(position));
-                favouriteLocations.remove(position);
-                Favourites.arrayAdapter.notifyDataSetChanged();
-                return false;
-            }
-        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LocationInfoActivity.class);
                 intent.putExtra("placeNumber", i);
                 intent.putExtra("Type", "Fav");
 
                 startActivity(intent);
             }
-
         });
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i("Removing", "" + favouriteLocations.get(position));
+                favouriteLocations.remove(position);
+                Favourites.arrayAdapter.notifyDataSetChanged();
+                return true;
+            }
+
+        });
 
     }
 
     public void initialiseLocations() {
-        Favourites.favouriteLocations.add(new markedLocation("Ace Cafe", "", new LatLng(51.5412794, -0.2799549), ""));
-        Favourites.favouriteLocations.add(new markedLocation("High Beach", "", new LatLng(51.657176, 0.0349883), ""));
-        Favourites.favouriteLocations.add(new markedLocation("Rykers Cafe", "", new LatLng(51.255562, -0.3243657), ""));
-        Favourites.favouriteLocations.add(new markedLocation("Loomies Cafe", "", new LatLng(51.030443, -1.0779103), ""));
-        Favourites.favouriteLocations.add(new markedLocation("H Cafe", "", new LatLng(51.658486, -1.1781097), ""));
-        Favourites.favouriteLocations.add(new markedLocation("On Yer Bike", "", new LatLng(51.854932, -0.968651), ""));
+        Favourites.favouriteLocations.add(new markedLocation("Ace Cafe", new LatLng(51.5412794, -0.2799549), "The world famous Ace Cafe. Food not the best though. Friday nights are always busy"));
+        Favourites.favouriteLocations.add(new markedLocation("High Beach", new LatLng(51.657176, 0.0349883), ""));
+        Favourites.favouriteLocations.add(new markedLocation("Rykers Cafe", new LatLng(51.255562, -0.3243657), ""));
+        Favourites.favouriteLocations.add(new markedLocation("Loomies Cafe", new LatLng(51.030443, -1.0779103), "Great roads lead to it. Nice burger once you get there!"));
+        Favourites.favouriteLocations.add(new markedLocation("H Cafe", new LatLng(51.658486, -1.1781097), ""));
+        Favourites.favouriteLocations.add(new markedLocation("On Yer Bike", new LatLng(51.854932, -0.968651), ""));
+        Favourites.favouriteLocations.add(new markedLocation("Revved Up", new LatLng(51.8500038,1.274296), ""));
+        Favourites.favouriteLocations.add(new markedLocation("The Midway Truck Stop", new LatLng(52.9373479,-2.6643152), ""));
+        Favourites.favouriteLocations.add(new markedLocation("Finchingfield", new LatLng(51.96829,0.4480183), "Beautiful scenery. Surrounded by great rounds."));
+
     }
 
     public static void saveFavs() {

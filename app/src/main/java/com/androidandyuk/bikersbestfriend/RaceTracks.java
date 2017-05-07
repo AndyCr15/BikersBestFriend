@@ -55,7 +55,7 @@ public class RaceTracks extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LocationInfoActivity.class);
                 intent.putExtra("placeNumber", i);
                 intent.putExtra("Type", "Track");
 
