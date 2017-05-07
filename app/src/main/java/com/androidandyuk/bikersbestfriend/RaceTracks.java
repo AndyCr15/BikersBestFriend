@@ -13,30 +13,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class Favourites extends AppCompatActivity {
-    static List<markedLocation> favouriteLocations = new ArrayList<>();
+public class RaceTracks extends AppCompatActivity {
+    static List<markedLocation> trackLocations = new ArrayList<>();
     static ArrayAdapter arrayAdapter;
 
-    public void addFav(View view) {
-        Log.i("Add Favs", "");
-        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-        intent.putExtra("Type", "Fav");
-        startActivity(intent);
-    }
 
-    public void viewFavourites(View view) {
-        Log.i("View Favs", "called");
+    public void viewTracks(View view) {
+        Log.i("View Race Tracks", "called");
         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
         // 9998 tells the Maps activity to show all the markers
         intent.putExtra("placeNumber", 9998);
-        intent.putExtra("Type", "Fav");
+        intent.putExtra("Type", "Track");
         startActivity(intent);
     }
 
     public void sortMyList() {
-        Log.i("Sort List", "" + favouriteLocations.size());
-        if (favouriteLocations.size() > 0) {
-            Collections.sort(favouriteLocations);
+        Log.i("Sort List", "" + trackLocations.size());
+        if (trackLocations.size() > 0) {
+            Collections.sort(trackLocations);
             arrayAdapter.notifyDataSetChanged();
         }
 
@@ -45,16 +39,14 @@ public class Favourites extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_race_tracks);
 
-        Log.i("Favourites", "onCreate");
 
-//        sortMyList();
+        Log.i("Race Tracks", "onCreate");
 
-        setContentView(R.layout.activity_favourites);
+        ListView listView = (ListView) findViewById(R.id.listTracks);
 
-        ListView listView = (ListView) findViewById(R.id.listView);
-
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, favouriteLocations);
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, trackLocations);
 
         listView.setAdapter(arrayAdapter);
 
@@ -65,7 +57,7 @@ public class Favourites extends AppCompatActivity {
 
                 Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
                 intent.putExtra("placeNumber", i);
-                intent.putExtra("Type", "Fav");
+                intent.putExtra("Type", "Track");
 
                 startActivity(intent);
             }
@@ -77,13 +69,15 @@ public class Favourites extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i("Favs Activity", "On Pause");
+        Log.i("Race Tracks Activity", "On Pause");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("Favs Activity", "On Resume");
+        Log.i("Race Tracks Activity", "On Resume");
         sortMyList();
     }
 }
+
+

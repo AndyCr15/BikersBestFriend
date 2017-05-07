@@ -27,16 +27,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
 
     LocationManager locationManager;
 
@@ -61,6 +60,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
 
+    }
+
+    public static void showMarkers(List<markedLocation> markedLocations, int colour) {
+        Log.i("Show Markers", "called");
+        //mMap.clear();
+        for (markedLocation location : markedLocations) {
+            Log.i("Marking", "" + location.getLocation());
+            mMap.addMarker(new MarkerOptions().position(location.getLocation()).title(location.name));
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 9));
     }
 
     public void centerMapOnLocation(LatLng latLng, String title) {
@@ -106,9 +115,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
+            MainActivity.user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+
             centerMapOnLocation(lastKnownLocation, "Your location");
         }
-
 
 
     }
@@ -138,17 +148,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.i("Maps Activity", "On Map Ready");
         mMap = googleMap;
 
         mMap.setOnMapLongClickListener(this);
 
+        // read in the reason the map has been called
         Intent intent = getIntent();
-        int favItem = intent.getIntExtra("placeNumber", 9999);
-        if (favItem != 9999) {
-            markedLocation temp = favouriteLocations.get(favItem);
-            centerMapOnLocation(temp.location, temp.name);
-            Log.i("Fav selected", "" + temp.name);
+        String type = "";
+        if (intent.getStringExtra("Type") != null) {
+            type = intent.getStringExtra("Type");
         }
+        int favItem = intent.getIntExtra("placeNumber", 9999);
+
+        if (type.equals("Fav")) {
+            if (favItem < 9998) {
+                // focus on favourite location
+                markedLocation temp = favouriteLocations.get(favItem);
+                centerMapOnLocation(temp.location, temp.name);
+                Log.i("Fav selected", "" + temp.name);
+            } else if (favItem == 9998) {
+                showMarkers(favouriteLocations, 0);
+            }
+        }
+
+
+        if (type.equals("Track")) {
+            if (favItem < 9998) {
+                // focus on favourite location
+                markedLocation temp = trackLocations.get(favItem);
+                centerMapOnLocation(temp.location, temp.name);
+                Log.i("Track selected", "" + temp.name);
+            } else if (favItem == 9998) {
+                showMarkers(trackLocations, 0);
+            }
+        }
+
 
         // zoom in on user's location
 
@@ -201,33 +236,32 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         }
 
-
-//        Location placeLocation = new Location(LocationManager.GPS_PROVIDER);
-//        LatLng latLng = new LatLng(placeLocation.getLatitude(), placeLocation.getLongitude());
-//        markedLocation here = new markedLocation("Here", latLng , "");
-//        Log.i("Adding", "here to favourites");
-//        Favourites.favouriteLocations.add(here);
-
-
     }
 
     @Override
     public void onMapLongClick(LatLng latLng) {
+        Log.i("Maps Activity", "On Long Click");
 
         Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
 
-        String address = "";
+        String address = "Unknown";
+        String locality = "Unknown";
 
         try {
 
             List<Address> listAddresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
 
             if (listAddresses != null && listAddresses.size() > 0) {
-
+                Log.i("Feature name", "" + listAddresses.get(0).getFeatureName());
+                if (listAddresses.get(0).getLocality() != null) {
+                    locality = listAddresses.get(0).getLocality();
+                    Log.i("Locality", "" + listAddresses.get(0).getLocality());
+                }
                 if (listAddresses.get(0).getThoroughfare() != null) {
-
+                    Log.i("Thoroughfare", "" + listAddresses.get(0).getThoroughfare());
+                    locality += ", " + listAddresses.get(0).getThoroughfare();
                     if (listAddresses.get(0).getSubThoroughfare() != null) {
-
+                        Log.i("Subthoroughfare", "" + listAddresses.get(0).getSubThoroughfare());
                         address += listAddresses.get(0).getSubThoroughfare() + " ";
 
                     }
@@ -242,22 +276,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             e.printStackTrace();
         }
 
-        if (address == "") {
-
-            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm yyyy-MM-dd");
-
-            address = sdf.format(new Date());
-
-        }
-
         mMap.addMarker(new MarkerOptions().position(latLng).title(address));
 
-        markedLocation newFav = new markedLocation(address, address, latLng, "");
+        markedLocation newFav = new markedLocation(locality, address, latLng, "");
 
         favouriteLocations.add(newFav);
 
         Favourites.arrayAdapter.notifyDataSetChanged();
 
         Toast.makeText(this, "Location " + address + " saved", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("Maps Activity", "On Pause");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("Maps Activity", "On Resume");
     }
 }
