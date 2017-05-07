@@ -69,7 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.i("Marking", "" + location.getLocation());
             mMap.addMarker(new MarkerOptions().position(location.getLocation()).title(location.name));
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 9));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 8));
     }
 
     public void centerMapOnLocation(LatLng latLng, String title) {
@@ -281,6 +281,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         markedLocation newFav = new markedLocation(locality, address, latLng, "");
 
         favouriteLocations.add(newFav);
+
+        Favourites.saveFavs();
 
         Favourites.arrayAdapter.notifyDataSetChanged();
 

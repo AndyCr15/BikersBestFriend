@@ -4,27 +4,57 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_portrait"
     tools:context="com.androidandyuk.bikersbestfriend.MainActivity">
 
     <Button
         android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="8dp"
         android:layout_marginTop="16dp"
         android:onClick="goToFavourites"
         android:text="Manage Favourites"
-        app:layout_constraintLeft_toLeftOf="parent"
+        android:textSize="12sp"
+        app:layout_constraintRight_toLeftOf="@+id/guideline2"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/button3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
         android:onClick="goToTracks"
         android:text="Race Tracks"
-        app:layout_constraintLeft_toLeftOf="@+id/button2"
-        app:layout_constraintTop_toBottomOf="@+id/button2" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/button2"
+        app:layout_constraintLeft_toRightOf="@+id/button2"
+        android:layout_marginLeft="16dp" />
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5" />
+
+    <Button
+        android:id="@+id/groupRideButton"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="8dp"
+        android:onClick="groupRideClicked"
+        android:text="Group Ride"
+        app:layout_constraintTop_toBottomOf="@+id/button2"
+        app:layout_constraintRight_toLeftOf="@+id/guideline2"
+        android:layout_marginRight="8dp" />
+
+    <Button
+        android:id="@+id/emergencyButton"
+        android:layout_width="160dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="16dp"
+        android:backgroundTint="@android:color/holo_red_light"
+        android:onClick="emergencyClicked"
+        android:text="Emergency"
+        app:layout_constraintBaseline_toBaselineOf="@+id/groupRideButton"
+        app:layout_constraintLeft_toRightOf="@+id/groupRideButton" />
 </android.support.constraint.ConstraintLayout>
