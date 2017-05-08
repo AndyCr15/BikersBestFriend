@@ -5,6 +5,7 @@ import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,10 +13,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.analytics.FirebaseAnalytics;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
 
     LocationManager locationManager;
     LocationListener locationListener;
+
+    public static LatLng userLatLng;
+    public static JSONObject jsonObject;
+    public static TextView weatherText;
+    public static String localForecast;
 
     static markedLocation user;
     static double conversion = 0.621;
@@ -64,15 +82,13 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void goToFavourites(View view) {
-        Intent intent = new Intent(getApplicationContext(), Favourites.class);
-
+    public void goToLocations(View view) {
+        Intent intent = new Intent(getApplicationContext(), Locations.class);
         startActivity(intent);
     }
 
-    public void goToTracks(View view) {
-        Intent intent = new Intent(getApplicationContext(), RaceTracks.class);
-
+    public void goToFueling(View view) {
+        Intent intent = new Intent(getApplicationContext(), Fueling.class);
         startActivity(intent);
     }
 
@@ -90,18 +106,29 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        weatherText = (TextView)findViewById(R.id.weatherView);
+
         Log.i("Main Activity", "onCreate");
+
+        // download the weather
+        DownloadTask task = new DownloadTask();
+        //change this to be users location
+        task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        LatLng userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
+        userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
 
         user = new markedLocation("You", "", userLatLng, "");
 
         initialiseTracks();
 
+
     }
+
+
+
 
     public void initialiseTracks() {
 
@@ -121,4 +148,81 @@ public class MainActivity extends AppCompatActivity {
             RaceTracks.trackLocations.add(new markedLocation("Rockingham", new LatLng(52.5156871, -0.6600846), ""));
         }
     }
+
+    public class DownloadTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... urls) {
+
+            String result = "";
+            URL url;
+            HttpURLConnection urlConnection = null;
+
+            try {
+                url = new URL(urls[0]);
+
+                urlConnection = (HttpURLConnection) url.openConnection();
+
+                InputStream in = urlConnection.getInputStream();
+
+                InputStreamReader reader = new InputStreamReader(in);
+
+                int data = reader.read();
+
+                while (data != -1) {
+
+                    char current = (char) data;
+
+                    result += current;
+
+                    data = reader.read();
+
+                }
+
+                return result;
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (result != null) {
+                try {
+
+                    jsonObject = new JSONObject(result);
+
+                    String weatherInfo = jsonObject.getString("weather");
+
+                    Log.i("Weather content", weatherInfo);
+
+                    JSONArray arr = new JSONArray(weatherInfo);
+
+                    for (int i = 0; i < arr.length(); i++) {
+
+                        JSONObject jsonPart = arr.getJSONObject(i);
+
+                        Log.i("main", jsonPart.getString("main"));
+                        Log.i("description", jsonPart.getString("description"));
+
+                        localForecast = jsonPart.getString("main");
+                        weatherText.setText("Today's forecast: " + localForecast);
+                    }
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+
+        }
+    }
+
 }

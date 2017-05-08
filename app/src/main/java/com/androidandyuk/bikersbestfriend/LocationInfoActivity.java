@@ -1,6 +1,7 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -33,6 +34,7 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     }
 
 
@@ -64,7 +66,7 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
         }
         int favItem = intent.getIntExtra("placeNumber", 9999);
 
-        if (type.equals("Fav")) {
+        if (type.equals("Fav") || type.equals("Hot")) {
             if (favItem < 9998) {
                 // focus on favourite location
                 temp = favouriteLocations.get(favItem);

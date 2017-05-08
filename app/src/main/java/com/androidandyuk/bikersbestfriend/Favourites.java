@@ -58,14 +58,6 @@ public class Favourites extends AppCompatActivity {
 
         loadFavs();
 
-        Log.i("Favs List Size", "" + Favourites.favouriteLocations.size());
-
-        if (Favourites.favouriteLocations.size() == 0) {
-            Log.i("Favourites", "Initializing Locations");
-            initialiseLocations();
-            //saveFavs();
-        }
-
         setContentView(R.layout.activity_favourites);
 
         ListView listView = (ListView) findViewById(R.id.listView);
@@ -113,19 +105,6 @@ public class Favourites extends AppCompatActivity {
             }
 
         });
-
-    }
-
-    public void initialiseLocations() {
-        Favourites.favouriteLocations.add(new markedLocation("Ace Cafe", new LatLng(51.5412794, -0.2799549), "The world famous Ace Cafe. Food not the best though. Friday nights are always busy"));
-        Favourites.favouriteLocations.add(new markedLocation("High Beach", new LatLng(51.657176, 0.0349883), ""));
-        Favourites.favouriteLocations.add(new markedLocation("Rykers Cafe", new LatLng(51.255562, -0.3243657), ""));
-        Favourites.favouriteLocations.add(new markedLocation("Loomies Cafe", new LatLng(51.030443, -1.0779103), "Great roads lead to it. Nice burger once you get there!"));
-        Favourites.favouriteLocations.add(new markedLocation("H Cafe", new LatLng(51.658486, -1.1781097), ""));
-        Favourites.favouriteLocations.add(new markedLocation("On Yer Bike", new LatLng(51.854932, -0.968651), ""));
-        Favourites.favouriteLocations.add(new markedLocation("Revved Up", new LatLng(51.8500038,1.274296), ""));
-        Favourites.favouriteLocations.add(new markedLocation("The Midway Truck Stop", new LatLng(52.9373479,-2.6643152), ""));
-        Favourites.favouriteLocations.add(new markedLocation("Finchingfield", new LatLng(51.96829,0.4480183), "Beautiful scenery. Surrounded by great rounds."));
 
     }
 
