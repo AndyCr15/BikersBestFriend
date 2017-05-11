@@ -39,16 +39,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Favourites" />
+        <activity android:name=".Favourites"
+            android:label="Favourites" />
         <activity android:name=".MapsActivity" />
         <activity android:name=".AboutActivity" />
-        <activity android:name=".RaceTracks" />
+        <activity android:name=".RaceTracks"
+            android:label="Tracks" />
         <activity
             android:name=".LocationInfoActivity"
             android:label="@string/title_activity_location_info" />
-        <activity android:name=".Locations" />
-        <activity android:name=".HotSpots" />
-        <activity android:name=".Fueling"></activity>
+        <activity android:name=".Locations"
+            android:label="Locations" />
+        <activity android:name=".HotSpots"
+            android:label="Hot Spots" />
+        <activity android:name=".Fueling"
+            android:label="Fueling" />
+        <activity android:name=".Garage"
+            android:label="Garage" />
+
     </application>
 
 </manifest>

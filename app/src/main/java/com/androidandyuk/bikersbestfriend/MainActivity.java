@@ -87,6 +87,11 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void goToGarage(View view) {
+        Intent intent = new Intent(getApplicationContext(), Garage.class);
+        startActivity(intent);
+    }
+
     public void goToFueling(View view) {
         Intent intent = new Intent(getApplicationContext(), Fueling.class);
         startActivity(intent);

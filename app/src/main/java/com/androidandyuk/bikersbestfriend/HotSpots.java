@@ -103,7 +103,7 @@ public class HotSpots extends AppCompatActivity {
         favouriteLocations.add(new markedLocation("The Midway Truck Stop", new LatLng(52.9373479,-2.6643152), ""));
         favouriteLocations.add(new markedLocation("Finchingfield", new LatLng(51.96829,0.4480183), "Beautiful scenery. Surrounded by great rounds."));
         favouriteLocations.add(new markedLocation("Bike Shed", new LatLng(51.527171,-0.0805737), "Own parking, often with security. Food can be pricey."));
-
+        favouriteLocations.add(new markedLocation("Hartside Cafe", new LatLng(54.6360254,-2.5316498), ""));
     }
 
 

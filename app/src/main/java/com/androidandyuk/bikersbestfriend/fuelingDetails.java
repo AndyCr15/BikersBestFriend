@@ -1,19 +1,25 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.icu.text.DateFormat;
+import android.icu.text.DecimalFormat;
+import android.support.annotation.NonNull;
+
 import java.util.Date;
 
 /**
  * Created by AndyCr15 on 08/05/2017.
  */
 
-public class fuelingDetails {
+public class fuelingDetails implements Comparable<fuelingDetails> {
     Date date;
     int miles;
     double price;
     double litres;
     double mpg;
+//    int bikeId;
 
     public fuelingDetails(int miles, double price, double litres) {
+//        this.bikeId = bikeId;
         this.miles = miles;
         this.price = price;
         this.litres = litres;
@@ -39,6 +45,23 @@ public class fuelingDetails {
 
     @Override
     public String toString() {
-        return "Date :" + date + ", mpg = " + mpg;
+        String stringDate = DateFormat.getDateInstance().format(date);
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        return stringDate + " - Miles : " + miles + " - mpg = " + df.format(mpg);
+    }
+
+    @Override
+    public int compareTo(@NonNull fuelingDetails o) {
+        //SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM");
+        if (this.date.after(o.date)) {
+            return -1;
+        }
+
+        if (o.date.after(this.date)) {
+            return 1;
+        }
+
+        return 0;
     }
 }
