@@ -45,7 +45,6 @@ public class Favourites extends AppCompatActivity {
             Collections.sort(favouriteLocations);
             arrayAdapter.notifyDataSetChanged();
         }
-
     }
 
     @Override
@@ -60,7 +59,7 @@ public class Favourites extends AppCompatActivity {
 
         setContentView(R.layout.activity_favourites);
 
-        ListView listView = (ListView) findViewById(R.id.listView);
+        ListView listView = (ListView) findViewById(R.id.maintenanceList);
 
         Button seeFavsMap = (Button) findViewById(R.id.seeFavsMap);
 

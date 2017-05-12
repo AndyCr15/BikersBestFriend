@@ -117,8 +117,18 @@ public class MainActivity extends AppCompatActivity {
 
         // download the weather
         DownloadTask task = new DownloadTask();
-        //change this to be users location
+
         task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
+
+//        if(user.location != null) {
+//            //change this to be users location
+//            double userLat = user.location.latitude;
+//            double userLon = user.location.longitude;
+//            String userLocation = "lat=" + userLat + "&lon=" + userLon;
+//            task.execute("http://api.openweathermap.org/data/2.5/weather?" + userLocation + "&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
+//
+//        }
+
 
         // Obtain the FirebaseAnalytics instance.
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -128,7 +138,6 @@ public class MainActivity extends AppCompatActivity {
         user = new markedLocation("You", "", userLatLng, "");
 
         initialiseTracks();
-
 
     }
 

@@ -16,7 +16,7 @@ public class Bike {
     String serviceDue;
     String MOTdue;
     ArrayList<fuelingDetails> fuelings = new ArrayList<>();
-//    ArrayList<maintenanceLog> maintenanceLogs = new ArrayList<>();
+    ArrayList<maintenanceLogDetails> maintenanceLogs = new ArrayList<>();
 
 
     public Bike(String make, String model, String registration) {

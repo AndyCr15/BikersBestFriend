@@ -1,5 +1,6 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -86,6 +87,11 @@ public class Garage extends AppCompatActivity {
 
         garageSetup();
 
+    }
+
+    public void goToMaintenanceLog(View view) {
+        Intent intent = new Intent(getApplicationContext(), Maintenance.class);
+        startActivity(intent);
     }
 
     @Override

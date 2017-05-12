@@ -20,7 +20,6 @@ import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 
 public class Fueling extends AppCompatActivity {
 
-    //static ArrayList<fuelingDetails> fuelings = new ArrayList<>();
     static ArrayAdapter arrayAdapter;
     static SharedPreferences sharedPreferences;
     static int lastHowManyFuels = 10;
@@ -60,13 +59,10 @@ public class Fueling extends AppCompatActivity {
 //        fuelings.add(test8);
 
 
-
-
-
     }
 
-    private void initiateList(){
-        listView = (ListView) findViewById(R.id.listView);
+    private void initiateList() {
+        listView = (ListView) findViewById(R.id.maintenanceList);
 
         fuelingDetailsLayout = findViewById(R.id.fuelingDetailsLayout);
 
@@ -93,13 +89,18 @@ public class Fueling extends AppCompatActivity {
         double totalLitres = 0;
         int count = 0;
         Bike thisBike = Garage.bikes.get(bikeID);
+        if (numberOfFuelings > thisBike.fuelings.size()) {
+            numberOfFuelings = thisBike.fuelings.size();
+        }
+
+
         for (int i = 0; i < numberOfFuelings; i++) {
             count++;
             totalMiles += thisBike.fuelings.get(i).miles;
             totalLitres += thisBike.fuelings.get(i).litres;
 
         }
-        Log.i("Caluclating MPG", "" + count);
+        Log.i("Calculating MPG", "" + count);
         double mpg = totalMiles / (totalLitres / 4.54609);
         return mpg;
     }
@@ -115,8 +116,6 @@ public class Fueling extends AppCompatActivity {
         fuelingDetailsLayout.setVisibility(View.INVISIBLE);
 
         TextView mpgView = (TextView) findViewById(R.id.mpgView);
-        // this will need setting once multiple bikes are implemented
-        int bikeID = 0;
 
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
@@ -128,6 +127,13 @@ public class Fueling extends AppCompatActivity {
         }
         mpgView.setText("Ave MPG over the last " + fuelingsForAve + " stops is " + df.format(aveMPG(activeBike, fuelingsForAve)) + " mpg");
 
+        // clear previous entries
+        milesDone.setText(null);
+        milesDone.clearFocus();
+        petrolPrice.setText(null);
+        petrolPrice.clearFocus();
+        litresUsed.setText(null);
+        litresUsed.clearFocus();
 
     }
 

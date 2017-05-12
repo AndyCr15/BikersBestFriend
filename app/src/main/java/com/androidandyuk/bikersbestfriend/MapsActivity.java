@@ -121,7 +121,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             centerMapOnLocation(lastKnownLocation, "Your location");
         }
 
-
     }
 
     @Override
