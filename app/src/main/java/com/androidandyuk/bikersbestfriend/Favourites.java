@@ -156,6 +156,7 @@ public class Favourites extends AppCompatActivity {
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.i("Adding Favs", "Failed attempt");
         }
     }
 
@@ -215,6 +216,19 @@ public class Favourites extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("Favs Activity","On Stop");
+        saveFavs();
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         Log.i("Favs Activity", "On Resume");
@@ -224,16 +238,5 @@ public class Favourites extends AppCompatActivity {
         sortMyList();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.i("On Stop", "Called");
-        saveFavs();
 
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
 }

@@ -1,30 +1,31 @@
 package com.androidandyuk.bikersbestfriend;
 
-import android.icu.text.DateFormat;
 import android.icu.text.DecimalFormat;
 import android.support.annotation.NonNull;
 
+import java.text.ParseException;
 import java.util.Date;
+
+import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
 /**
  * Created by AndyCr15 on 08/05/2017.
  */
 
-public class fuelingDetails implements Comparable<fuelingDetails> {
-    Date date;
+public class fuellingDetails implements Comparable<fuellingDetails> {
+    String date;
     int miles;
     double price;
     double litres;
     double mpg;
-//    int bikeId;
 
-    public fuelingDetails(int miles, double price, double litres) {
-//        this.bikeId = bikeId;
+    public fuellingDetails(int miles, double price, double litres) {
         this.miles = miles;
         this.price = price;
         this.litres = litres;
         mpg = miles / (litres / 4.54609);
-        date = new Date();
+        Date fuelDate = new Date();
+        this.date = sdf.format(fuelDate);
     }
 
     public int getMiles() {
@@ -45,23 +46,30 @@ public class fuelingDetails implements Comparable<fuelingDetails> {
 
     @Override
     public String toString() {
-        String stringDate = DateFormat.getDateInstance().format(date);
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
-        return stringDate + " - Miles : " + miles + " - mpg = " + df.format(mpg);
+        return this.date + " - Miles : " + miles + " - mpg = " + df.format(mpg);
     }
 
     @Override
-    public int compareTo(@NonNull fuelingDetails o) {
-        //SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM");
-        if (this.date.after(o.date)) {
+    public int compareTo(@NonNull fuellingDetails o) {
+        Date thisDate = new Date();
+        Date oDate = new Date();
+
+        try {
+            thisDate = sdf.parse(this.date);
+            oDate = sdf.parse(o.date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        if (thisDate.after(oDate)) {
             return -1;
         }
 
-        if (o.date.after(this.date)) {
+        if (oDate.after(thisDate)) {
             return 1;
         }
-
         return 0;
     }
 }

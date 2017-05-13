@@ -16,6 +16,7 @@ public class Garage extends AppCompatActivity {
 
     public static ArrayList<Bike> bikes = new ArrayList<>();
 
+
     View addingBikeInfo;
     EditText bikeMake;
     EditText bikeModel;
@@ -31,12 +32,13 @@ public class Garage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_garage);
 
-        // for testing
-        Bike newBike = new Bike("KTM", "SDR", "SR66 YTW");
-        bikes.add(newBike);
-        Bike newBike2 = new Bike("Honda", "CB1000R", "REG1");
-        bikes.add(newBike2);
-
+        if (bikes.size() == 0) {
+            // for testing
+            Bike newBike = new Bike("KTM", "SDR", "SR66 YTW");
+            bikes.add(newBike);
+            Bike newBike2 = new Bike("Honda", "CB1000R", "REG1");
+            bikes.add(newBike2);
+        }
 
         // for adding a new bike
         bikeMake = (EditText) findViewById(R.id.bikeMake);
@@ -160,4 +162,5 @@ public class Garage extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

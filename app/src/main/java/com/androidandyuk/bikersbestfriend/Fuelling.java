@@ -18,7 +18,7 @@ import java.util.Collections;
 import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 
-public class Fueling extends AppCompatActivity {
+public class Fuelling extends AppCompatActivity {
 
     static ArrayAdapter arrayAdapter;
     static SharedPreferences sharedPreferences;
@@ -39,23 +39,23 @@ public class Fueling extends AppCompatActivity {
         initiateList();
 
 
-//        fuelingDetails test = new fuelingDetails(120, 1.199, 16.25);
+//        fuellingDetails test = new fuellingDetails(120, 1.199, 16.25);
 //        bikes.get(activeBike).fuelings.add(test);
-//        fuelingDetails test1 = new fuelingDetails(100, 1.199, 16.25);
+//        fuellingDetails test1 = new fuellingDetails(100, 1.199, 16.25);
 //        fuelings.add(test1);
-//        fuelingDetails test2 = new fuelingDetails(170, 1.199, 16.25);
+//        fuellingDetails test2 = new fuellingDetails(170, 1.199, 16.25);
 //        fuelings.add(test2);
-//        fuelingDetails test3 = new fuelingDetails(120, 1.199, 18.25);
+//        fuellingDetails test3 = new fuellingDetails(120, 1.199, 18.25);
 //        fuelings.add(test3);
-//        fuelingDetails test4 = new fuelingDetails(140, 1.199, 16.25);
+//        fuellingDetails test4 = new fuellingDetails(140, 1.199, 16.25);
 //        fuelings.add(test4);
-//        fuelingDetails test5 = new fuelingDetails(130, 1.199, 16.25);
+//        fuellingDetails test5 = new fuellingDetails(130, 1.199, 16.25);
 //        fuelings.add(test5);
-//        fuelingDetails test6 = new fuelingDetails(120, 1.199, 19.25);
+//        fuellingDetails test6 = new fuellingDetails(120, 1.199, 19.25);
 //        fuelings.add(test6);
-//        fuelingDetails test7 = new fuelingDetails(140, 1.199, 16.25);
+//        fuellingDetails test7 = new fuellingDetails(140, 1.199, 16.25);
 //        fuelings.add(test7);
-//        fuelingDetails test8 = new fuelingDetails(170, 1.199, 19.25);
+//        fuellingDetails test8 = new fuellingDetails(170, 1.199, 19.25);
 //        fuelings.add(test8);
 
 
@@ -75,13 +75,13 @@ public class Fueling extends AppCompatActivity {
         listView.setAdapter(arrayAdapter);
         aveMPG(activeBike, lastHowManyFuels);
 
-        setTitle("Fueling: " + bikes.get(activeBike).model);
+        setTitle("Fuelling: " + bikes.get(activeBike).model);
 
     }
 
     public void showFueling(View view) {
         // opens the add fueling dialog
-        Log.i("Fueling", "Adding fuel up");
+        Log.i("Fuelling", "Adding fuel up");
         fuelingDetailsLayout.setVisibility(View.VISIBLE);
 
     }
@@ -111,7 +111,7 @@ public class Fueling extends AppCompatActivity {
         int miles = Integer.parseInt(milesDone.getText().toString());
         double price = Double.parseDouble(petrolPrice.getText().toString());
         double litres = Double.parseDouble(litresUsed.getText().toString());
-        fuelingDetails today = new fuelingDetails(miles, price, litres);
+        fuellingDetails today = new fuellingDetails(miles, price, litres);
         bikes.get(activeBike).fuelings.add(today);
         Collections.sort(bikes.get(activeBike).fuelings);
         arrayAdapter.notifyDataSetChanged();

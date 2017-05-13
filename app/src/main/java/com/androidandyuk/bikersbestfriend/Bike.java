@@ -15,7 +15,7 @@ public class Bike {
     String VIN;
     String serviceDue;
     String MOTdue;
-    ArrayList<fuelingDetails> fuelings = new ArrayList<>();
+    ArrayList<fuellingDetails> fuelings = new ArrayList<>();
     ArrayList<maintenanceLogDetails> maintenanceLogs = new ArrayList<>();
 
 
@@ -36,6 +36,6 @@ public class Bike {
 
     @Override
     public String toString() {
-        return make + model;
+        return make + " " + model;
     }
 }

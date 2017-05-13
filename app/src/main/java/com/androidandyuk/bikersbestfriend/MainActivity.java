@@ -1,6 +1,8 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
 import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -29,6 +31,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,14 +44,19 @@ public class MainActivity extends AppCompatActivity {
     LocationManager locationManager;
     LocationListener locationListener;
 
-    public static LatLng userLatLng;
+        public static LatLng userLatLng;
     public static JSONObject jsonObject;
     public static TextView weatherText;
     public static String localForecast;
 
+    public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy");
+    public static SimpleDateFormat sdfShort = new SimpleDateFormat("dd MMM");
+
     static markedLocation user;
     static double conversion = 0.621;
     static Geocoder geocoder;
+    static SharedPreferences sharedPreferences;
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToFueling(View view) {
-        Intent intent = new Intent(getApplicationContext(), Fueling.class);
+        Intent intent = new Intent(getApplicationContext(), Fuelling.class);
         startActivity(intent);
     }
 
@@ -238,5 +250,82 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+    public static void saveBikes() {
+        Log.i("Shared Prefs", "Saving Logs");
 
+        try {
+
+            ArrayList<String> dates = new ArrayList<>();
+            ArrayList<String> logs = new ArrayList<>();
+            ArrayList<String> costs = new ArrayList<>();
+
+            for (int i = 0; i < bikes.size(); i++) {
+
+                for (maintenanceLogDetails thisLog : bikes.get(i).maintenanceLogs) {
+
+                    dates.add(thisLog.date);
+                    logs.add(thisLog.log);
+                    costs.add(Double.toString(thisLog.price));
+
+                }
+
+                sharedPreferences.edit().putString("dates", ObjectSerializer.serialize(dates)).apply();
+                sharedPreferences.edit().putString("logs", ObjectSerializer.serialize(logs)).apply();
+                sharedPreferences.edit().putString("costs", ObjectSerializer.serialize(costs)).apply();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadBikes() {
+        Log.i("Shared Prefs", "Loading Logs");
+
+        ArrayList<String> bikeID = new ArrayList<>();
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<String> logs = new ArrayList<>();
+        ArrayList<String> costs = new ArrayList<>();
+
+        // I think these are new variables, so likely don't need clearing?
+        bikeID.clear();
+        dates.clear();
+        logs.clear();
+        costs.clear();
+
+        for (int i = 0; i < bikes.size(); i++) {
+            bikes.get(i).maintenanceLogs.clear();
+
+            try {
+
+                bikeID = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("bikeID", ObjectSerializer.serialize(new ArrayList<String>())));
+                dates = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("dates", ObjectSerializer.serialize(new ArrayList<String>())));
+                logs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("logs", ObjectSerializer.serialize(new ArrayList<String>())));
+                costs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("costs", ObjectSerializer.serialize(new ArrayList<String>())));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (bikeID.size() > 0 && dates.size() > 0 && logs.size() > 0 && costs.size() > 0) {
+                // we've checked there is some info
+                if (bikeID.size() == dates.size() && logs.size() == costs.size()) {
+                    // we've checked each item has the same amount of info, nothing is missing
+
+                    for (int x = 0; x < bikeID.size(); x++) {
+
+                        Date thisDate = new Date();
+                        try {
+                            thisDate = sdf.parse(dates.get(x));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        maintenanceLogDetails newLog = new maintenanceLogDetails(logs.get(x), Double.parseDouble(costs.get(x)), thisDate);
+                        bikes.get(i).maintenanceLogs.add(newLog);
+                    }
+
+                }
+            }
+        }
+    }
 }

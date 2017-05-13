@@ -58,7 +58,7 @@
             android:name=".HotSpots"
             android:label="Hot Spots" />
         <activity
-            android:name=".Fueling"
+            android:name=".Fuelling"
             android:label="Fueling" />
         <activity
             android:name=".Garage"

@@ -2,6 +2,7 @@ package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,18 +17,24 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
-//import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
+
+//import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 
 public class Maintenance extends AppCompatActivity {
 
+    static SharedPreferences sharedPreferences;
+    static SharedPreferences.Editor ed;
+
     static ArrayAdapter arrayAdapter;
+
     ListView maintList;
 
     View logDetails;
@@ -45,8 +52,19 @@ public class Maintenance extends AppCompatActivity {
         logString = (EditText) findViewById(R.id.logString);
         logCost = (EditText) findViewById(R.id.logCost);
 
-        maintenanceLogDetails newLog = new maintenanceLogDetails("Testing");
-        bikes.get(activeBike).maintenanceLogs.add(newLog);
+//        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
+        ed = sharedPreferences.edit();
+
+        loadLogs();
+
+
+        //for testing purposes
+        // remove once tested!
+//        if (bikes.get(activeBike).maintenanceLogs.size() == 0) {
+//            maintenanceLogDetails newLog = new maintenanceLogDetails("Testing");
+//            bikes.get(activeBike).maintenanceLogs.add(newLog);
+//        }
 
         initiateList();
 
@@ -55,7 +73,7 @@ public class Maintenance extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                Log.i("Maint List","Tapped " + i);
+                Log.i("Maint List", "Tapped " + i);
             }
         });
 
@@ -76,7 +94,7 @@ public class Maintenance extends AppCompatActivity {
                                 Log.i("Removing", "Log " + logPosition);
                                 bikes.get(activeBike).maintenanceLogs.remove(logPosition);
                                 initiateList();
-                                Toast.makeText(context,"Deleted!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Deleted!", Toast.LENGTH_SHORT).show();
 
                             }
                         })
@@ -123,7 +141,7 @@ public class Maintenance extends AppCompatActivity {
         // Check if no view has focus:
         View logDetails = this.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
 
@@ -207,76 +225,102 @@ public class Maintenance extends AppCompatActivity {
     }
 
     public static void saveLogs() {
-        Log.i("Shared Prefs", "Saving Logs");
-        
-        try {
 
-            ArrayList<String> dates = new ArrayList<>();
-            ArrayList<String> logs = new ArrayList<>();
-            ArrayList<String> cost = new ArrayList<>();
+        for (Bike thisBike : bikes) {
 
-            for (maintenanceLogDetails thisLog : maintenanceLogs) {
-                names.add(location.name);
-                latitudes.add(Double.toString(location.location.latitude));
-                longitudes.add(Double.toString(location.location.longitude));
-                addresses.add(location.address);
-                comments.add(location.comment);
+            Log.i("Saving Logs", "" + thisBike);
+            try {
+                ArrayList<String> dates = new ArrayList<>();
+                ArrayList<String> logs = new ArrayList<>();
+                ArrayList<String> costs = new ArrayList<>();
+
+                // I think these are new variables, so likely don't need clearing?
+                dates.clear();
+                logs.clear();
+                costs.clear();
+
+                for (maintenanceLogDetails thisLog : thisBike.maintenanceLogs) {
+
+                    dates.add(thisLog.date);
+                    logs.add(thisLog.log);
+                    costs.add(Double.toString(thisLog.price));
+
+                }
+
+                Log.i("Saving Logs", "Size :" + dates.size());
+                ed.putString("dates" + thisBike.bikeId, ObjectSerializer.serialize(dates)).apply();
+                ed.putString("logs" + thisBike.bikeId, ObjectSerializer.serialize(logs)).apply();
+                ed.putString("costs" + thisBike.bikeId, ObjectSerializer.serialize(costs)).apply();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Adding details", "Failed attempt");
             }
-
-            sharedPreferences.edit().putString("names", ObjectSerializer.serialize(names)).apply();
-            sharedPreferences.edit().putString("latitudes", ObjectSerializer.serialize(latitudes)).apply();
-            sharedPreferences.edit().putString("longitudes", ObjectSerializer.serialize(longitudes)).apply();
-            sharedPreferences.edit().putString("addresses", ObjectSerializer.serialize(addresses)).apply();
-            sharedPreferences.edit().putString("comments", ObjectSerializer.serialize(comments)).apply();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
     public static void loadLogs() {
-        Log.i("Shared Prefs", "Loading Favs");
 
-        favouriteLocations.clear();
+        for (Bike thisBike : bikes) {
+            thisBike.maintenanceLogs.clear();
 
-        ArrayList<String> names = new ArrayList<>();
-        ArrayList<String> latitudes = new ArrayList<>();
-        ArrayList<String> longitudes = new ArrayList<>();
-        ArrayList<String> addresses = new ArrayList<>();
-        ArrayList<String> comments = new ArrayList<>();
+            Log.i("Loading Logs", "" + thisBike);
 
-        names.clear();
-        latitudes.clear();
-        longitudes.clear();
-        addresses.clear();
-        comments.clear();
+            ArrayList<String> dates = new ArrayList<>();
+            ArrayList<String> logs = new ArrayList<>();
+            ArrayList<String> costs = new ArrayList<>();
 
-        try {
+            // I think these are new variables, so likely don't need clearing?
+            dates.clear();
+            logs.clear();
+            costs.clear();
 
-            names = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("names", ObjectSerializer.serialize(new ArrayList<String>())));
-            latitudes = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("latitudes", ObjectSerializer.serialize(new ArrayList<String>())));
-            longitudes = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("longitudes", ObjectSerializer.serialize(new ArrayList<String>())));
-            addresses = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("addresses", ObjectSerializer.serialize(new ArrayList<String>())));
-            comments = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("comments", ObjectSerializer.serialize(new ArrayList<String>())));
+            try {
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                dates = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("dates" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                logs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("logs" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                costs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("costs" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                Log.i("Dates for " + thisBike, "Count :" + dates.size());
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Loading details", "Failed attempt");
+            }
 
-        if (names.size() > 0 && latitudes.size() > 0 && longitudes.size() > 0) {
-            // we've checked there is some info
-            if (names.size() == latitudes.size() && latitudes.size() == longitudes.size()) {
-                // we've checked each item has the same amout of info, nothing is missing
+            Log.i("Retrieved info" + thisBike, "Log count :" + dates.size());
+            if (dates.size() > 0 && logs.size() > 0 && costs.size() > 0) {
+                // we've checked there is some info
+                if (dates.size() == logs.size() && logs.size() == costs.size()) {
+                    // we've checked each item has the same amount of info, nothing is missing
+                    for (int x = 0; x < dates.size(); x++) {
+                        Date thisDate = new Date();
+                        try {
+                            thisDate = sdf.parse(dates.get(x));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        maintenanceLogDetails newLog = new maintenanceLogDetails(logs.get(x), Double.parseDouble(costs.get(x)), thisDate);
+                        Log.i("Adding", "" + x + "" + newLog);
+                        thisBike.maintenanceLogs.add(newLog);
+                    }
 
-                for (int i = 0; i < names.size(); i++) {
-                    LatLng pos = new LatLng(Double.parseDouble(latitudes.get(i)), Double.parseDouble(longitudes.get(i)));
-                    markedLocation newLoc = new markedLocation(names.get(i), addresses.get(i), pos, comments.get(i));
-                    favouriteLocations.add(newLoc);
                 }
-
             }
         }
+    }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("Logs Activity", "On Pause");
+        saveLogs();
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        Log.i("Logs Activity", "On Stop");
+//        saveLogs();
 
     }
 
