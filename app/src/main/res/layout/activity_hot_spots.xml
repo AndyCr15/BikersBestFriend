@@ -23,10 +23,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/maintenanceList" />
+        app:layout_constraintTop_toBottomOf="@+id/maintList" />
 
     <ListView
-        android:id="@+id/maintenanceList"
+        android:id="@+id/maintList"
         android:layout_width="0dp"
         android:layout_height="439dp"
         android:layout_marginEnd="8dp"

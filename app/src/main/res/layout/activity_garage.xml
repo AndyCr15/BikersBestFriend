@@ -30,7 +30,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/bikeDetails"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="200dp"
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
@@ -40,7 +40,9 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bikeTitleReg">
+        app:layout_constraintTop_toBottomOf="@+id/bikeTitleReg"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp">
 
         <TextView
             android:id="@+id/textView3"
@@ -53,7 +55,9 @@
             android:textSize="18sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
     </android.support.constraint.ConstraintLayout>
 
     <Button
@@ -70,7 +74,9 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/bikeDetails"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
 
     <RelativeLayout
         android:id="@+id/addingBikeInfo"
@@ -187,7 +193,8 @@
         android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        tools:layout_editor_absoluteY="28dp" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="16dp" />
 
     <TextView
         android:id="@+id/bikeTitleReg"
@@ -211,6 +218,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/guideline4"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintGuide_percent="0.5"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="192dp" />
 
 </android.support.constraint.ConstraintLayout>

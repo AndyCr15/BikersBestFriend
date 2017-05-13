@@ -1,9 +1,11 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -59,7 +62,7 @@ public class Favourites extends AppCompatActivity {
 
         setContentView(R.layout.activity_favourites);
 
-        ListView listView = (ListView) findViewById(R.id.maintenanceList);
+        ListView listView = (ListView) findViewById(R.id.maintList);
 
         Button seeFavsMap = (Button) findViewById(R.id.seeFavsMap);
 
@@ -98,8 +101,28 @@ public class Favourites extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 Log.i("Removing", "" + favouriteLocations.get(position));
-                favouriteLocations.remove(position);
-                Favourites.arrayAdapter.notifyDataSetChanged();
+
+
+                final int favPosition = position;
+                final Context context = App.getContext();
+
+                new AlertDialog.Builder(Favourites.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Are you sure?")
+                        .setMessage("You're about to remove this favourite forever...")
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i("Removing", "Location");
+                                favouriteLocations.remove(favPosition);
+                                Favourites.arrayAdapter.notifyDataSetChanged();
+                                Toast.makeText(context,"Removed!", Toast.LENGTH_SHORT).show();
+
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+
                 return true;
             }
 

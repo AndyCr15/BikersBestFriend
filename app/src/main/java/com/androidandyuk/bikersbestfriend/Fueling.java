@@ -62,7 +62,7 @@ public class Fueling extends AppCompatActivity {
     }
 
     private void initiateList() {
-        listView = (ListView) findViewById(R.id.maintenanceList);
+        listView = (ListView) findViewById(R.id.maintList);
 
         fuelingDetailsLayout = findViewById(R.id.fuelingDetailsLayout);
 
@@ -74,6 +74,8 @@ public class Fueling extends AppCompatActivity {
 
         listView.setAdapter(arrayAdapter);
         aveMPG(activeBike, lastHowManyFuels);
+
+        setTitle("Fueling: " + bikes.get(activeBike).model);
 
     }
 
