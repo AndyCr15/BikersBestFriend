@@ -37,6 +37,7 @@ public class Fuelling extends AppCompatActivity {
     EditText milesDone;
     EditText petrolPrice;
     EditText litresUsed;
+    EditText mileageText;
     TextView mpgView;
     View fuelingDetailsLayout;
 
@@ -50,34 +51,15 @@ public class Fuelling extends AppCompatActivity {
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
 
+        Log.i("Fuelling", "Loading Fuels");
         loadFuels();
 
         initiateList();
 
-
-//        fuellingDetails test = new fuellingDetails(120, 1.199, 16.25);
-//        bikes.get(activeBike).fuelings.add(test);
-//        fuellingDetails test1 = new fuellingDetails(100, 1.199, 16.25);
-//        fuelings.add(test1);
-//        fuellingDetails test2 = new fuellingDetails(170, 1.199, 16.25);
-//        fuelings.add(test2);
-//        fuellingDetails test3 = new fuellingDetails(120, 1.199, 18.25);
-//        fuelings.add(test3);
-//        fuellingDetails test4 = new fuellingDetails(140, 1.199, 16.25);
-//        fuelings.add(test4);
-//        fuellingDetails test5 = new fuellingDetails(130, 1.199, 16.25);
-//        fuelings.add(test5);
-//        fuellingDetails test6 = new fuellingDetails(120, 1.199, 19.25);
-//        fuelings.add(test6);
-//        fuellingDetails test7 = new fuellingDetails(140, 1.199, 16.25);
-//        fuelings.add(test7);
-//        fuellingDetails test8 = new fuellingDetails(170, 1.199, 19.25);
-//        fuelings.add(test8);
-
-
     }
 
     private void initiateList() {
+        Log.i("Fuelling", "Initiating List");
         listView = (ListView) findViewById(R.id.maintList);
 
         fuelingDetailsLayout = findViewById(R.id.fuelingDetailsLayout);
@@ -85,7 +67,10 @@ public class Fuelling extends AppCompatActivity {
         milesDone = (EditText) findViewById(R.id.milesDone);
         petrolPrice = (EditText) findViewById(R.id.petrolPrice);
         litresUsed = (EditText) findViewById(R.id.litresUsed);
+        mileageText = (EditText) findViewById(R.id.mileage);
 
+
+        Log.i("Fuelling", "Setting arrayAdapter");
         arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bikes.get(activeBike).fuelings);
 
         listView.setAdapter(arrayAdapter);
@@ -129,7 +114,8 @@ public class Fuelling extends AppCompatActivity {
         int miles = Integer.parseInt(milesDone.getText().toString());
         double price = Double.parseDouble(petrolPrice.getText().toString());
         double litres = Double.parseDouble(litresUsed.getText().toString());
-        fuellingDetails today = new fuellingDetails(miles, price, litres);
+        int mileage = Integer.parseInt(mileageText.getText().toString());
+        fuellingDetails today = new fuellingDetails(miles, price, litres, mileage);
         bikes.get(activeBike).fuelings.add(today);
         Collections.sort(bikes.get(activeBike).fuelings);
         arrayAdapter.notifyDataSetChanged();
@@ -238,12 +224,14 @@ public class Fuelling extends AppCompatActivity {
                 ArrayList<String> miles = new ArrayList<>();
                 ArrayList<String> prices = new ArrayList<>();
                 ArrayList<String> litres = new ArrayList<>();
+                ArrayList<String> mileage = new ArrayList<>();
 
                 // I think these are new variables, so likely don't need clearing?
                 fdates.clear();
                 miles.clear();
                 prices.clear();
                 litres.clear();
+                mileage.clear();
 
                 for (fuellingDetails thisLog : thisBike.fuelings) {
 
@@ -251,6 +239,7 @@ public class Fuelling extends AppCompatActivity {
                     miles.add(Integer.toString(thisLog.miles));
                     prices.add(Double.toString(thisLog.price));
                     litres.add(Double.toString(thisLog.litres));
+                    mileage.add(Integer.toString(thisLog.mileage));
 
                 }
 
@@ -259,7 +248,7 @@ public class Fuelling extends AppCompatActivity {
                 ed.putString("miles" + thisBike.bikeId, ObjectSerializer.serialize(miles)).apply();
                 ed.putString("prices" + thisBike.bikeId, ObjectSerializer.serialize(prices)).apply();
                 ed.putString("litres" + thisBike.bikeId, ObjectSerializer.serialize(litres)).apply();
-
+                ed.putString("mileage" + thisBike.bikeId, ObjectSerializer.serialize(mileage)).apply();
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Adding fuellings", "Failed attempt");
@@ -278,12 +267,14 @@ public class Fuelling extends AppCompatActivity {
             ArrayList<String> miles = new ArrayList<>();
             ArrayList<String> prices = new ArrayList<>();
             ArrayList<String> litres = new ArrayList<>();
+            ArrayList<String> mileage = new ArrayList<>();
 
             // I think these are new variables, so likely don't need clearing?
             fdates.clear();
             miles.clear();
             prices.clear();
             litres.clear();
+            mileage.clear();
 
             try {
 
@@ -291,6 +282,7 @@ public class Fuelling extends AppCompatActivity {
                 miles = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("miles" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 prices = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("prices" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 litres = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("litres" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                mileage = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("mileage" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 Log.i("fDates for " + thisBike, "Count :" + fdates.size());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -309,7 +301,7 @@ public class Fuelling extends AppCompatActivity {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        fuellingDetails newLog = new fuellingDetails(Integer.parseInt(miles.get(x)), Double.parseDouble(prices.get(x)), Double.parseDouble(litres.get(x)), thisDate);
+                        fuellingDetails newLog = new fuellingDetails(Integer.parseInt(miles.get(x)), Double.parseDouble(prices.get(x)), Double.parseDouble(litres.get(x)), thisDate, Integer.parseInt(mileage.get(x)));
                         Log.i("Adding", "" + x + "" + newLog);
                         thisBike.fuelings.add(newLog);
                     }

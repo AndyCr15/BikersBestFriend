@@ -28,8 +28,6 @@ import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
-//import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
-
 public class Maintenance extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -58,7 +56,6 @@ public class Maintenance extends AppCompatActivity {
         logString = (EditText) findViewById(R.id.logString);
         logCost = (EditText) findViewById(R.id.logCost);
 
-//        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
 
@@ -230,6 +227,17 @@ public class Maintenance extends AppCompatActivity {
         setTitle("Maintenance: " + bikes.get(activeBike).model);
     }
 
+    public static double calculateMaintSpend(Bike bike){
+        Log.i("Garage","Calculating Spend on " + bike);
+        Log.i("Number of logs","" + bike.maintenanceLogs.size());
+        double spend = 0;
+        for(maintenanceLogDetails log : bike.maintenanceLogs){
+            Log.i("Price","" + log.price);
+            spend += log.price;
+        }
+        return spend;
+    }
+
     public static void saveLogs() {
 
         for (Bike thisBike : bikes) {
@@ -289,7 +297,7 @@ public class Maintenance extends AppCompatActivity {
                 Log.i("Dates for " + thisBike, "Count :" + dates.size());
             } catch (Exception e) {
                 e.printStackTrace();
-                Log.i("Loading details", "Failed attempt");
+                Log.i("Loading Maint Logs", "Failed attempt");
             }
 
             Log.i("Retrieved info" + thisBike, "Log count :" + dates.size());
@@ -317,15 +325,15 @@ public class Maintenance extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i("Logs Activity", "On Pause");
+        Log.i("Maintenance Activity", "On Pause");
         saveLogs();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-//        Log.i("Logs Activity", "On Stop");
-//        saveLogs();
+        Log.i("Maintenance Activity", "On Stop");
+        saveLogs();
     }
 
 

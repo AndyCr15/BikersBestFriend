@@ -16,10 +16,12 @@ public class Bike {
     String serviceDue;
     String MOTdue;
     String yearOfMan;
+    String notes;
+    int estMileage;
     ArrayList<fuellingDetails> fuelings = new ArrayList<>();
     ArrayList<maintenanceLogDetails> maintenanceLogs = new ArrayList<>();
 
-    public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue, String yearOfMan) {
+    public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue, String yearOfMan, String notes, int estMileage) {
         this.bikeId = bikeId;
         this.make = make;
         this.model = model;
@@ -28,6 +30,8 @@ public class Bike {
         this.serviceDue = serviceDue;
         this.MOTdue = MOTdue;
         this.yearOfMan = yearOfMan;
+        this.notes = notes;
+        this.estMileage = estMileage;
         // no bikeCount increment as this is only used by loading bikes, which restores the old bikeCount anyway
     }
 

@@ -66,16 +66,23 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        weatherText = (TextView) findViewById(R.id.weatherView);
+        Log.i("Main Activity", "onCreate");
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        Log.i("Main Activity", "sharedPrefs init");
 
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
 
+        Log.i("Main Activity", "Loading Shared Prefs");
         loadBikes();
+        loadFuels();
+        loadLogs();
 
-        Log.i("Main Activity", "onCreate");
+        weatherText = (TextView) findViewById(R.id.weatherView);
 
-// download the weather
+//      download the weather
         DownloadTask task = new DownloadTask();
 
         task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
@@ -89,9 +96,8 @@ public class MainActivity extends AppCompatActivity {
 //
 //        }
 
-
         // Obtain the FirebaseAnalytics instance.
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
 
         userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
 
@@ -149,8 +155,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToFueling(View view) {
-        Intent intent = new Intent(getApplicationContext(), Fuelling.class);
-        startActivity(intent);
+        if (bikes.size() > 0) {
+            Intent intent = new Intent(getApplicationContext(), Fuelling.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(MainActivity.this, "Add a bike in your Garage first", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void groupRideClicked(View view) {
@@ -259,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void saveBikes() {
-
+        Log.i("Main Activity", "Saving Bikes");
         ed.putInt("bikeCount", Bike.bikeCount).apply();
         ed.putInt("bikesSize", bikes.size()).apply();
 
@@ -275,6 +285,8 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> serviceDue = new ArrayList<>();
                 ArrayList<String> MOTdue = new ArrayList<>();
                 ArrayList<String> yearOfMan = new ArrayList<>();
+                ArrayList<String> notes = new ArrayList<>();
+                ArrayList<String> estMileage = new ArrayList<>();
 
                 // I think these are new variables, so likely don't need clearing?
                 make.clear();
@@ -285,6 +297,8 @@ public class MainActivity extends AppCompatActivity {
                 serviceDue.clear();
                 MOTdue.clear();
                 yearOfMan.clear();
+                notes.clear();
+                estMileage.clear();
 
                 make.add(thisBike.make);
                 model.add(thisBike.model);
@@ -294,6 +308,8 @@ public class MainActivity extends AppCompatActivity {
                 serviceDue.add(thisBike.serviceDue);
                 MOTdue.add(thisBike.MOTdue);
                 yearOfMan.add(thisBike.yearOfMan);
+                notes.add(thisBike.notes);
+                estMileage.add(Integer.toString(thisBike.estMileage));
 
                 Log.i("Saving Bikes", "Size :" + bikes.size());
                 ed.putString("make" + i, ObjectSerializer.serialize(make)).apply();
@@ -304,6 +320,8 @@ public class MainActivity extends AppCompatActivity {
                 ed.putString("serviceDue" + i, ObjectSerializer.serialize(serviceDue)).apply();
                 ed.putString("MOTdue" + i, ObjectSerializer.serialize(MOTdue)).apply();
                 ed.putString("yearOfMan" + i, ObjectSerializer.serialize(yearOfMan)).apply();
+                ed.putString("notes" + i, ObjectSerializer.serialize(notes)).apply();
+                ed.putString("estMileage" + i, ObjectSerializer.serialize(estMileage)).apply();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -314,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static void loadBikes() {
-
+        Log.i("Main Activity", "Bikes Loading");
         int bikesSize = sharedPreferences.getInt("bikesSize", 0);
 
         bikes.clear();
@@ -329,6 +347,8 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> serviceDue = new ArrayList<>();
             ArrayList<String> MOTdue = new ArrayList<>();
             ArrayList<String> yearOfMan = new ArrayList<>();
+            ArrayList<String> notes = new ArrayList<>();
+            ArrayList<String> estMileage = new ArrayList<>();
 
             // I think these are new variables, so likely don't need clearing?
             make.clear();
@@ -339,6 +359,8 @@ public class MainActivity extends AppCompatActivity {
             serviceDue.clear();
             MOTdue.clear();
             yearOfMan.clear();
+            notes.clear();
+            estMileage.clear();
 
             try {
 
@@ -350,6 +372,8 @@ public class MainActivity extends AppCompatActivity {
                 serviceDue = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("serviceDue" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 MOTdue = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("MOTdue" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 yearOfMan = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("yearOfMan" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                notes = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("notes" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                estMileage = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("estMileage" + i, ObjectSerializer.serialize(new ArrayList<String>())));
 
                 Log.i("Bikes Restored ", "Count :" + make.size());
             } catch (Exception e) {
@@ -364,7 +388,8 @@ public class MainActivity extends AppCompatActivity {
                     // we've checked each item has the same amount of info, nothing is missing
                     for (int x = 0; x < make.size(); x++) {
                         int thisId = Integer.parseInt(bikeId.get(x));
-                        Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), yearOfMan.get(x));
+                        int thisEstMileage = Integer.parseInt(estMileage.get(x));
+                        Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), yearOfMan.get(x), notes.get(x), thisEstMileage);
                         Log.i("Adding", "" + x + "" + newBike);
                         bikes.add(newBike);
                     }

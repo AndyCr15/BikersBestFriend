@@ -102,116 +102,6 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/guideline4" />
 
-    <RelativeLayout
-        android:id="@+id/addingBikeInfo"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:alpha="0.8"
-        android:background="@color/colorPrimary"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            tools:layout_editor_absoluteX="8dp"
-            tools:layout_editor_absoluteY="8dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/editText2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?attr/colorButtonNormal"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:padding="5dp"
-                    android:text="Make"
-                    android:textSize="18sp" />
-
-                <EditText
-                    android:id="@+id/bikeMake"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/editText4"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?attr/colorButtonNormal"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:padding="5dp"
-                    android:text="Model"
-                    android:textSize="18sp" />
-
-                <EditText
-                    android:id="@+id/bikeModel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/editText5"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:background="?attr/colorButtonNormal"
-                    android:ems="10"
-                    android:inputType="textPersonName"
-                    android:padding="5dp"
-                    android:text="Year of Make"
-                    android:textSize="18sp" />
-
-                <EditText
-                    android:id="@+id/bikeReg"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1" />
-
-            </LinearLayout>
-
-            <Button
-                android:id="@+id/button7"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="addNewBike"
-                android:text="Add Bike" />
-
-        </LinearLayout>
-
-    </RelativeLayout>
-
     <LinearLayout
         android:id="@+id/bikeDetails"
         android:layout_width="0dp"
@@ -229,8 +119,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/addingBikeInfo"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="@+id/bikeTitle"
+        app:layout_constraintVertical_bias="0.35000002">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -289,34 +179,34 @@
         </LinearLayout>
 
         <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp">
-
-        <TextView
-            android:id="@+id/mileageText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:background="?attr/colorButtonNormal"
-            android:text="Estimated Mileage"
-            android:textAlignment="center"
-            android:textSize="18sp" />
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
 
-        <TextView
-            android:id="@+id/estMileage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            android:layout_weight="2"
-            android:background="?attr/colorButtonNormal"
-            android:text="tbc"
-            android:textAlignment="center"
-            android:textSize="18sp" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/mileageText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="?attr/colorButtonNormal"
+                android:text="Estimated Mileage"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/estMileage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:layout_weight="2"
+                android:background="?attr/colorButtonNormal"
+                android:text="tbc"
+                android:textAlignment="center"
+                android:textSize="18sp" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -379,5 +269,122 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/addingBikeInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:alpha="0.8"
+        android:background="?attr/colorButtonNormal"
+        android:elevation="24dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/editText2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:text="Make"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/bikeMake"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="2"
+                    android:background="@color/colorPrimary"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/editText4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:text="Model"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/bikeModel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="2"
+                    android:background="@color/colorPrimary"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/editText5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="1"
+                    android:background="@color/colorPrimary"
+                    android:text="Year of Make"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+                <EditText
+                    android:id="@+id/bikeReg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="8dp"
+                    android:layout_weight="2"
+                    android:background="@color/colorPrimary"
+                    android:textAlignment="center"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/button7"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="addNewBike"
+                android:text="Add Bike" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

@@ -19,6 +19,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
+import static com.androidandyuk.bikersbestfriend.Maintenance.calculateMaintSpend;
+
 public class Garage extends AppCompatActivity {
 
     public static ArrayList<Bike> bikes = new ArrayList<>();
@@ -30,6 +32,8 @@ public class Garage extends AppCompatActivity {
     EditText bikeModel;
     EditText bikeReg;
     TextView aveMPG;
+    TextView bikeEstMileage;
+    TextView amountSpent;
 
     TextView bikeTitle;
     TextView bikeTitleReg;
@@ -43,18 +47,20 @@ public class Garage extends AppCompatActivity {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        if (bikes.size() == 0) {
-            // for testing
-            Bike newBike = new Bike("KTM", "Superduke R", "2016");
-            bikes.add(newBike);
-            Bike newBike2 = new Bike("Honda", "CB1000R", "2011");
-            bikes.add(newBike2);
-        }
+//        if (bikes.size() == 0) {
+//            // for testing
+//            Bike newBike = new Bike("KTM", "Superduke R", "2016");
+//            bikes.add(newBike);
+//            Bike newBike2 = new Bike("Honda", "CB1000R", "2011");
+//            bikes.add(newBike2);
+//        }
 
         // for adding a new bike
         bikeMake = (EditText) findViewById(R.id.bikeMake);
         bikeModel = (EditText) findViewById(R.id.bikeModel);
         bikeReg = (EditText) findViewById(R.id.bikeReg);
+        bikeEstMileage = (TextView) findViewById(R.id.estMileage);
+        amountSpent = (TextView) findViewById(R.id.amountSpent);
 
         Log.i("Active Bike", "" + activeBike);
 
@@ -66,11 +72,19 @@ public class Garage extends AppCompatActivity {
         bikeTitle = (TextView) findViewById(R.id.bikeTitle);
         bikeTitleReg = (TextView) findViewById(R.id.bikeTitleReg);
         aveMPG = (TextView) findViewById(R.id.aveMPG);
+        bikeEstMileage = (TextView) findViewById(R.id.estMileage);
+        amountSpent = (TextView) findViewById(R.id.amountSpent);
 
         if (bikes.size() > 0) {
             bikeTitle.setText(bikes.get(activeBike).yearOfMan + " " + bikes.get(activeBike).model);
             bikeTitleReg.setText(bikes.get(activeBike).registration);
-            aveMPG.setText(Fuelling.aveMPG(activeBike,10));
+            aveMPG.setText(Fuelling.aveMPG(activeBike, 10));
+            String spend = "£" + Double.toString(calculateMaintSpend(bikes.get(activeBike)));
+            amountSpent.setText(spend);
+            if (bikes.get(activeBike).estMileage > 0) {
+                bikeEstMileage.setText(Integer.toString(bikes.get(activeBike).estMileage));
+            }
+
         }
     }
 
@@ -129,14 +143,11 @@ public class Garage extends AppCompatActivity {
                         Fuelling.saveFuels();
                         activeBike = bikes.size() - 1;
                         onBackPressed();
-                        Toast.makeText(Garage.this,"Removed!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(Garage.this, "Removed!", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .setNegativeButton("No", null)
                 .show();
-
-
-
 
 
     }
@@ -213,4 +224,9 @@ public class Garage extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        garageSetup();
+    }
 }

@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import java.text.ParseException;
 import java.util.Date;
 
+import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
 /**
@@ -18,22 +19,30 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
     double price;
     double litres;
     double mpg;
+    int mileage = 0;
 
-    public fuellingDetails(int miles, double price, double litres) {
+    public fuellingDetails(int miles, double price, double litres, int mileage) {
         this.miles = miles;
         this.price = price;
         this.litres = litres;
         mpg = miles / (litres / 4.54609);
         Date fuelDate = new Date();
         this.date = sdf.format(fuelDate);
+        if(mileage == 0) {
+            Garage.bikes.get(activeBike).estMileage += miles;
+            return;
+        } else if (mileage > 0) {
+            Garage.bikes.get(activeBike).estMileage = mileage;
+        }
     }
 
-    public fuellingDetails(int miles, double price, double litres, Date date) {
+    public fuellingDetails(int miles, double price, double litres, Date date, int mileage) {
         this.miles = miles;
         this.price = price;
         this.litres = litres;
         mpg = miles / (litres / 4.54609);
         this.date = sdf.format(date);
+        this.mileage = mileage;
     }
 
     public int getMiles() {
