@@ -1,8 +1,10 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -96,31 +99,42 @@ public class Garage extends AppCompatActivity {
 
         garageSetup();
 
-        // Check if no view has focus.  view should be whatever layout you just used
-        View view2 = this.getCurrentFocus();
-        if (view2 != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view2.getWindowToken(), 0);
-        }
-
         // hide keyboard
         View viewAddBike = this.getCurrentFocus();
         if (viewAddBike != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(viewAddBike.getWindowToken(), 0);
         }
+        onBackPressed();
     }
 
-    public void deleteBike(View view){
-        Log.i("Delete Bike", ""+bikes.get(activeBike));
+    public void deleteBike(View view) {
+        Log.i("Delete Bike", "" + bikes.get(activeBike));
 
-        bikes.remove(activeBike);
-        MainActivity.saveBikes();
-        Maintenance.saveLogs();
-        Fuelling.saveFuels();
-        activeBike = bikes.size() - 1;
-        //update viewing bike info
-        //update menu options
+        // add warning
+        new AlertDialog.Builder(Garage.this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle("Are you sure?")
+                .setMessage("You're about to remove this bike and all it's data forever...")
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.i("Removing", "Bike");
+                        bikes.remove(activeBike);
+                        MainActivity.saveBikes();
+                        Maintenance.saveLogs();
+                        Fuelling.saveFuels();
+                        activeBike = bikes.size() - 1;
+                        onBackPressed();
+                        Toast.makeText(Garage.this,"Removed!", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+
+
+
+
 
     }
 

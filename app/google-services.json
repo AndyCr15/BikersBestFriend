@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "575608120308",
+    "firebase_url": "https://bikersbestfriend.firebaseio.com",
+    "project_id": "bikersbestfriend",
+    "storage_bucket": "bikersbestfriend.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575608120308:android:2ea9db9808b1ef57",
+        "android_client_info": {
+          "package_name": "com.androidandyuk.bikersbestfriend"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "575608120308-itb5lp1db7s9dbh11fgdk0to9cps1g4m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.androidandyuk.bikersbestfriend",
+            "certificate_hash": "4fc4e949725f2ecef655554c896ef128275e2d75"
+          }
+        },
+        {
+          "client_id": "575608120308-19oqoh9l95egv5tceuohtroecnvdo66o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQOxFgDxZS4M_xM89OjnyfEpr26gksOY0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "575608120308-19oqoh9l95egv5tceuohtroecnvdo66o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
