@@ -313,7 +313,6 @@ public class Maintenance extends AppCompatActivity {
         super.onPause();
         Log.i("Logs Activity", "On Pause");
         saveLogs();
-
     }
 
     @Override
@@ -321,7 +320,6 @@ public class Maintenance extends AppCompatActivity {
         super.onStop();
 //        Log.i("Logs Activity", "On Stop");
 //        saveLogs();
-
     }
 
 

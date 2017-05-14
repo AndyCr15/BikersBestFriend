@@ -1,5 +1,6 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -34,9 +36,9 @@ public class Garage extends AppCompatActivity {
 
         if (bikes.size() == 0) {
             // for testing
-            Bike newBike = new Bike("KTM", "SDR", "SR66 YTW");
+            Bike newBike = new Bike("KTM", "Superduke R", "2016");
             bikes.add(newBike);
-            Bike newBike2 = new Bike("Honda", "CB1000R", "REG1");
+            Bike newBike2 = new Bike("Honda", "CB1000R", "2011");
             bikes.add(newBike2);
         }
 
@@ -88,6 +90,13 @@ public class Garage extends AppCompatActivity {
         activeBike = bikes.size() - 1;
 
         garageSetup();
+
+        // Check if no view has focus.  view should be whatever layout you just used
+        View view2 = this.getCurrentFocus();
+        if (view2 != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view2.getWindowToken(), 0);
+        }
 
     }
 

@@ -1,5 +1,6 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.icu.text.SimpleDateFormat;
@@ -31,11 +32,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 
+import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
+import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,7 +45,10 @@ public class MainActivity extends AppCompatActivity {
     LocationManager locationManager;
     LocationListener locationListener;
 
-        public static LatLng userLatLng;
+    static SharedPreferences sharedPreferences;
+    static SharedPreferences.Editor ed;
+
+    public static LatLng userLatLng;
     public static JSONObject jsonObject;
     public static TextView weatherText;
     public static String localForecast;
@@ -55,7 +59,47 @@ public class MainActivity extends AppCompatActivity {
     static markedLocation user;
     static double conversion = 0.621;
     static Geocoder geocoder;
-    static SharedPreferences sharedPreferences;
+//    static SharedPreferences sharedPreferences;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        weatherText = (TextView) findViewById(R.id.weatherView);
+
+        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
+        ed = sharedPreferences.edit();
+
+        loadBikes();
+
+        Log.i("Main Activity", "onCreate");
+
+        // download the weather
+        DownloadTask task = new DownloadTask();
+
+        task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
+
+//        if(user.location != null) {
+//            //change this to be users location
+//            double userLat = user.location.latitude;
+//            double userLon = user.location.longitude;
+//            String userLocation = "lat=" + userLat + "&lon=" + userLon;
+//            task.execute("http://api.openweathermap.org/data/2.5/weather?" + userLocation + "&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
+//
+//        }
+
+
+        // Obtain the FirebaseAnalytics instance.
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
+
+        user = new markedLocation("You", "", userLatLng, "");
+
+        initialiseTracks();
+
+    }
 
 
     @Override
@@ -118,48 +162,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        weatherText = (TextView)findViewById(R.id.weatherView);
-
-        Log.i("Main Activity", "onCreate");
-
-        // download the weather
-        DownloadTask task = new DownloadTask();
-
-        task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
-
-//        if(user.location != null) {
-//            //change this to be users location
-//            double userLat = user.location.latitude;
-//            double userLon = user.location.longitude;
-//            String userLocation = "lat=" + userLat + "&lon=" + userLon;
-//            task.execute("http://api.openweathermap.org/data/2.5/weather?" + userLocation + "&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
-//
-//        }
-
-
-        // Obtain the FirebaseAnalytics instance.
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
-
-        user = new markedLocation("You", "", userLatLng, "");
-
-        initialiseTracks();
-
-    }
-
-
-
-
     public void initialiseTracks() {
 
         if (RaceTracks.trackLocations.size() == 0) {
-            Log.i("Initialising Tracks","Started");
+            Log.i("Initialising Tracks", "Started");
             RaceTracks.trackLocations.add(new markedLocation("Brands Hatch", new LatLng(51.3598711, 0.2586481), ""));
             RaceTracks.trackLocations.add(new markedLocation("Silverstone", new LatLng(52.0733006, -1.0168521), ""));
             RaceTracks.trackLocations.add(new markedLocation("Snetterton", new LatLng(52.4636482, 0.9436173), ""));
@@ -250,82 +256,138 @@ public class MainActivity extends AppCompatActivity {
 
         }
     }
+
     public static void saveBikes() {
-        Log.i("Shared Prefs", "Saving Logs");
 
-        try {
+        ed.putInt("bikeCount", Bike.bikeCount).apply();
+        ed.putInt("bikesSize", bikes.size()).apply();
 
-            ArrayList<String> dates = new ArrayList<>();
-            ArrayList<String> logs = new ArrayList<>();
-            ArrayList<String> costs = new ArrayList<>();
+        int i = 0;
+        for (Bike thisBike : bikes) {
+            Log.i("Saving Bikes", "" + thisBike);
+            try {
+                ArrayList<String> make = new ArrayList<>();
+                ArrayList<String> model = new ArrayList<>();
+                ArrayList<String> reg = new ArrayList<>();
+                ArrayList<String> bikeId = new ArrayList<>();
+                ArrayList<String> VIN = new ArrayList<>();
+                ArrayList<String> serviceDue = new ArrayList<>();
+                ArrayList<String> MOTdue = new ArrayList<>();
+                ArrayList<String> yearOfMan = new ArrayList<>();
 
-            for (int i = 0; i < bikes.size(); i++) {
+                // I think these are new variables, so likely don't need clearing?
+                make.clear();
+                model.clear();
+                reg.clear();
+                bikeId.clear();
+                VIN.clear();
+                serviceDue.clear();
+                MOTdue.clear();
+                yearOfMan.clear();
 
-                for (maintenanceLogDetails thisLog : bikes.get(i).maintenanceLogs) {
+                make.add(thisBike.make);
+                model.add(thisBike.model);
+                reg.add(thisBike.registration);
+                bikeId.add(Integer.toString(thisBike.bikeId));
+                VIN.add(thisBike.VIN);
+                serviceDue.add(thisBike.serviceDue);
+                MOTdue.add(thisBike.MOTdue);
+                yearOfMan.add(thisBike.yearOfMan);
 
-                    dates.add(thisLog.date);
-                    logs.add(thisLog.log);
-                    costs.add(Double.toString(thisLog.price));
+                Log.i("Saving Bikes", "Size :" + bikes.size());
+                ed.putString("make" + i, ObjectSerializer.serialize(make)).apply();
+                ed.putString("model" + i, ObjectSerializer.serialize(model)).apply();
+                ed.putString("reg" + i, ObjectSerializer.serialize(reg)).apply();
+                ed.putString("bikeId" + i, ObjectSerializer.serialize(bikeId)).apply();
+                ed.putString("VIN" + i, ObjectSerializer.serialize(VIN)).apply();
+                ed.putString("serviceDue" + i, ObjectSerializer.serialize(serviceDue)).apply();
+                ed.putString("MOTdue" + i, ObjectSerializer.serialize(MOTdue)).apply();
+                ed.putString("yearOfMan" + i, ObjectSerializer.serialize(yearOfMan)).apply();
 
-                }
-
-                sharedPreferences.edit().putString("dates", ObjectSerializer.serialize(dates)).apply();
-                sharedPreferences.edit().putString("logs", ObjectSerializer.serialize(logs)).apply();
-                sharedPreferences.edit().putString("costs", ObjectSerializer.serialize(costs)).apply();
-
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Adding details", "Failed attempt");
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            i++;
         }
     }
 
     public static void loadBikes() {
-        Log.i("Shared Prefs", "Loading Logs");
 
-        ArrayList<String> bikeID = new ArrayList<>();
-        ArrayList<String> dates = new ArrayList<>();
-        ArrayList<String> logs = new ArrayList<>();
-        ArrayList<String> costs = new ArrayList<>();
+        int bikesSize = sharedPreferences.getInt("bikesSize", 0);
 
-        // I think these are new variables, so likely don't need clearing?
-        bikeID.clear();
-        dates.clear();
-        logs.clear();
-        costs.clear();
+        bikes.clear();
 
-        for (int i = 0; i < bikes.size(); i++) {
-            bikes.get(i).maintenanceLogs.clear();
+        for (int i = 0; i < bikesSize; i++) {
+
+            ArrayList<String> make = new ArrayList<>();
+            ArrayList<String> model = new ArrayList<>();
+            ArrayList<String> reg = new ArrayList<>();
+            ArrayList<String> bikeId = new ArrayList<>();
+            ArrayList<String> VIN = new ArrayList<>();
+            ArrayList<String> serviceDue = new ArrayList<>();
+            ArrayList<String> MOTdue = new ArrayList<>();
+            ArrayList<String> yearOfMan = new ArrayList<>();
+
+            // I think these are new variables, so likely don't need clearing?
+            make.clear();
+            model.clear();
+            reg.clear();
+            bikeId.clear();
+            VIN.clear();
+            serviceDue.clear();
+            MOTdue.clear();
+            yearOfMan.clear();
 
             try {
 
-                bikeID = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("bikeID", ObjectSerializer.serialize(new ArrayList<String>())));
-                dates = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("dates", ObjectSerializer.serialize(new ArrayList<String>())));
-                logs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("logs", ObjectSerializer.serialize(new ArrayList<String>())));
-                costs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("costs", ObjectSerializer.serialize(new ArrayList<String>())));
+                make = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("make" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                model = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("model" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                reg = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("reg" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                bikeId = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("bikeId" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                VIN = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("VIN" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                serviceDue = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("serviceDue" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                MOTdue = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("MOTdue" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                yearOfMan = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("yearOfMan" + i, ObjectSerializer.serialize(new ArrayList<String>())));
 
+                Log.i("Bikes Restored ", "Count :" + make.size());
             } catch (Exception e) {
                 e.printStackTrace();
+                Log.i("Loading Bikes", "Failed attempt");
             }
 
-            if (bikeID.size() > 0 && dates.size() > 0 && logs.size() > 0 && costs.size() > 0) {
+            Log.i("Retrieved info", "Log count :" + make.size());
+            if (make.size() > 0 && model.size() > 0 && bikeId.size() > 0) {
                 // we've checked there is some info
-                if (bikeID.size() == dates.size() && logs.size() == costs.size()) {
+                if (make.size() == model.size() && model.size() == bikeId.size()) {
                     // we've checked each item has the same amount of info, nothing is missing
-
-                    for (int x = 0; x < bikeID.size(); x++) {
-
-                        Date thisDate = new Date();
-                        try {
-                            thisDate = sdf.parse(dates.get(x));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        maintenanceLogDetails newLog = new maintenanceLogDetails(logs.get(x), Double.parseDouble(costs.get(x)), thisDate);
-                        bikes.get(i).maintenanceLogs.add(newLog);
+                    for (int x = 0; x < make.size(); x++) {
+                        int thisId = Integer.parseInt(bikeId.get(x));
+                        Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), yearOfMan.get(x));
+                        Log.i("Adding", "" + x + "" + newBike);
+                        bikes.add(newBike);
                     }
 
                 }
             }
+            Bike.bikeCount = sharedPreferences.getInt("bikeCount", 0);
+            loadLogs();
+            loadFuels();
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("Logs Activity", "On Pause");
+        saveBikes();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("Logs Activity", "On Stop");
+        saveBikes();
+    }
+
 }

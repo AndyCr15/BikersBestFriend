@@ -1,5 +1,6 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.icu.text.DecimalFormat;
 import android.os.Bundle;
@@ -13,10 +14,15 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 
 import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
+import static com.androidandyuk.bikersbestfriend.Maintenance.ed;
 
 public class Fuelling extends AppCompatActivity {
 
@@ -35,6 +41,11 @@ public class Fuelling extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fueling);
+
+        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
+        ed = sharedPreferences.edit();
+
+        loadFuels();
 
         initiateList();
 
@@ -206,4 +217,101 @@ public class Fuelling extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static void saveFuels() {
+
+        for (Bike thisBike : bikes) {
+
+            Log.i("Saving Fuellings", "" + thisBike);
+            try {
+                ArrayList<String> fdates = new ArrayList<>();
+                ArrayList<String> miles = new ArrayList<>();
+                ArrayList<String> prices = new ArrayList<>();
+                ArrayList<String> litres = new ArrayList<>();
+
+                // I think these are new variables, so likely don't need clearing?
+                fdates.clear();
+                miles.clear();
+                prices.clear();
+                litres.clear();
+
+                for (fuellingDetails thisLog : thisBike.fuelings) {
+
+                    fdates.add(thisLog.date);
+                    miles.add(Integer.toString(thisLog.miles));
+                    prices.add(Double.toString(thisLog.price));
+                    litres.add(Double.toString(thisLog.litres));
+
+                }
+
+                Log.i("Saving Fuels", "Size :" + fdates.size());
+                ed.putString("fdates" + thisBike.bikeId, ObjectSerializer.serialize(fdates)).apply();
+                ed.putString("miles" + thisBike.bikeId, ObjectSerializer.serialize(miles)).apply();
+                ed.putString("prices" + thisBike.bikeId, ObjectSerializer.serialize(prices)).apply();
+                ed.putString("litres" + thisBike.bikeId, ObjectSerializer.serialize(litres)).apply();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Adding fuellings", "Failed attempt");
+            }
+        }
+    }
+
+    public static void loadFuels() {
+
+        for (Bike thisBike : bikes) {
+            thisBike.fuelings.clear();
+
+            Log.i("Loading Fuels", "" + thisBike);
+
+            ArrayList<String> fdates = new ArrayList<>();
+            ArrayList<String> miles = new ArrayList<>();
+            ArrayList<String> prices = new ArrayList<>();
+            ArrayList<String> litres = new ArrayList<>();
+
+            // I think these are new variables, so likely don't need clearing?
+            fdates.clear();
+            miles.clear();
+            prices.clear();
+            litres.clear();
+
+            try {
+
+                fdates = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("fdates" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                miles = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("miles" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                prices = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("prices" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                litres = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("litres" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                Log.i("fDates for " + thisBike, "Count :" + fdates.size());
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Loading details", "Failed attempt");
+            }
+
+            Log.i("Retrieved info" + thisBike, "Log count :" + fdates.size());
+            if (fdates.size() > 0 && miles.size() > 0 && prices.size() > 0 && litres.size() > 0) {
+                // we've checked there is some info
+                if (fdates.size() == miles.size() && miles.size() == prices.size() && prices.size() == litres.size()) {
+                    // we've checked each item has the same amount of info, nothing is missing
+                    for (int x = 0; x < fdates.size(); x++) {
+                        Date thisDate = new Date();
+                        try {
+                            thisDate = sdf.parse(fdates.get(x));
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        fuellingDetails newLog = new fuellingDetails(Integer.parseInt(miles.get(x)), Double.parseDouble(prices.get(x)), Double.parseDouble(litres.get(x)), thisDate);
+                        Log.i("Adding", "" + x + "" + newLog);
+                        thisBike.fuelings.add(newLog);
+                    }
+
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("Fuelling Activity", "On Pause");
+        saveFuels();
+    }
 }

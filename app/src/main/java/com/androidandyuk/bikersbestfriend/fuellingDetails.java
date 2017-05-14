@@ -28,6 +28,14 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         this.date = sdf.format(fuelDate);
     }
 
+    public fuellingDetails(int miles, double price, double litres, Date date) {
+        this.miles = miles;
+        this.price = price;
+        this.litres = litres;
+        mpg = miles / (litres / 4.54609);
+        this.date = sdf.format(date);
+    }
+
     public int getMiles() {
         return miles;
     }
