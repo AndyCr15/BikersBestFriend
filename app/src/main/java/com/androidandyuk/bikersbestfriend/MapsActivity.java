@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 
 import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MainActivity.geocoder;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 
@@ -53,6 +54,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                Log.i("Last Known Lct updated", "" + lastKnownLocation);
 
                 //centerMapOnLocation(lastKnownLocation, "Your location");
 
@@ -95,7 +98,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         LatLng selectedLatLng = new LatLng(location.getLatitude(), location.getLongitude());
 
-        mMap.clear();
+        //mMap.clear();
 
         if (title != "Your location") {
 
@@ -114,6 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
+            Log.i("Center View on User","LK Location updated");
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
             MainActivity.user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
@@ -169,6 +173,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("Fav selected", "" + temp.name);
             } else if (favItem == 9998) {
                 showMarkers(favouriteLocations, 0);
+            }
+        }
+
+        if (type.equals("Hot")) {
+            if (favItem < 9998) {
+                // focus on favourite location
+                markedLocation temp = hotspotLocations.get(favItem);
+                centerMapOnLocation(temp.location, temp.name);
+                Log.i("Hot spot selected", "" + temp.name);
+            } else if (favItem == 9998) {
+                showMarkers(hotspotLocations, 0);
             }
         }
 
@@ -288,7 +303,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Toast.makeText(this, "Location " + locality + " saved", Toast.LENGTH_SHORT).show();
     }
-
 
 
     @Override

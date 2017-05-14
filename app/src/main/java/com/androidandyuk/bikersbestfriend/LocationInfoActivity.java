@@ -18,6 +18,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MapsActivity.showMarkers;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 
@@ -66,7 +67,7 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
         }
         int favItem = intent.getIntExtra("placeNumber", 9999);
 
-        if (type.equals("Fav") || type.equals("Hot")) {
+        if (type.equals("Fav")) {
             if (favItem < 9998) {
                 // focus on favourite location
                 temp = favouriteLocations.get(favItem);
@@ -80,6 +81,19 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
             }
         }
 
+        if (type.equals("Hot")) {
+            if (favItem < 9998) {
+                // focus on favourite location
+                temp = hotspotLocations.get(favItem);
+                centerMapOnLocation(temp.location, temp.name);
+                Log.i("Hot Spot selected", "" + temp.name);
+                locationName.setText(temp.name);
+                locationAddress.setText(temp.address);
+                locationComment.setText(temp.comment);
+            } else if (favItem == 9998) {
+                showMarkers(hotspotLocations, 0);
+            }
+        }
 
         if (type.equals("Track")) {
             if (favItem < 9998) {
