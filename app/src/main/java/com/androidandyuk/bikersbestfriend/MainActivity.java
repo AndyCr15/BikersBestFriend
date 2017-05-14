@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     public static LatLng userLatLng;
     public static JSONObject jsonObject;
     public static TextView weatherText;
-    public static String localForecast;
+    public static String currentForecast;
 
     public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy");
     public static SimpleDateFormat sdfShort = new SimpleDateFormat("dd MMM");
@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.i("Main Activity", "onCreate");
 
-        // download the weather
+// download the weather
         DownloadTask task = new DownloadTask();
 
         task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
@@ -243,8 +243,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.i("main", jsonPart.getString("main"));
                         Log.i("description", jsonPart.getString("description"));
 
-                        localForecast = jsonPart.getString("main");
-                        weatherText.setText("Today's forecast: " + localForecast);
+                        currentForecast = jsonPart.getString("main");
+                        weatherText.setText("Today's forecast: " + currentForecast);
+
                     }
 
 

@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,37 +25,17 @@ public class Favourites extends AppCompatActivity {
     static ArrayList<markedLocation> favouriteLocations = new ArrayList<>();
     static ArrayAdapter arrayAdapter;
     static SharedPreferences sharedPreferences;
+    private FirebaseAnalytics mFirebaseAnalytics;
     Button seeFavsMap;
 
-    public void addFav(View view) {
-        Log.i("Add Favs", "");
-        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-        intent.putExtra("Type", "Fav");
-        startActivity(intent);
-    }
-
-    public void viewFavourites(View view) {
-        Log.i("View Favs", "called");
-        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-        // 9998 tells the Maps activity to show all the markers
-        intent.putExtra("placeNumber", 9998);
-        intent.putExtra("Type", "Fav");
-        startActivity(intent);
-    }
-
-    public void sortMyList() {
-        Log.i("Sort List", "" + favouriteLocations.size());
-        if (favouriteLocations.size() > 0) {
-            Collections.sort(favouriteLocations);
-            arrayAdapter.notifyDataSetChanged();
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Log.i("Favourites", "onCreate");
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
 
@@ -128,6 +109,30 @@ public class Favourites extends AppCompatActivity {
 
         });
 
+    }
+
+    public void addFav(View view) {
+        Log.i("Add Favs", "");
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        intent.putExtra("Type", "Fav");
+        startActivity(intent);
+    }
+
+    public void viewFavourites(View view) {
+        Log.i("View Favs", "called");
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        // 9998 tells the Maps activity to show all the markers
+        intent.putExtra("placeNumber", 9998);
+        intent.putExtra("Type", "Fav");
+        startActivity(intent);
+    }
+
+    public void sortMyList() {
+        Log.i("Sort List", "" + favouriteLocations.size());
+        if (favouriteLocations.size() > 0) {
+            Collections.sort(favouriteLocations);
+            arrayAdapter.notifyDataSetChanged();
+        }
     }
 
     public static void saveFavs() {

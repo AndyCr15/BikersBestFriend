@@ -17,6 +17,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +31,8 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 //import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 
 public class Maintenance extends AppCompatActivity {
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     static SharedPreferences sharedPreferences;
     static SharedPreferences.Editor ed;
@@ -46,6 +50,8 @@ public class Maintenance extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maintenance_log);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         logDetails = findViewById(R.id.logDetails);
 

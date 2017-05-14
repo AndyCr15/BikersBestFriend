@@ -12,12 +12,15 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.ArrayList;
 
 public class Garage extends AppCompatActivity {
 
     public static ArrayList<Bike> bikes = new ArrayList<>();
 
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     View addingBikeInfo;
     EditText bikeMake;
@@ -33,6 +36,8 @@ public class Garage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_garage);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         if (bikes.size() == 0) {
             // for testing
@@ -58,7 +63,7 @@ public class Garage extends AppCompatActivity {
         bikeTitleReg = (TextView) findViewById(R.id.bikeTitleReg);
 
         if (bikes.size() > 0) {
-            bikeTitle.setText(bikes.get(activeBike).make + " " + bikes.get(activeBike).model);
+            bikeTitle.setText(bikes.get(activeBike).yearOfMan + " " + bikes.get(activeBike).model);
             bikeTitleReg.setText(bikes.get(activeBike).registration);
         }
     }
@@ -97,6 +102,25 @@ public class Garage extends AppCompatActivity {
             InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view2.getWindowToken(), 0);
         }
+
+        // hide keyboard
+        View viewAddBike = this.getCurrentFocus();
+        if (viewAddBike != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public void deleteBike(View view){
+        Log.i("Delete Bike", ""+bikes.get(activeBike));
+
+        bikes.remove(activeBike);
+        MainActivity.saveBikes();
+        Maintenance.saveLogs();
+        Fuelling.saveFuels();
+        activeBike = bikes.size() - 1;
+        //update viewing bike info
+        //update menu options
 
     }
 

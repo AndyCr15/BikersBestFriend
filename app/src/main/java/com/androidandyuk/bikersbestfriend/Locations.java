@@ -6,19 +6,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
-import static com.androidandyuk.bikersbestfriend.MainActivity.localForecast;
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import static com.androidandyuk.bikersbestfriend.MainActivity.currentForecast;
 import static com.androidandyuk.bikersbestfriend.MainActivity.weatherText;
 
 public class Locations extends AppCompatActivity {
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locations);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
         weatherText = (TextView)findViewById(R.id.weatherView);
         // take weather found in MainActivity
-        weatherText.setText("Today's forecast: " + localForecast);
+        weatherText.setText("Today's forecast: " + currentForecast);
     }
 
     public void goToFavourites(View view) {

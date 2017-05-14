@@ -9,6 +9,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.List;
 public class RaceTracks extends AppCompatActivity {
     static List<markedLocation> trackLocations = new ArrayList<>();
     static ArrayAdapter arrayAdapter;
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
 
     public void viewTracks(View view) {
@@ -41,6 +45,7 @@ public class RaceTracks extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_race_tracks);
 
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         Log.i("Race Tracks", "onCreate");
 

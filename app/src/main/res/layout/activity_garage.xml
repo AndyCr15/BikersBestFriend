@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:alpha="0.8"
         android:background="@color/colorPrimary"
-        android:visibility="gone"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
@@ -107,11 +107,14 @@
                 <TextView
                     android:id="@+id/editText2"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="?attr/colorButtonNormal"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:text="Make" />
+                    android:padding="5dp"
+                    android:text="Make"
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/bikeMake"
@@ -130,11 +133,14 @@
                 <TextView
                     android:id="@+id/editText4"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="?attr/colorButtonNormal"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:text="Model" />
+                    android:padding="5dp"
+                    android:text="Model"
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/bikeModel"
@@ -153,11 +159,14 @@
                 <TextView
                     android:id="@+id/editText5"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:background="?attr/colorButtonNormal"
                     android:ems="10"
                     android:inputType="textPersonName"
-                    android:text="Reg" />
+                    android:padding="5dp"
+                    android:text="Year of Make"
+                    android:textSize="18sp" />
 
                 <EditText
                     android:id="@+id/bikeReg"
@@ -221,5 +230,16 @@
         app:layout_constraintGuide_percent="0.5"
         tools:layout_editor_absoluteY="0dp"
         tools:layout_editor_absoluteX="192dp" />
+
+    <Button
+        android:id="@+id/button11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:onClick="deleteBike"
+        android:text="Delete Bike"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

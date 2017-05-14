@@ -25,6 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,99 +39,18 @@ import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private static GoogleMap mMap;
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     LocationManager locationManager;
 
     LocationListener locationListener;
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-                Log.i("Last Known Lct updated", "" + lastKnownLocation);
-
-                //centerMapOnLocation(lastKnownLocation, "Your location");
-
-            }
-
-
-        }
-
-    }
-
-    public static void showMarkers(List<markedLocation> markedLocations, int colour) {
-        Log.i("Show Markers", "called");
-        //mMap.clear();
-        for (markedLocation location : markedLocations) {
-            Log.i("Marking", "" + location.getLocation());
-            mMap.addMarker(new MarkerOptions().position(location.getLocation()).title(location.name));
-        }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 8));
-    }
-
-    public void centerMapOnLocation(LatLng latLng, String title) {
-
-        Log.i("Maps Activity", "Center on map - latLng");
-
-        mMap.clear();
-
-        if (title != "Your location") {
-
-            mMap.addMarker(new MarkerOptions().position(latLng).title(title));
-
-        }
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
-
-    }
-
-    public void centerMapOnLocation(Location location, String title) {
-
-        Log.i("Maps Activity", "Center on map - location");
-
-        LatLng selectedLatLng = new LatLng(location.getLatitude(), location.getLongitude());
-
-        //mMap.clear();
-
-        if (title != "Your location") {
-
-            mMap.addMarker(new MarkerOptions().position(selectedLatLng).title(title));
-
-        }
-
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 14));
-
-    }
-
-    public void centerMapOnUser(View view) {
-        Log.i("Center View on User", "called");
-
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-
-            Log.i("Center View on User","LK Location updated");
-            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-
-            MainActivity.user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
-
-            centerMapOnLocation(lastKnownLocation, "Your location");
-        }
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         Log.i("Maps Activity", "onCreate");
 
@@ -252,6 +172,92 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                Log.i("Last Known Lct updated", "" + lastKnownLocation);
+
+                //centerMapOnLocation(lastKnownLocation, "Your location");
+
+            }
+
+
+        }
+
+    }
+
+    public static void showMarkers(List<markedLocation> markedLocations, int colour) {
+        Log.i("Show Markers", "called");
+        //mMap.clear();
+        for (markedLocation location : markedLocations) {
+            Log.i("Marking", "" + location.getLocation());
+            mMap.addMarker(new MarkerOptions().position(location.getLocation()).title(location.name));
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 8));
+    }
+
+    public void centerMapOnLocation(LatLng latLng, String title) {
+
+        Log.i("Maps Activity", "Center on map - latLng");
+
+        mMap.clear();
+
+        if (title != "Your location") {
+
+            mMap.addMarker(new MarkerOptions().position(latLng).title(title));
+
+        }
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+
+    }
+
+    public void centerMapOnLocation(Location location, String title) {
+
+        Log.i("Maps Activity", "Center on map - location");
+
+        LatLng selectedLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        //mMap.clear();
+
+        if (title != "Your location") {
+
+            mMap.addMarker(new MarkerOptions().position(selectedLatLng).title(title));
+
+        }
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLatLng, 14));
+
+    }
+
+    public void centerMapOnUser(View view) {
+        Log.i("Center View on User", "called");
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+            Log.i("Center View on User","LK Location updated");
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            MainActivity.user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+
+            centerMapOnLocation(lastKnownLocation, "Your location");
+        }
+
+    }
+
+
 
     @Override
     public void onMapLongClick(LatLng latLng) {

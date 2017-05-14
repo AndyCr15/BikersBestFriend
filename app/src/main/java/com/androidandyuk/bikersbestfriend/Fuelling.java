@@ -14,6 +14,8 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,6 +29,7 @@ import static com.androidandyuk.bikersbestfriend.Maintenance.ed;
 public class Fuelling extends AppCompatActivity {
 
     static ArrayAdapter arrayAdapter;
+    private FirebaseAnalytics mFirebaseAnalytics;
     static SharedPreferences sharedPreferences;
     static int lastHowManyFuels = 10;
 
@@ -41,6 +44,8 @@ public class Fuelling extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fueling);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();

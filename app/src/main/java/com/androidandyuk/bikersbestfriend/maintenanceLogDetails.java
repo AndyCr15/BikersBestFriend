@@ -17,7 +17,6 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
     String log;
     double price;
 
-
     public maintenanceLogDetails(String log) {
         this.log = log;
         Date logDate = new Date();
