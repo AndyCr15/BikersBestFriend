@@ -29,6 +29,7 @@ public class Garage extends AppCompatActivity {
     EditText bikeMake;
     EditText bikeModel;
     EditText bikeReg;
+    TextView aveMPG;
 
     TextView bikeTitle;
     TextView bikeTitleReg;
@@ -64,10 +65,12 @@ public class Garage extends AppCompatActivity {
     public void garageSetup() {
         bikeTitle = (TextView) findViewById(R.id.bikeTitle);
         bikeTitleReg = (TextView) findViewById(R.id.bikeTitleReg);
+        aveMPG = (TextView) findViewById(R.id.aveMPG);
 
         if (bikes.size() > 0) {
             bikeTitle.setText(bikes.get(activeBike).yearOfMan + " " + bikes.get(activeBike).model);
             bikeTitleReg.setText(bikes.get(activeBike).registration);
+            aveMPG.setText(Fuelling.aveMPG(activeBike,10));
         }
     }
 

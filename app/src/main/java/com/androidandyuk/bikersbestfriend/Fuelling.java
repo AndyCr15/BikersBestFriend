@@ -89,7 +89,8 @@ public class Fuelling extends AppCompatActivity {
         arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bikes.get(activeBike).fuelings);
 
         listView.setAdapter(arrayAdapter);
-        aveMPG(activeBike, lastHowManyFuels);
+
+        updateAveMPG();
 
         setTitle("Fuelling: " + bikes.get(activeBike).model);
 
@@ -102,7 +103,7 @@ public class Fuelling extends AppCompatActivity {
 
     }
 
-    public double aveMPG(int bikeID, int numberOfFuelings) {
+    public static String aveMPG(int bikeID, int numberOfFuelings) {
         double totalMiles = 0;
         double totalLitres = 0;
         int count = 0;
@@ -120,7 +121,8 @@ public class Fuelling extends AppCompatActivity {
         }
         Log.i("Calculating MPG", "" + count);
         double mpg = totalMiles / (totalLitres / 4.54609);
-        return mpg;
+        DecimalFormat numberFormat = new DecimalFormat("#.0");
+        return numberFormat.format(mpg);
     }
 
     public void addFueling(View view) {
@@ -133,17 +135,7 @@ public class Fuelling extends AppCompatActivity {
         arrayAdapter.notifyDataSetChanged();
         fuelingDetailsLayout.setVisibility(View.INVISIBLE);
 
-        TextView mpgView = (TextView) findViewById(R.id.mpgView);
-
-        DecimalFormat df = new DecimalFormat();
-        df.setMaximumFractionDigits(2);
-
-        int fuelingsForAve = lastHowManyFuels;
-
-        if (bikes.get(activeBike).fuelings.size() < fuelingsForAve) {
-            fuelingsForAve = bikes.get(activeBike).fuelings.size();
-        }
-        mpgView.setText("Ave MPG over the last " + fuelingsForAve + " stops is " + df.format(aveMPG(activeBike, fuelingsForAve)) + " mpg");
+        updateAveMPG();
 
         // clear previous entries
         milesDone.setText(null);
@@ -153,6 +145,20 @@ public class Fuelling extends AppCompatActivity {
         litresUsed.setText(null);
         litresUsed.clearFocus();
 
+    }
+
+    public void updateAveMPG() {
+
+        TextView mpgView = (TextView) findViewById(R.id.mpgView);
+
+        int fuelingsForAve = lastHowManyFuels;
+
+        if (bikes.get(activeBike).fuelings.size() < fuelingsForAve) {
+            fuelingsForAve = bikes.get(activeBike).fuelings.size();
+        }
+        mpgView.setText("Ave MPG over the last " + fuelingsForAve + " stops is " +
+
+                aveMPG(activeBike, fuelingsForAve) + " mpg");
     }
 
     @Override
