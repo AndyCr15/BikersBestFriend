@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import java.text.ParseException;
 import java.util.Date;
 
-import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
 /**

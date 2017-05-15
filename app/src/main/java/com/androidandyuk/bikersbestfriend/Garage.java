@@ -15,10 +15,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
 import static com.androidandyuk.bikersbestfriend.Maintenance.calculateMaintSpend;
 
@@ -27,6 +30,10 @@ public class Garage extends AppCompatActivity {
     public static ArrayList<Bike> bikes = new ArrayList<>();
 
     private FirebaseAnalytics mFirebaseAnalytics;
+
+    private static final String TAG = "MainActivity";
+
+    private AdView mAdView;
 
     View addingBikeInfo;
     EditText bikeMake;
@@ -40,14 +47,16 @@ public class Garage extends AppCompatActivity {
     TextView bikeTitleReg;
     EditText bikeNotes;
 
-    public static int activeBike;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_garage);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
 //        if (bikes.size() == 0) {
 //            // for testing
@@ -146,35 +155,39 @@ public class Garage extends AppCompatActivity {
     }
 
     public void deleteBike(View view) {
-        Log.i("Delete Bike", "" + bikes.get(activeBike));
 
-        // add warning
-        new AlertDialog.Builder(Garage.this)
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setTitle("Are you sure?")
-                .setMessage("You're about to remove this bike and all it's data forever...")
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Log.i("Removing", "Bike");
-                        bikes.remove(activeBike);
-                        MainActivity.saveBikes();
-                        Maintenance.saveLogs();
-                        Fuelling.saveFuels();
-                        activeBike = bikes.size() - 1;
-                        onBackPressed();
-                        Toast.makeText(Garage.this, "Removed!", Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .setNegativeButton("No", null)
-                .show();
+        if (activeBike > -1) {
+            Log.i("Delete Bike", "" + bikes.get(activeBike));
 
+            // add warning
+            new AlertDialog.Builder(Garage.this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Are you sure?")
+                    .setMessage("You're about to remove this bike and all it's data forever...")
+                    .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Log.i("Removing", "Bike");
+                            bikes.remove(activeBike);
+                            MainActivity.saveBikes();
+                            Maintenance.saveLogs();
+                            Fuelling.saveFuels();
+                            activeBike = bikes.size() - 1;
+                            onBackPressed();
+                            Toast.makeText(Garage.this, "Removed!", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
 
+        }
     }
 
     public void goToMaintenanceLog(View view) {
-        Intent intent = new Intent(getApplicationContext(), Maintenance.class);
-        startActivity(intent);
+        if (activeBike > -1) {
+            Intent intent = new Intent(getApplicationContext(), Maintenance.class);
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -253,7 +266,10 @@ public class Garage extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         bikeNotes = (EditText) findViewById(R.id.bikeNotes);
-        bikes.get(activeBike).notes = bikeNotes.getText().toString();
+        // check there's actually a bike before saving the notes
+        if (bikeNotes != null && bikes.size() > 0) {
+            bikes.get(activeBike).notes = bikeNotes.getText().toString();
+        }
     }
 
     @Override

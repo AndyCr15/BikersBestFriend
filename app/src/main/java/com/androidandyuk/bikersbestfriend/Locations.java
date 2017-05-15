@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.currentForecast;
@@ -15,12 +17,20 @@ public class Locations extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    private static final String TAG = "MainActivity";
+
+    private AdView mAdView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locations);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         weatherText = (TextView)findViewById(R.id.weatherView);
         // take weather found in MainActivity

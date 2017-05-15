@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
-import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.Maintenance.ed;

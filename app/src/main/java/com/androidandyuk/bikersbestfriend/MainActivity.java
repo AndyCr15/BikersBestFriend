@@ -1,8 +1,6 @@
 package com.androidandyuk.bikersbestfriend;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.icu.text.DecimalFormat;
 import android.icu.text.SimpleDateFormat;
 import android.location.Geocoder;
@@ -20,6 +18,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,8 +48,9 @@ public class MainActivity extends AppCompatActivity {
     LocationManager locationManager;
     LocationListener locationListener;
 
-    static SharedPreferences sharedPreferences;
-    static SharedPreferences.Editor ed;
+    private static final String TAG = "MainActivity";
+
+    private AdView mAdView;
 
     public static LatLng userLatLng;
     public static JSONObject jsonObject;
@@ -61,12 +64,16 @@ public class MainActivity extends AppCompatActivity {
     static double conversion = 0.621;
     static Geocoder geocoder;
 
+    public static int activeBike;
+
     public static final DecimalFormat precision = new DecimalFormat("0.00");
 
 //    static SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+//        setTheme(R.style.AppTheme);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -74,21 +81,18 @@ public class MainActivity extends AppCompatActivity {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        Log.i("Main Activity", "sharedPrefs init");
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
-        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
-        ed = sharedPreferences.edit();
+        // check if there are any bikes
+        if (bikes.size() == 0) {
+            activeBike = -1;
+        }
 
-        Log.i("Main Activity", "Loading Shared Prefs");
-        loadBikes();
-        loadFuels();
-        loadLogs();
-
+        //      download the weather
         weatherText = (TextView) findViewById(R.id.weatherView);
-
-//      download the weather
         DownloadTask task = new DownloadTask();
-
         task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
 
 //        if(user.location != null) {
@@ -107,10 +111,9 @@ public class MainActivity extends AppCompatActivity {
 
         user = new markedLocation("You", "", userLatLng, "");
 
-        initialiseTracks();
+
 
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -159,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToFueling(View view) {
-        if (bikes.size() > 0) {
+        if (activeBike > -1) {
             Intent intent = new Intent(getApplicationContext(), Fuelling.class);
             startActivity(intent);
         } else {
@@ -176,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void initialiseTracks() {
+    public static void initialiseTracks() {
 
         if (RaceTracks.trackLocations.size() == 0) {
             Log.i("Initialising Tracks", "Started");
