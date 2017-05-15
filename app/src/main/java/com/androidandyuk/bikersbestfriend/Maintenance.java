@@ -130,24 +130,32 @@ public class Maintenance extends AppCompatActivity {
         }
 
         String logInfo = logString.getText().toString();
-        maintenanceLogDetails today = new maintenanceLogDetails(logInfo, cost);
-        bikes.get(activeBike).maintenanceLogs.add(today);
-        Collections.sort(bikes.get(activeBike).maintenanceLogs);
-        arrayAdapter.notifyDataSetChanged();
-        logDetails.setVisibility(View.INVISIBLE);
 
-        logString.setText(null);
-        logString.clearFocus();
-        logCost.setText(null);
-        logCost.clearFocus();
+        // check information has been entered
+        if (logInfo.isEmpty()) {
 
-        // Check if no view has focus:
-        View logDetails = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            Toast.makeText(Maintenance.this, "Please complete all necessary details", Toast.LENGTH_LONG).show();
+
+        } else {
+
+            maintenanceLogDetails today = new maintenanceLogDetails(logInfo, cost);
+            bikes.get(activeBike).maintenanceLogs.add(today);
+            Collections.sort(bikes.get(activeBike).maintenanceLogs);
+            arrayAdapter.notifyDataSetChanged();
+            logDetails.setVisibility(View.INVISIBLE);
+
+            logString.setText(null);
+            logString.clearFocus();
+            logCost.setText(null);
+            logCost.clearFocus();
+
+            // Check if no view has focus:
+            View logDetails = this.getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
-
     }
 
     @Override
@@ -335,6 +343,5 @@ public class Maintenance extends AppCompatActivity {
         Log.i("Maintenance Activity", "On Stop");
         saveLogs();
     }
-
 
 }

@@ -111,6 +111,7 @@
                 android:background="?attr/colorButtonNormal"
                 android:hint="Enter miles"
                 android:textAlignment="center"
+                android:inputType="numberDecimal"
                 android:textSize="18sp" />
 
         </LinearLayout>
@@ -140,6 +141,7 @@
                 android:background="?attr/colorButtonNormal"
                 android:hint="Enter price"
                 android:textAlignment="center"
+                android:inputType="numberDecimal"
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -168,6 +170,7 @@
                 android:background="?attr/colorButtonNormal"
                 android:hint="Enter litres"
                 android:textAlignment="center"
+                android:inputType="numberDecimal"
                 android:textSize="18sp" />
         </LinearLayout>
 
@@ -196,6 +199,7 @@
                 android:background="?attr/colorButtonNormal"
                 android:hint="Mileage"
                 android:textAlignment="center"
+                android:inputType="number"
                 android:textSize="18sp" />
         </LinearLayout>
 

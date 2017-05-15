@@ -3,6 +3,7 @@ package com.androidandyuk.bikersbestfriend;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.icu.text.DecimalFormat;
 import android.icu.text.SimpleDateFormat;
 import android.location.Geocoder;
 import android.location.LocationListener;
@@ -59,6 +60,9 @@ public class MainActivity extends AppCompatActivity {
     static markedLocation user;
     static double conversion = 0.621;
     static Geocoder geocoder;
+
+    public static final DecimalFormat precision = new DecimalFormat("0.00");
+
 //    static SharedPreferences sharedPreferences;
 
     @Override

@@ -9,10 +9,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -25,6 +27,7 @@ import static com.androidandyuk.bikersbestfriend.Garage.activeBike;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.Maintenance.ed;
+import static com.androidandyuk.bikersbestfriend.R.id.mileage;
 
 public class Fuelling extends AppCompatActivity {
 
@@ -67,7 +70,7 @@ public class Fuelling extends AppCompatActivity {
         milesDone = (EditText) findViewById(R.id.milesDone);
         petrolPrice = (EditText) findViewById(R.id.petrolPrice);
         litresUsed = (EditText) findViewById(R.id.litresUsed);
-        mileageText = (EditText) findViewById(R.id.mileage);
+        mileageText = (EditText) findViewById(mileage);
 
 
         Log.i("Fuelling", "Setting arrayAdapter");
@@ -111,26 +114,44 @@ public class Fuelling extends AppCompatActivity {
     }
 
     public void addFueling(View view) {
-        int miles = Integer.parseInt(milesDone.getText().toString());
-        double price = Double.parseDouble(petrolPrice.getText().toString());
-        double litres = Double.parseDouble(litresUsed.getText().toString());
-        int mileage = Integer.parseInt(mileageText.getText().toString());
-        fuellingDetails today = new fuellingDetails(miles, price, litres, mileage);
-        bikes.get(activeBike).fuelings.add(today);
-        Collections.sort(bikes.get(activeBike).fuelings);
-        arrayAdapter.notifyDataSetChanged();
-        fuelingDetailsLayout.setVisibility(View.INVISIBLE);
+        // only add the details if all three important details have information in
+        if (milesDone.getText().toString().isEmpty() || petrolPrice.getText().toString().isEmpty() || litresUsed.getText().toString().isEmpty()) {
 
-        updateAveMPG();
+            Toast.makeText(Fuelling.this, "Please complete all necessary details", Toast.LENGTH_LONG).show();
 
-        // clear previous entries
-        milesDone.setText(null);
-        milesDone.clearFocus();
-        petrolPrice.setText(null);
-        petrolPrice.clearFocus();
-        litresUsed.setText(null);
-        litresUsed.clearFocus();
+        } else {
 
+            int miles = Integer.parseInt(milesDone.getText().toString());
+            double price = Double.parseDouble(petrolPrice.getText().toString());
+            double litres = Double.parseDouble(litresUsed.getText().toString());
+            int mileage;
+            if (mileageText.getText().toString().isEmpty()) {
+                mileage = 0;
+            } else {
+                mileage = Integer.parseInt(mileageText.getText().toString());
+            }
+            fuellingDetails today = new fuellingDetails(miles, price, litres, mileage);
+            bikes.get(activeBike).fuelings.add(today);
+            Collections.sort(bikes.get(activeBike).fuelings);
+            arrayAdapter.notifyDataSetChanged();
+            fuelingDetailsLayout.setVisibility(View.INVISIBLE);
+
+            updateAveMPG();
+
+            View thisView = this.getCurrentFocus();
+            if (thisView != null) {
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(thisView.getWindowToken(), 0);
+            }
+
+            // clear previous entries
+            milesDone.setText(null);
+            milesDone.clearFocus();
+            petrolPrice.setText(null);
+            petrolPrice.clearFocus();
+            litresUsed.setText(null);
+            litresUsed.clearFocus();
+        }
     }
 
     public void updateAveMPG() {

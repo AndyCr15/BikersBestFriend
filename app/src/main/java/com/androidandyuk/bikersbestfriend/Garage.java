@@ -19,6 +19,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
 import static com.androidandyuk.bikersbestfriend.Maintenance.calculateMaintSpend;
 
 public class Garage extends AppCompatActivity {
@@ -30,13 +31,14 @@ public class Garage extends AppCompatActivity {
     View addingBikeInfo;
     EditText bikeMake;
     EditText bikeModel;
-    EditText bikeReg;
+    EditText bikeYear;
     TextView aveMPG;
     TextView bikeEstMileage;
     TextView amountSpent;
 
     TextView bikeTitle;
     TextView bikeTitleReg;
+    EditText bikeNotes;
 
     public static int activeBike;
 
@@ -58,7 +60,7 @@ public class Garage extends AppCompatActivity {
         // for adding a new bike
         bikeMake = (EditText) findViewById(R.id.bikeMake);
         bikeModel = (EditText) findViewById(R.id.bikeModel);
-        bikeReg = (EditText) findViewById(R.id.bikeReg);
+        bikeYear = (EditText) findViewById(R.id.bikeYear);
         bikeEstMileage = (TextView) findViewById(R.id.estMileage);
         amountSpent = (TextView) findViewById(R.id.amountSpent);
 
@@ -74,17 +76,20 @@ public class Garage extends AppCompatActivity {
         aveMPG = (TextView) findViewById(R.id.aveMPG);
         bikeEstMileage = (TextView) findViewById(R.id.estMileage);
         amountSpent = (TextView) findViewById(R.id.amountSpent);
+        bikeNotes = (EditText) findViewById(R.id.bikeNotes);
 
+        // check the user has a bike, then set all the views to it's current details
         if (bikes.size() > 0) {
             bikeTitle.setText(bikes.get(activeBike).yearOfMan + " " + bikes.get(activeBike).model);
             bikeTitleReg.setText(bikes.get(activeBike).registration);
             aveMPG.setText(Fuelling.aveMPG(activeBike, 10));
-            String spend = "£" + Double.toString(calculateMaintSpend(bikes.get(activeBike)));
+            // show only 2 decimal places.  Precision is declared in MainActivity to 2 decimal places
+            String spend = "£" + precision.format(calculateMaintSpend(bikes.get(activeBike)));
             amountSpent.setText(spend);
             if (bikes.get(activeBike).estMileage > 0) {
                 bikeEstMileage.setText(Integer.toString(bikes.get(activeBike).estMileage));
             }
-
+            bikeNotes.setText(bikes.get(activeBike).notes);
         }
     }
 
@@ -95,34 +100,49 @@ public class Garage extends AppCompatActivity {
         // clear out any previous details
         bikeMake.setText("");
         bikeModel.setText("");
-        bikeReg.setText("");
+        bikeYear.setText("");
 
         addingBikeInfo.setVisibility(View.VISIBLE);
     }
 
     public void addNewBike(View view) {
-        View addingBikeInfo = findViewById(R.id.addingBikeInfo);
-        addingBikeInfo.setVisibility(View.INVISIBLE);
 
         String make = bikeMake.getText().toString();
         String model = bikeModel.getText().toString();
-        String reg = bikeReg.getText().toString();
+        String year = bikeYear.getText().toString();
 
-        Bike newBike = new Bike(make, model, reg);
+        // check enough details are entered
+        if (make.isEmpty() || model.isEmpty() || year.isEmpty()) {
 
-        bikes.add(newBike);
+            Toast.makeText(Garage.this, "Please complete all necessary details", Toast.LENGTH_LONG).show();
 
-        activeBike = bikes.size() - 1;
+        } else {
 
-        garageSetup();
+            // check the year looks correct
+            if (Integer.parseInt(year) > 1900 && Integer.parseInt(year) < 2050) {
+                Bike newBike = new Bike(make, model, year);
 
-        // hide keyboard
-        View viewAddBike = this.getCurrentFocus();
-        if (viewAddBike != null) {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(viewAddBike.getWindowToken(), 0);
+                bikes.add(newBike);
+
+                activeBike = bikes.size() - 1;
+
+                garageSetup();
+
+                // hide keyboard
+                View viewAddBike = this.getCurrentFocus();
+                if (viewAddBike != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(viewAddBike.getWindowToken(), 0);
+                }
+                View addingBikeInfo = findViewById(R.id.addingBikeInfo);
+                addingBikeInfo.setVisibility(View.INVISIBLE);
+                onBackPressed();
+            } else {
+
+                Toast.makeText(Garage.this, "That year looks unlikely", Toast.LENGTH_LONG).show();
+
+            }
         }
-        onBackPressed();
     }
 
     public void deleteBike(View view) {
@@ -173,6 +193,11 @@ public class Garage extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        // save any changes in Bike notes
+        bikeNotes = (EditText) findViewById(R.id.bikeNotes);
+        bikes.get(activeBike).notes = bikeNotes.getText().toString();
+
+        // change to bike selected
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
@@ -222,6 +247,13 @@ public class Garage extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bikeNotes = (EditText) findViewById(R.id.bikeNotes);
+        bikes.get(activeBike).notes = bikeNotes.getText().toString();
     }
 
     @Override

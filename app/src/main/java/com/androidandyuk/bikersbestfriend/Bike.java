@@ -44,6 +44,7 @@ public class Bike {
         this.serviceDue = "";
         this.MOTdue = "";
         this.yearOfMan = year;
+        this.estMileage = 0;
         bikeCount++;
     }
 
@@ -55,6 +56,7 @@ public class Bike {
         this.serviceDue = "";
         this.MOTdue = "";
         this.yearOfMan = "";
+        this.estMileage = 0;
         bikeCount++;
     }
 

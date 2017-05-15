@@ -45,22 +45,6 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         this.mileage = mileage;
     }
 
-    public int getMiles() {
-        return miles;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public double getLitres() {
-        return litres;
-    }
-
-    public double getMpg() {
-        return mpg;
-    }
-
     @Override
     public String toString() {
         DecimalFormat df = new DecimalFormat();
