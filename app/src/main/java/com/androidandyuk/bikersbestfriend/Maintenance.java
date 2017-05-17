@@ -37,7 +37,6 @@ public class Maintenance extends AppCompatActivity {
     static SharedPreferences.Editor ed;
 
     static ArrayAdapter arrayAdapter;
-
     ListView maintList;
 
     View logDetails;
@@ -72,14 +71,6 @@ public class Maintenance extends AppCompatActivity {
         ed = sharedPreferences.edit();
 
         loadLogs();
-
-
-        //for testing purposes
-        // remove once tested!
-//        if (bikes.get(activeBike).maintenanceLogs.size() == 0) {
-//            maintenanceLogDetails newLog = new maintenanceLogDetails("Testing");
-//            bikes.get(activeBike).maintenanceLogs.add(newLog);
-//        }
 
         initiateList();
 
@@ -136,7 +127,6 @@ public class Maintenance extends AppCompatActivity {
 
 
         });
-
 
     }
 

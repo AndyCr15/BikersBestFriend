@@ -35,6 +35,7 @@ import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MainActivity.geocoder;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
+import static com.androidandyuk.bikersbestfriend.Traffic.trafficEvents;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
@@ -116,6 +117,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("Track selected", "" + temp.name);
             } else if (favItem == 9998) {
                 showMarkers(trackLocations, 0);
+            }
+        }
+
+        if (type.equals("Traffic")) {
+            if (favItem < 9998) {
+//                markedLocation temp = Traffic.trafficEvents.get(favItem);
+//                centerMapOnLocation(temp.location, temp.name);
+//                Log.i("Track selected", "" + temp.name);
+            } else if (favItem == 9998) {
+                showTrafficMarkers(trafficEvents, 0);
             }
         }
 
@@ -206,6 +217,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 8));
     }
 
+    public static void showTrafficMarkers(List<TrafficEvent> trafficEvents, int colour) {
+        Log.i("Show Traffic Markers", "called");
+        mMap.clear();
+        for (TrafficEvent location : trafficEvents) {
+            mMap.addMarker(new MarkerOptions().position(location.location).title(location.road));
+        }
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 10));
+    }
+
     public void centerMapOnLocation(LatLng latLng, String title) {
 
         Log.i("Maps Activity", "Center on map - latLng");
@@ -256,8 +276,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
     }
-
-
 
     @Override
     public void onMapLongClick(LatLng latLng) {

@@ -1,21 +1,20 @@
 package com.androidandyuk.bikersbestfriend;
 
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import java.io.BufferedInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -25,6 +24,9 @@ public class Traffic extends AppCompatActivity {
 
     public static ArrayList<TrafficEvent> trafficEvents = new ArrayList<>();
 
+    static ArrayAdapter arrayAdapter;
+    ListView trafficList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,13 +35,19 @@ public class Traffic extends AppCompatActivity {
 //        DownloadTraffic task = new DownloadTraffic();
 //        task.execute("http://m.highways.gov.uk/feeds/rss/AllEvents.xml");
 
+        setTitle("Traffic");
+
+        // download traffic here
+        Log.i("Traffic","Download Here");
+
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             SAXParser parser = parserFactory.newSAXParser();
 
             SAXHandler handler = new SAXHandler();
-            InputSource source = new InputSource(new FileReader("xml/allevents.xml"));
-            source.setEncoding("utf-8");
+
+            Resources res = this.getResources();
+            InputStream source = res.openRawResource(R.raw.allevents);
             parser.parse(source, handler);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
@@ -49,71 +57,31 @@ public class Traffic extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
-        Log.i("Traffic Size", "" + trafficEvents.size());
+        initiateList();
 
     }
 
-    public class DownloadTraffic extends AsyncTask<String, Void, String>{
-
-        @Override
-        protected String doInBackground(String... urls) {
-
-            Log.i("Download Traffic" , "doInBackground");
-
-            String result = "";
-            URL url = null;
-
-
-            try {
-
-                url = new URL("http://m.highways.gov.uk/feeds/rss/AllEvents.xml");
-                URLConnection urlConnection = url.openConnection();
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                InputStreamReader reader = new InputStreamReader(in);
-                int data;
-
-                data = reader.read();
-
-                while (data != -1) {
-
-                    char current = (char) data;
-
-                    result += current;
-
-                    try {
-                        data = reader.read();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                }
-                return result;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            Log.i("Download Traffic" , "onPostExecute");
-
-            SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-            SAXParser parser = null;
-            try {
-                parser = parserFactory.newSAXParser();
-                SAXHandler handler = new SAXHandler();
-                parser.parse(result, handler);
-            } catch (ParserConfigurationException e) {
-                e.printStackTrace();
-            } catch (SAXException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+    private void initiateList() {
+        Collections.sort(trafficEvents);
+        for(int i=0; i < trafficEvents.size();i++){
+            if(trafficEvents.get(i).delay.equals("No Delay")){
+                trafficEvents.remove(i);
             }
         }
+
+        Log.i("Initiating List", "List size " + trafficEvents.size());
+        trafficList = (ListView) findViewById(R.id.trafficList);
+        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, trafficEvents);
+        trafficList.setAdapter(arrayAdapter);
+    }
+
+    public void viewTrafficOnMap(View view){
+        Log.i("Traffic","View on map called");
+        Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+        // 9998 tells the Maps activity to show all the markers
+        intent.putExtra("placeNumber", 9998);
+        intent.putExtra("Type", "Traffic");
+        startActivity(intent);
     }
 
 }

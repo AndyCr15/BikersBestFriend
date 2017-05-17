@@ -10,7 +10,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * Created by AndyCr15 on 16/05/2017.
  */
 
-public class SAXHandler extends DefaultHandler{
+public class SAXHandler extends DefaultHandler {
 
     private TrafficEvent newTrafficEvent;
     private String content;
@@ -20,14 +20,14 @@ public class SAXHandler extends DefaultHandler{
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
-        if(qName.equals("title")){
+        if (qName.equals("title")) {
             newTrafficEvent = new TrafficEvent();
         }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        switch (qName){
+        switch (qName) {
             case "title":
                 newTrafficEvent.title = content;
                 break;
@@ -44,11 +44,14 @@ public class SAXHandler extends DefaultHandler{
             case "longitude":
                 longitude = content;
                 newTrafficEvent.location = new LatLng(Double.parseDouble(latitude), Double.parseDouble(longitude));
-                break;
-            case "description":
-                newTrafficEvent.description = content;
                 Traffic.trafficEvents.add(newTrafficEvent);
                 break;
+//            case "description":
+////                if (newTrafficEvent.description != null) {
+////                    newTrafficEvent.description = content;
+////                }
+//                Traffic.trafficEvents.add(newTrafficEvent);
+//                break;
         }
     }
 

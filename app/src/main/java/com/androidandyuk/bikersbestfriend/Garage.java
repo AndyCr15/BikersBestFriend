@@ -74,6 +74,7 @@ public class Garage extends AppCompatActivity {
         bikeYear = (EditText) findViewById(R.id.bikeYear);
         bikeEstMileage = (TextView) findViewById(R.id.estMileage);
         amountSpent = (TextView) findViewById(R.id.amountSpent);
+        myRegView = (TextView) findViewById(R.id.clickable_reg_view);
 
         Log.i("Active Bike", "" + activeBike);
 
@@ -96,6 +97,8 @@ public class Garage extends AppCompatActivity {
         if (bikes.size() > 0) {
             bikeTitle.setText(bikes.get(activeBike).yearOfMan + " " + bikes.get(activeBike).model);
             aveMPG.setText(Fuelling.aveMPG(activeBike, 10));
+
+            Log.i("Active Bike Reg"," " + (bikes.get(activeBike).registration));
 
             myRegView.setText((bikes.get(activeBike).registration));
             myRegView.requestFocus();
@@ -212,9 +215,11 @@ public class Garage extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.bike_choice, menu);
 
         super.onCreateOptionsMenu(menu);
+        menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
+
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i+1, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
 
         return true;
@@ -231,47 +236,51 @@ public class Garage extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                activeBike = 0;
-                garageSetup();
+                Toast.makeText(Garage.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
             case 1:
                 Log.i("Option", "1");
-                activeBike = 1;
+                activeBike = 0;
                 garageSetup();
                 return true;
             case 2:
                 Log.i("Option", "2");
+                activeBike = 1;
+                garageSetup();
+                return true;
+            case 3:
+                Log.i("Option", "3");
                 activeBike = 2;
                 garageSetup();
                 return true;
             case 4:
-                Log.i("Option", "3");
+                Log.i("Option", "4");
                 activeBike = 3;
                 garageSetup();
                 return true;
             case 5:
-                Log.i("Option", "4");
+                Log.i("Option", "5");
                 activeBike = 4;
                 garageSetup();
                 return true;
             case 6:
-                Log.i("Option", "5");
+                Log.i("Option", "6");
                 activeBike = 5;
                 garageSetup();
                 return true;
             case 7:
-                Log.i("Option", "6");
+                Log.i("Option", "7");
                 activeBike = 6;
                 garageSetup();
                 return true;
             case 8:
-                Log.i("Option", "7");
+                Log.i("Option", "8");
                 activeBike = 7;
                 garageSetup();
                 return true;
-            case 10:
+            case 9:
                 Log.i("Option", "9");
-                activeBike = 9;
+                activeBike = 8;
                 garageSetup();
                 return true;
         }

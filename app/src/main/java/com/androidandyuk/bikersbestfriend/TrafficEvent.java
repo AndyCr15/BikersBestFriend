@@ -15,15 +15,20 @@ public class TrafficEvent implements Comparable<TrafficEvent> {
     String delay;
     String description;
 
-    public TrafficEvent(String title, String road, LatLng location, String delay, String description) {
+    public TrafficEvent(String title, String road, LatLng location, String delay) {
         this.title = title;
         this.road = road;
         this.location = location;
         this.delay = delay;
-        this.description = description;
+//        this.description = description;
     }
 
     public TrafficEvent() {
+        this.title = "";
+        this.road = "";
+        this.location = null;
+        this.delay = "";
+//        this.description = "";
     }
 
     public double getDistance(LatLng o) {
@@ -42,6 +47,11 @@ public class TrafficEvent implements Comparable<TrafficEvent> {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double d = r * c;
         return d;
+    }
+
+    @Override
+    public String toString() {
+        return this.title + " " + this.delay;
     }
 
     @Override

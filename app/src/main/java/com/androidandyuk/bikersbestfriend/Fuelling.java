@@ -1,15 +1,18 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.icu.text.DecimalFormat;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -23,10 +26,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
-import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.Garage.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.Maintenance.ed;
+import static com.androidandyuk.bikersbestfriend.R.id.maintList;
 import static com.androidandyuk.bikersbestfriend.R.id.mileage;
 
 public class Fuelling extends AppCompatActivity {
@@ -44,6 +48,12 @@ public class Fuelling extends AppCompatActivity {
     TextView mpgView;
     View fuelingDetailsLayout;
 
+    // used to store what item might be being edited or deleted
+    int itemLongPressedPosition = 0;
+    fuellingDetails itemLongPressed;
+    String editDate = "";
+    
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,11 +69,64 @@ public class Fuelling extends AppCompatActivity {
 
         initiateList();
 
+        //needed for editing a fueling
+
+
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                itemLongPressedPosition = position;
+                itemLongPressed = bikes.get(activeBike).fuelings.get(position);
+                Log.i("Fuel List", "Tapped " + position);
+
+                milesDone.setText(Integer.toString(bikes.get(activeBike).fuelings.get(position).getMiles()));
+                petrolPrice.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getPrice()));
+                litresUsed.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getLitres()));
+                editDate = bikes.get(activeBike).fuelings.get(position).getDate();
+                bikes.get(activeBike).fuelings.remove(position);
+                fuelingDetailsLayout.setVisibility(View.VISIBLE);
+
+            }
+        });
+
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final int fuelPosition = position;
+                final Context context = App.getContext();
+
+                new AlertDialog.Builder(Fuelling.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Are you sure?")
+                        .setMessage("You're about to delete this log forever...")
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i("Removing", "Log " + fuelPosition);
+                                bikes.get(activeBike).fuelings.remove(fuelPosition);
+                                initiateList();
+                                Toast.makeText(context, "Deleted!", Toast.LENGTH_SHORT).show();
+
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+
+                return true;
+            }
+
+
+        });
+
+
     }
 
     private void initiateList() {
         Log.i("Fuelling", "Initiating List");
-        listView = (ListView) findViewById(R.id.maintList);
+        listView = (ListView) findViewById(maintList);
 
         fuelingDetailsLayout = findViewById(R.id.fuelingDetailsLayout);
 
@@ -177,9 +240,11 @@ public class Fuelling extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.bike_choice, menu);
 
         super.onCreateOptionsMenu(menu);
+        menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
+
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i+1, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
 
         return true;
@@ -191,47 +256,51 @@ public class Fuelling extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                activeBike = 0;
-                initiateList();
+                Toast.makeText(Fuelling.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
             case 1:
                 Log.i("Option", "1");
-                activeBike = 1;
+                activeBike = 0;
                 initiateList();
                 return true;
             case 2:
                 Log.i("Option", "2");
+                activeBike = 1;
+                initiateList();
+                return true;
+            case 3:
+                Log.i("Option", "3");
                 activeBike = 2;
                 initiateList();
                 return true;
             case 4:
-                Log.i("Option", "3");
+                Log.i("Option", "4");
                 activeBike = 3;
                 initiateList();
                 return true;
             case 5:
-                Log.i("Option", "4");
+                Log.i("Option", "5");
                 activeBike = 4;
                 initiateList();
                 return true;
             case 6:
-                Log.i("Option", "5");
+                Log.i("Option", "6");
                 activeBike = 5;
                 initiateList();
                 return true;
             case 7:
-                Log.i("Option", "6");
+                Log.i("Option", "7");
                 activeBike = 6;
                 initiateList();
                 return true;
             case 8:
-                Log.i("Option", "7");
+                Log.i("Option", "8");
                 activeBike = 7;
                 initiateList();
                 return true;
-            case 10:
+            case 9:
                 Log.i("Option", "9");
-                activeBike = 9;
+                activeBike = 8;
                 initiateList();
                 return true;
         }
