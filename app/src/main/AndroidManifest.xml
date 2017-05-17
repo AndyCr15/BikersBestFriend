@@ -8,6 +8,7 @@
          location permissions for the 'MyLocation' functionality. 
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".App"
@@ -31,16 +32,15 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyArj442hrHRXeONxwuaUK8TUZLHrx5hIAo" />
 
-
         <activity
             android:name=".SplashScreen"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:label="Biker&apos;s Best Friend"
@@ -64,8 +64,12 @@
             android:label="@string/title_activity_location_info"
             android:theme="@style/AppTheme" />
         <activity
-            android:name=".Locations"
-            android:label="Locations"
+        android:name=".Locations"
+        android:label="Locations"
+        android:theme="@style/AppTheme" />
+        <activity
+            android:name=".Traffic"
+            android:label="Traffic"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".HotSpots"
@@ -83,7 +87,6 @@
             android:name=".Maintenance"
             android:label="Maintenance Log"
             android:theme="@style/AppTheme" />
-
     </application>
 
 </manifest>

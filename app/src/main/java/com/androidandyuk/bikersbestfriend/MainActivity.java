@@ -6,13 +6,11 @@ import android.icu.text.SimpleDateFormat;
 import android.location.Geocoder;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -117,38 +115,67 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.bike_choice, menu);
 
-        MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.main_menu, menu);
+        super.onCreateOptionsMenu(menu);
 
-        return super.onCreateOptionsMenu(menu);
+        menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
+
+        for (int i = 0; i < bikes.size(); i++) {
+            String bikeMakeMenu = bikes.get(i).model;
+            menu.add(0, i+1, 0, bikeMakeMenu).setShortcut('3', 'c');
+        }
+
+        return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
-            case R.id.settings:
-                Log.i("Menu Item Selected", "Settings");
-                Toast.makeText(MainActivity.this, "Not yet implemented", Toast.LENGTH_LONG).show();
+            case 0:
+                Log.i("Option", "0");
+                Toast.makeText(MainActivity.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
-            case R.id.about:
-                Log.i("Menu Item Selected", "About");
-                Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
-                startActivity(intent);
+            case 1:
+                Log.i("Option", "1");
+                activeBike = 0;
                 return true;
-            case R.id.otherapps:
-                Log.i("Menu Item Selected", "Other Apps");
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/developer?id=AAUK")));
+            case 2:
+                Log.i("Option", "2");
+                activeBike = 1;
                 return true;
-            case R.id.youtube:
-                Log.i("Menu Item Selected", "My YouTube Channel");
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/user/AndroidAndyUK")));
+            case 3:
+                Log.i("Option", "3");
+                activeBike = 2;
                 return true;
-            default:
-                return false;
+            case 4:
+                Log.i("Option", "4");
+                activeBike = 3;
+                return true;
+            case 5:
+                Log.i("Option", "5");
+                activeBike = 4;
+                return true;
+            case 6:
+                Log.i("Option", "6");
+                activeBike = 5;
+                return true;
+            case 7:
+                Log.i("Option", "7");
+                activeBike = 6;
+                return true;
+            case 8:
+                Log.i("Option", "8");
+                activeBike = 7;
+                return true;
+            case 9:
+                Log.i("Option", "9");
+                activeBike = 8;
+                return true;
         }
 
+        return super.onOptionsItemSelected(item);
     }
 
     public void goToLocations(View view) {
@@ -265,7 +292,6 @@ public class MainActivity extends AppCompatActivity {
 
                     }
 
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -291,6 +317,8 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> VIN = new ArrayList<>();
                 ArrayList<String> serviceDue = new ArrayList<>();
                 ArrayList<String> MOTdue = new ArrayList<>();
+                ArrayList<String> lastKnownService = new ArrayList<>();
+                ArrayList<String> lastKnownMOT = new ArrayList<>();
                 ArrayList<String> yearOfMan = new ArrayList<>();
                 ArrayList<String> notes = new ArrayList<>();
                 ArrayList<String> estMileage = new ArrayList<>();
@@ -303,6 +331,8 @@ public class MainActivity extends AppCompatActivity {
                 VIN.clear();
                 serviceDue.clear();
                 MOTdue.clear();
+                lastKnownService.clear();
+                lastKnownMOT.clear();
                 yearOfMan.clear();
                 notes.clear();
                 estMileage.clear();
@@ -314,6 +344,8 @@ public class MainActivity extends AppCompatActivity {
                 VIN.add(thisBike.VIN);
                 serviceDue.add(thisBike.serviceDue);
                 MOTdue.add(thisBike.MOTdue);
+                lastKnownService.add(thisBike.lastKnownService);
+                lastKnownMOT.add(thisBike.lastKnownMOT);
                 yearOfMan.add(thisBike.yearOfMan);
                 notes.add(thisBike.notes);
                 estMileage.add(Integer.toString(thisBike.estMileage));
@@ -326,6 +358,8 @@ public class MainActivity extends AppCompatActivity {
                 ed.putString("VIN" + i, ObjectSerializer.serialize(VIN)).apply();
                 ed.putString("serviceDue" + i, ObjectSerializer.serialize(serviceDue)).apply();
                 ed.putString("MOTdue" + i, ObjectSerializer.serialize(MOTdue)).apply();
+                ed.putString("lastKnownService" + i, ObjectSerializer.serialize(lastKnownService)).apply();
+                ed.putString("lastKnownMOT" + i, ObjectSerializer.serialize(lastKnownMOT)).apply();
                 ed.putString("yearOfMan" + i, ObjectSerializer.serialize(yearOfMan)).apply();
                 ed.putString("notes" + i, ObjectSerializer.serialize(notes)).apply();
                 ed.putString("estMileage" + i, ObjectSerializer.serialize(estMileage)).apply();
@@ -353,6 +387,8 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> VIN = new ArrayList<>();
             ArrayList<String> serviceDue = new ArrayList<>();
             ArrayList<String> MOTdue = new ArrayList<>();
+            ArrayList<String> lastKnownService = new ArrayList<>();
+            ArrayList<String> lastKnownMOT = new ArrayList<>();
             ArrayList<String> yearOfMan = new ArrayList<>();
             ArrayList<String> notes = new ArrayList<>();
             ArrayList<String> estMileage = new ArrayList<>();
@@ -365,6 +401,8 @@ public class MainActivity extends AppCompatActivity {
             VIN.clear();
             serviceDue.clear();
             MOTdue.clear();
+            lastKnownService.clear();
+            lastKnownMOT.clear();
             yearOfMan.clear();
             notes.clear();
             estMileage.clear();
@@ -378,6 +416,8 @@ public class MainActivity extends AppCompatActivity {
                 VIN = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("VIN" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 serviceDue = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("serviceDue" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 MOTdue = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("MOTdue" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                lastKnownService = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("lastKnownService" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                lastKnownMOT = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("lastKnownMOT" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 yearOfMan = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("yearOfMan" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 notes = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("notes" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 estMileage = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("estMileage" + i, ObjectSerializer.serialize(new ArrayList<String>())));
@@ -396,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
                     for (int x = 0; x < make.size(); x++) {
                         int thisId = Integer.parseInt(bikeId.get(x));
                         int thisEstMileage = Integer.parseInt(estMileage.get(x));
-                        Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), yearOfMan.get(x), notes.get(x), thisEstMileage);
+                        Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), lastKnownService.get(x), lastKnownMOT.get(x), yearOfMan.get(x), notes.get(x), thisEstMileage);
                         Log.i("Adding", "" + x + "" + newBike);
                         bikes.add(newBike);
                     }

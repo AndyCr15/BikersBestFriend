@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewSwitcher;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -42,9 +43,10 @@ public class Garage extends AppCompatActivity {
     TextView aveMPG;
     TextView bikeEstMileage;
     TextView amountSpent;
+    TextView myRegView;
 
     TextView bikeTitle;
-    TextView bikeTitleReg;
+    ViewSwitcher regSwitcher;
     EditText bikeNotes;
 
     @Override
@@ -81,17 +83,23 @@ public class Garage extends AppCompatActivity {
 
     public void garageSetup() {
         bikeTitle = (TextView) findViewById(R.id.bikeTitle);
-        bikeTitleReg = (TextView) findViewById(R.id.bikeTitleReg);
+        regSwitcher = (ViewSwitcher) findViewById(R.id.regSwitcher);
         aveMPG = (TextView) findViewById(R.id.aveMPG);
         bikeEstMileage = (TextView) findViewById(R.id.estMileage);
         amountSpent = (TextView) findViewById(R.id.amountSpent);
         bikeNotes = (EditText) findViewById(R.id.bikeNotes);
+        bikeNotes.setSelected(false);
+        myRegView = (TextView) findViewById(R.id.clickable_reg_view);
+
 
         // check the user has a bike, then set all the views to it's current details
         if (bikes.size() > 0) {
             bikeTitle.setText(bikes.get(activeBike).yearOfMan + " " + bikes.get(activeBike).model);
-            bikeTitleReg.setText(bikes.get(activeBike).registration);
             aveMPG.setText(Fuelling.aveMPG(activeBike, 10));
+
+            myRegView.setText((bikes.get(activeBike).registration));
+            myRegView.requestFocus();
+
             // show only 2 decimal places.  Precision is declared in MainActivity to 2 decimal places
             String spend = "£" + precision.format(calculateMaintSpend(bikes.get(activeBike)));
             amountSpent.setText(spend);
@@ -100,6 +108,15 @@ public class Garage extends AppCompatActivity {
             }
             bikeNotes.setText(bikes.get(activeBike).notes);
         }
+    }
+
+    public void TextViewClicked(View view) {
+        ViewSwitcher switcher = (ViewSwitcher) findViewById(R.id.regSwitcher);
+        switcher.showNext(); //or switcher.showPrevious();
+        myRegView = (TextView) switcher.findViewById(R.id.clickable_reg_view);
+        myRegView.setText("");
+        myRegView.setSelected(true);
+        myRegView.requestFocus();
     }
 
     public void addBike(View view) {
@@ -269,6 +286,12 @@ public class Garage extends AppCompatActivity {
         // check there's actually a bike before saving the notes
         if (bikeNotes != null && bikes.size() > 0) {
             bikes.get(activeBike).notes = bikeNotes.getText().toString();
+        }
+
+        myRegView = (EditText) findViewById(R.id.hidden_reg_view);
+        // check there's actually a bike before saving the notes
+        if (myRegView != null && bikes.size() > 0) {
+            bikes.get(activeBike).registration = myRegView.getText().toString();
         }
     }
 

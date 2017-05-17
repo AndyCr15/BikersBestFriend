@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -43,6 +44,14 @@ public class Maintenance extends AppCompatActivity {
 
     EditText logString;
     EditText logCost;
+    EditText logMilage;
+    CheckBox isService;
+    CheckBox isMOT;
+
+    // used to store what item might be being edited or deleted
+    int itemLongPressedPosition = 0;
+    maintenanceLogDetails itemLongPressed;
+    String editDate = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +64,9 @@ public class Maintenance extends AppCompatActivity {
 
         logString = (EditText) findViewById(R.id.logString);
         logCost = (EditText) findViewById(R.id.logCost);
+        logMilage = (EditText) findViewById(R.id.logMileage);
+        isService = (CheckBox) findViewById(R.id.serviceCheckBox);
+        isMOT = (CheckBox) findViewById(R.id.MOTCheckBox);
 
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
@@ -74,9 +86,23 @@ public class Maintenance extends AppCompatActivity {
         maintList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                itemLongPressedPosition = position;
+                itemLongPressed = bikes.get(activeBike).maintenanceLogs.get(position);
+                Log.i("Maint List", "Tapped " + position);
 
-                Log.i("Maint List", "Tapped " + i);
+                logString.setText(bikes.get(activeBike).maintenanceLogs.get(position).getLog());
+                logCost.setText(Double.toString(bikes.get(activeBike).maintenanceLogs.get(position).getPrice()));
+                if (bikes.get(activeBike).maintenanceLogs.get(position).getWasService()) {
+                    isService.setChecked(true);
+                }
+                if (bikes.get(activeBike).maintenanceLogs.get(position).getWasMOT()) {
+                    isMOT.setChecked(true);
+                }
+                editDate = bikes.get(activeBike).maintenanceLogs.get(position).getDate();
+                bikes.get(activeBike).maintenanceLogs.remove(position);
+                logDetails.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -108,6 +134,7 @@ public class Maintenance extends AppCompatActivity {
                 return true;
             }
 
+
         });
 
 
@@ -119,7 +146,11 @@ public class Maintenance extends AppCompatActivity {
         logDetails.setVisibility(View.VISIBLE);
     }
 
-    public void addLog(View view) {
+    public void addClicked(View view){
+        addLog();
+    }
+
+    public void addLog() {
         Log.i("Maintenance", "Taking details and adding");
         Double cost = 0d;
 
@@ -138,7 +169,31 @@ public class Maintenance extends AppCompatActivity {
 
         } else {
 
-            maintenanceLogDetails today = new maintenanceLogDetails(logInfo, cost);
+            isService = (CheckBox) findViewById(R.id.serviceCheckBox);
+            isMOT = (CheckBox) findViewById(R.id.MOTCheckBox);
+
+            int mileage;
+            if (logMilage.getText().toString().isEmpty()) {
+                mileage = 0;
+            } else {
+                mileage = Integer.parseInt(logMilage.getText().toString());
+            }
+
+            Boolean isAService = isService.isChecked();
+            Boolean isAMOT = isMOT.isChecked();
+
+            // check if this is a log that has been edited
+            // if so, carry over the old date
+            // if not, create without a date, which will set it to today
+            String date = editDate;
+            maintenanceLogDetails today = null;
+            if (!date.equals("")) {
+                today = new maintenanceLogDetails(logInfo, cost, date, isAService, isAMOT, mileage);
+                Log.i("Created ","with old date");
+            } else {
+                today = new maintenanceLogDetails(logInfo, cost, isAService, isAMOT, mileage);
+                Log.i("Created ","with new date");
+            }
             bikes.get(activeBike).maintenanceLogs.add(today);
             Collections.sort(bikes.get(activeBike).maintenanceLogs);
             arrayAdapter.notifyDataSetChanged();
@@ -148,12 +203,23 @@ public class Maintenance extends AppCompatActivity {
             logString.clearFocus();
             logCost.setText(null);
             logCost.clearFocus();
+            // needs to be set back to "" to show the next item isn't being edited
+            // unless changed to a date by the onItemClick
+            editDate = "";
+
+            if (isService.isChecked()) {
+                isService.setChecked(false);
+            }
+            if (isMOT.isChecked()) {
+                isMOT.setChecked(false);
+            }
+
 
             // Check if no view has focus:
-            View logDetails = this.getCurrentFocus();
-            if (view != null) {
+            View thisView = this.getCurrentFocus();
+            if (thisView != null) {
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(thisView.getWindowToken(), 0);
             }
         }
     }
@@ -163,9 +229,12 @@ public class Maintenance extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.bike_choice, menu);
 
         super.onCreateOptionsMenu(menu);
+
+        menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
+
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i + 1, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
 
         return true;
@@ -177,47 +246,51 @@ public class Maintenance extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                activeBike = 0;
-                initiateList();
+                Toast.makeText(Maintenance.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
             case 1:
                 Log.i("Option", "1");
-                activeBike = 1;
+                activeBike = 0;
                 initiateList();
                 return true;
             case 2:
                 Log.i("Option", "2");
+                activeBike = 1;
+                initiateList();
+                return true;
+            case 3:
+                Log.i("Option", "3");
                 activeBike = 2;
                 initiateList();
                 return true;
             case 4:
-                Log.i("Option", "3");
+                Log.i("Option", "4");
                 activeBike = 3;
                 initiateList();
                 return true;
             case 5:
-                Log.i("Option", "4");
+                Log.i("Option", "5");
                 activeBike = 4;
                 initiateList();
                 return true;
             case 6:
-                Log.i("Option", "5");
+                Log.i("Option", "6");
                 activeBike = 5;
                 initiateList();
                 return true;
             case 7:
-                Log.i("Option", "6");
+                Log.i("Option", "7");
                 activeBike = 6;
                 initiateList();
                 return true;
             case 8:
-                Log.i("Option", "7");
+                Log.i("Option", "8");
                 activeBike = 7;
                 initiateList();
                 return true;
-            case 10:
+            case 9:
                 Log.i("Option", "9");
-                activeBike = 9;
+                activeBike = 8;
                 initiateList();
                 return true;
         }
@@ -235,12 +308,12 @@ public class Maintenance extends AppCompatActivity {
         setTitle("Maintenance: " + bikes.get(activeBike).model);
     }
 
-    public static double calculateMaintSpend(Bike bike){
-        Log.i("Garage","Calculating Spend on " + bike);
-        Log.i("Number of logs","" + bike.maintenanceLogs.size());
+    public static double calculateMaintSpend(Bike bike) {
+        Log.i("Garage", "Calculating Spend on " + bike);
+        Log.i("Number of logs", "" + bike.maintenanceLogs.size());
         double spend = 0;
-        for(maintenanceLogDetails log : bike.maintenanceLogs){
-            Log.i("Price","" + log.price);
+        for (maintenanceLogDetails log : bike.maintenanceLogs) {
+            Log.i("Price", "" + log.price);
             spend += log.price;
         }
         return spend;
@@ -255,17 +328,23 @@ public class Maintenance extends AppCompatActivity {
                 ArrayList<String> dates = new ArrayList<>();
                 ArrayList<String> logs = new ArrayList<>();
                 ArrayList<String> costs = new ArrayList<>();
+                ArrayList<String> wasService = new ArrayList<>();
+                ArrayList<String> wasMOT = new ArrayList<>();
 
                 // I think these are new variables, so likely don't need clearing?
                 dates.clear();
                 logs.clear();
                 costs.clear();
+                wasService.clear();
+                wasMOT.clear();
 
                 for (maintenanceLogDetails thisLog : thisBike.maintenanceLogs) {
 
                     dates.add(thisLog.date);
                     logs.add(thisLog.log);
                     costs.add(Double.toString(thisLog.price));
+                    wasService.add(String.valueOf(thisLog.wasService));
+                    wasMOT.add(String.valueOf(thisLog.wasMOT));
 
                 }
 
@@ -273,6 +352,8 @@ public class Maintenance extends AppCompatActivity {
                 ed.putString("dates" + thisBike.bikeId, ObjectSerializer.serialize(dates)).apply();
                 ed.putString("logs" + thisBike.bikeId, ObjectSerializer.serialize(logs)).apply();
                 ed.putString("costs" + thisBike.bikeId, ObjectSerializer.serialize(costs)).apply();
+                ed.putString("wasService" + thisBike.bikeId, ObjectSerializer.serialize(wasService)).apply();
+                ed.putString("wasMOT" + thisBike.bikeId, ObjectSerializer.serialize(wasMOT)).apply();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -291,18 +372,26 @@ public class Maintenance extends AppCompatActivity {
             ArrayList<String> dates = new ArrayList<>();
             ArrayList<String> logs = new ArrayList<>();
             ArrayList<String> costs = new ArrayList<>();
+            ArrayList<String> wasService = new ArrayList<>();
+            ArrayList<String> wasMOT = new ArrayList<>();
 
             // I think these are new variables, so likely don't need clearing?
             dates.clear();
             logs.clear();
             costs.clear();
+            wasService.clear();
+            wasMOT.clear();
 
             try {
 
                 dates = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("dates" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 logs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("logs" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 costs = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("costs" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                wasService = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("wasService" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                wasMOT = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("wasMOT" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+
                 Log.i("Dates for " + thisBike, "Count :" + dates.size());
+
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Loading Maint Logs", "Failed attempt");
@@ -320,8 +409,12 @@ public class Maintenance extends AppCompatActivity {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        maintenanceLogDetails newLog = new maintenanceLogDetails(logs.get(x), Double.parseDouble(costs.get(x)), thisDate);
-                        Log.i("Adding", "" + x + "" + newLog);
+                        Log.i("Trying to Add", "" + x);
+                        Log.i("Service " + wasService.get(x), "MOT " + wasMOT.get(x));
+                        Boolean wasItAService = Boolean.valueOf(wasService.get(x));
+                        Boolean wasItAMOT = Boolean.valueOf(wasMOT.get(x));
+                        maintenanceLogDetails newLog = new maintenanceLogDetails(logs.get(x), Double.parseDouble(costs.get(x)), thisDate, wasItAService, wasItAMOT);
+                        Log.i("Added", "" + x + "" + newLog);
                         thisBike.maintenanceLogs.add(newLog);
                     }
 
@@ -334,6 +427,11 @@ public class Maintenance extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.i("Maintenance Activity", "On Pause");
+        Log.i("On Pause", "Edit date " + editDate);
+        if (!editDate.equals("")){
+            Log.i("On Pause","While editing");
+            addLog();
+        }
         saveLogs();
     }
 

@@ -113,7 +113,11 @@ public class Fuelling extends AppCompatActivity {
         return numberFormat.format(mpg);
     }
 
-    public void addFueling(View view) {
+    public void addFuelingClicked (View view){
+        addFueling();
+    }
+
+    public void addFueling() {
         // only add the details if all three important details have information in
         if (milesDone.getText().toString().isEmpty() || petrolPrice.getText().toString().isEmpty() || litresUsed.getText().toString().isEmpty()) {
 

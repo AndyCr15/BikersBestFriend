@@ -94,7 +94,6 @@ public class markedLocation implements Comparable<markedLocation> {
 
     public LatLng getLocation() {
 
-
         return location;
     }
 

@@ -39,7 +39,11 @@ public class Locations extends AppCompatActivity {
 
     public void goToFavourites(View view) {
         Intent intent = new Intent(getApplicationContext(), Favourites.class);
+        startActivity(intent);
+    }
 
+    public void goToTraffic(View view) {
+        Intent intent = new Intent(getApplicationContext(), Traffic.class);
         startActivity(intent);
     }
 

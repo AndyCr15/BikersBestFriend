@@ -60,6 +60,7 @@ public class SplashScreen extends Activity {
         getApplicationContext().setTheme(R.style.AppTheme);
         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
 }
