@@ -13,15 +13,6 @@ public class TrafficEvent implements Comparable<TrafficEvent> {
     String road;
     LatLng location;
     String delay;
-    String description;
-
-    public TrafficEvent(String title, String road, LatLng location, String delay) {
-        this.title = title;
-        this.road = road;
-        this.location = location;
-        this.delay = delay;
-//        this.description = description;
-    }
 
     public TrafficEvent() {
         this.title = "";

@@ -19,11 +19,11 @@ public class Bike {
     String lastKnownMOT;
     String yearOfMan;
     String notes;
-    int estMileage;
+    double estMileage;
     ArrayList<fuellingDetails> fuelings = new ArrayList<>();
     ArrayList<maintenanceLogDetails> maintenanceLogs = new ArrayList<>();
 
-    public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue, String lastKnownService, String lastKnownMOT, String yearOfMan, String notes, int estMileage) {
+    public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue, String lastKnownService, String lastKnownMOT, String yearOfMan, String notes, double estMileage) {
         this.bikeId = bikeId;
         this.make = make;
         this.model = model;

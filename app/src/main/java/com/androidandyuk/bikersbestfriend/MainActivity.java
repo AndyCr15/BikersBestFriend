@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -158,14 +157,6 @@ public class MainActivity extends AppCompatActivity {
             task.execute(userLocationForWeather);
 
         }
-
-        // Obtain the FirebaseAnalytics instance.
-
-
-//        userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
-//
-//        user = new markedLocation("You", "", userLatLng, "");
-
 
         Favourites.loadFavs();
         Favourites.sortMyList();
@@ -412,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
                 lastKnownMOT.add(thisBike.lastKnownMOT);
                 yearOfMan.add(thisBike.yearOfMan);
                 notes.add(thisBike.notes);
-                estMileage.add(Integer.toString(thisBike.estMileage));
+                estMileage.add(Double.toString(thisBike.estMileage));
 
                 Log.i("Saving Bikes", "Size :" + bikes.size());
                 ed.putString("make" + i, ObjectSerializer.serialize(make)).apply();
@@ -499,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
                     // we've checked each item has the same amount of info, nothing is missing
                     for (int x = 0; x < make.size(); x++) {
                         int thisId = Integer.parseInt(bikeId.get(x));
-                        int thisEstMileage = Integer.parseInt(estMileage.get(x));
+                        double thisEstMileage = Double.parseDouble(estMileage.get(x));
                         Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), lastKnownService.get(x), lastKnownMOT.get(x), yearOfMan.get(x), notes.get(x), thisEstMileage);
                         Log.i("Adding", "" + x + "" + newBike);
                         bikes.add(newBike);

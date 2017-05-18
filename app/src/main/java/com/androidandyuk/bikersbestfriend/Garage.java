@@ -111,7 +111,7 @@ public class Garage extends AppCompatActivity {
             String spend = "£" + precision.format(calculateMaintSpend(bikes.get(activeBike)));
             amountSpent.setText(spend);
             if (bikes.get(activeBike).estMileage > 0) {
-                bikeEstMileage.setText(Integer.toString(bikes.get(activeBike).estMileage));
+                bikeEstMileage.setText(Double.toString(bikes.get(activeBike).estMileage));
             }
             bikeNotes.setText(bikes.get(activeBike).notes);
         }

@@ -83,7 +83,7 @@ public class Fuelling extends AppCompatActivity {
                 itemLongPressed = bikes.get(activeBike).fuelings.get(position);
                 Log.i("Fuel List", "Tapped " + position);
 
-                milesDone.setText(Integer.toString(bikes.get(activeBike).fuelings.get(position).getMiles()));
+                milesDone.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getMiles()));
                 petrolPrice.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getPrice()));
                 litresUsed.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getLitres()));
                 editDate = bikes.get(activeBike).fuelings.get(position).getDate();
@@ -192,7 +192,7 @@ public class Fuelling extends AppCompatActivity {
 
         } else {
 
-            int miles = Integer.parseInt(milesDone.getText().toString());
+            double miles = Double.parseDouble(milesDone.getText().toString());
             double price = Double.parseDouble(petrolPrice.getText().toString());
             double litres = Double.parseDouble(litresUsed.getText().toString());
             int mileage;
@@ -337,10 +337,10 @@ public class Fuelling extends AppCompatActivity {
                 for (fuellingDetails thisLog : thisBike.fuelings) {
 
                     fdates.add(thisLog.date);
-                    miles.add(Integer.toString(thisLog.miles));
+                    miles.add(Double.toString(thisLog.miles));
                     prices.add(Double.toString(thisLog.price));
                     litres.add(Double.toString(thisLog.litres));
-                    mileage.add(Integer.toString(thisLog.mileage));
+                    mileage.add(Double.toString(thisLog.mileage));
 
                 }
 
@@ -402,7 +402,7 @@ public class Fuelling extends AppCompatActivity {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        fuellingDetails newLog = new fuellingDetails(Integer.parseInt(miles.get(x)), Double.parseDouble(prices.get(x)), Double.parseDouble(litres.get(x)), thisDate, Integer.parseInt(mileage.get(x)));
+                        fuellingDetails newLog = new fuellingDetails(Double.parseDouble(miles.get(x)), Double.parseDouble(prices.get(x)), Double.parseDouble(litres.get(x)), thisDate, Double.parseDouble(mileage.get(x)));
                         Log.i("Adding", "" + x + "" + newLog);
                         thisBike.fuelings.add(newLog);
                     }

@@ -17,13 +17,13 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
 public class fuellingDetails implements Comparable<fuellingDetails> {
     String date;
-    int miles;
+    double miles;
     double price;
     double litres;
     double mpg;
-    int mileage = 0;
+    double mileage = 0;
 
-    public fuellingDetails(int miles, double price, double litres, int mileage) {
+    public fuellingDetails(double miles, double price, double litres, double mileage) {
         this.miles = miles;
         this.price = price;
         this.litres = litres;
@@ -38,7 +38,7 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         }
     }
 
-    public fuellingDetails(int miles, double price, double litres, Date date, int mileage) {
+    public fuellingDetails(double miles, double price, double litres, Date date, double mileage) {
         this.miles = miles;
         this.price = price;
         this.litres = litres;
@@ -47,7 +47,7 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         this.mileage = mileage;
     }
 
-    public fuellingDetails(int miles, double price, double litres, String date, int mileage) {
+    public fuellingDetails(double miles, double price, double litres, String date, double mileage) {
         this.miles = miles;
         this.price = price;
         this.litres = litres;
@@ -75,7 +75,7 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         return date;
     }
 
-    public int getMiles() {
+    public double getMiles() {
         return miles;
     }
 
@@ -91,7 +91,7 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         return mpg;
     }
 
-    public int getMileage() {
+    public double getMileage() {
         return mileage;
     }
 

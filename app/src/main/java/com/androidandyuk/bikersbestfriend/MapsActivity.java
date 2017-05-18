@@ -221,9 +221,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.i("Show Traffic Markers", "called");
         mMap.clear();
         for (TrafficEvent location : trafficEvents) {
-            mMap.addMarker(new MarkerOptions().position(location.location).title(location.road));
+            mMap.addMarker(new MarkerOptions().position(location.location).title(location.title));
         }
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 10));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 11));
     }
 
     public void centerMapOnLocation(LatLng latLng, String title) {
