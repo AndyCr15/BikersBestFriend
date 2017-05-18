@@ -3,7 +3,6 @@ package com.androidandyuk.bikersbestfriend;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -21,10 +20,13 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
+
 public class Favourites extends AppCompatActivity {
-    static ArrayList<markedLocation> favouriteLocations = new ArrayList<>();
+
     static ArrayAdapter arrayAdapter;
-    static SharedPreferences sharedPreferences;
+
     private FirebaseAnalytics mFirebaseAnalytics;
     Button seeFavsMap;
 
@@ -58,7 +60,6 @@ public class Favourites extends AppCompatActivity {
                 return true;
             }
         });
-
 
         arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, favouriteLocations);
 
@@ -127,11 +128,11 @@ public class Favourites extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void sortMyList() {
+    public static void sortMyList() {
         Log.i("Sort List", "" + favouriteLocations.size());
         if (favouriteLocations.size() > 0) {
             Collections.sort(favouriteLocations);
-            arrayAdapter.notifyDataSetChanged();
+//            arrayAdapter.notifyDataSetChanged();
         }
     }
 
@@ -238,9 +239,8 @@ public class Favourites extends AppCompatActivity {
         super.onResume();
         Log.i("Favs Activity", "On Resume");
 
-        //loadFavs();
-
         sortMyList();
+        arrayAdapter.notifyDataSetChanged();
     }
 
 

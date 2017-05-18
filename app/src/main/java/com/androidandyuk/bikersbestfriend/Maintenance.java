@@ -3,6 +3,7 @@ package com.androidandyuk.bikersbestfriend;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,14 +27,15 @@ import java.util.Collections;
 import java.util.Date;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
-import static com.androidandyuk.bikersbestfriend.Garage.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class Maintenance extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    static SharedPreferences sharedPreferences;
+
     static SharedPreferences.Editor ed;
 
     static ArrayAdapter arrayAdapter;
@@ -58,6 +60,9 @@ public class Maintenance extends AppCompatActivity {
         setContentView(R.layout.activity_maintenance_log);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        // until I implement landscape view, lock the orientation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         logDetails = findViewById(R.id.logDetails);
 
@@ -298,16 +303,7 @@ public class Maintenance extends AppCompatActivity {
         setTitle("Maintenance: " + bikes.get(activeBike).model);
     }
 
-    public static double calculateMaintSpend(Bike bike) {
-        Log.i("Garage", "Calculating Spend on " + bike);
-        Log.i("Number of logs", "" + bike.maintenanceLogs.size());
-        double spend = 0;
-        for (maintenanceLogDetails log : bike.maintenanceLogs) {
-            Log.i("Price", "" + log.price);
-            spend += log.price;
-        }
-        return spend;
-    }
+
 
     public static void saveLogs() {
 

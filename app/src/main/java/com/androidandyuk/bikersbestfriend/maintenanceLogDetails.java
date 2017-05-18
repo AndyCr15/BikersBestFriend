@@ -47,8 +47,8 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         this.wasService = wasService;
         this.wasMOT = wasMOT;
 
-        if (mileage != 0 && mileage > Garage.bikes.get(activeBike).estMileage) {
-            Garage.bikes.get(activeBike).estMileage = mileage;
+        if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
+            MainActivity.bikes.get(activeBike).estMileage = mileage;
         } else if (mileage != 0) {
             Context context = App.getContext();
             Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
@@ -68,8 +68,8 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         String formattedDate = sdf.format(todaysDate);
         // check if it's still the same day, allow mileage to be changed
         if (date.equals(formattedDate)) {
-            if (mileage != 0 && mileage > Garage.bikes.get(activeBike).estMileage) {
-                Garage.bikes.get(activeBike).estMileage = mileage;
+            if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
+                MainActivity.bikes.get(activeBike).estMileage = mileage;
             } else if (mileage != 0) {
                 Context context = App.getContext();
                 Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();

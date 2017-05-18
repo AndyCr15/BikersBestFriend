@@ -1,13 +1,20 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.icu.text.DecimalFormat;
 import android.icu.text.SimpleDateFormat;
 import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -34,17 +41,19 @@ import java.net.URL;
 import java.util.ArrayList;
 
 import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
-import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
+
 public class MainActivity extends AppCompatActivity {
+    static ArrayList<markedLocation> favouriteLocations = new ArrayList<>();
+    public static ArrayList<Bike> bikes = new ArrayList<>();
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    LocationManager locationManager;
-    LocationListener locationListener;
+    public static LocationManager locationManager;
+    public static LocationListener locationListener;
 
     private static final String TAG = "MainActivity";
 
@@ -64,24 +73,29 @@ public class MainActivity extends AppCompatActivity {
 
     public static int activeBike;
 
-    public static final DecimalFormat precision = new DecimalFormat("0.00");
+    public static String userLocationForWeather;
 
-//    static SharedPreferences sharedPreferences;
+    public static final DecimalFormat precision = new DecimalFormat("0.00");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        setTheme(R.style.AppTheme);
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         Log.i("Main Activity", "onCreate");
+
+        // until I implement landscape view, lock the orientation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        loadBikes();
+        loadFuels();
+        loadLogs();
 
         // check if there are any bikes
         if (bikes.size() == 0) {
@@ -91,25 +105,70 @@ public class MainActivity extends AppCompatActivity {
         //      download the weather
         weatherText = (TextView) findViewById(R.id.weatherView);
         DownloadTask task = new DownloadTask();
-        task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
+//        task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
 
-//        if(user.location != null) {
-//            //change this to be users location
-//            double userLat = user.location.latitude;
-//            double userLon = user.location.longitude;
-//            String userLocation = "lat=" + userLat + "&lon=" + userLon;
-//            task.execute("http://api.openweathermap.org/data/2.5/weather?" + userLocation + "&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
-//
-//        }
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
-        // Obtain the FirebaseAnalytics instance.
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
 
+                //centerMapOnLocation(location, "Your location");
+
+            }
+
+            @Override
+            public void onStatusChanged(String s, int i, Bundle bundle) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String s) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String s) {
+
+            }
+        };
 
         userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
 
         user = new markedLocation("You", "", userLatLng, "");
 
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
+
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+
+            Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+            user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+
+        }
+
+        if(user.location != null) {
+            //change this to be users location
+            double userLat = user.location.latitude;
+            double userLon = user.location.longitude;
+            String userLocation = "lat=" + userLat + "&lon=" + userLon;
+            userLocationForWeather = "http://api.openweathermap.org/data/2.5/weather?" + userLocation + "&APPID=81e5e0ca31ad432ee9153dd761ed3b27";
+            Log.i("Getting Weather",userLocationForWeather);
+            task.execute(userLocationForWeather);
+
+        }
+
+        // Obtain the FirebaseAnalytics instance.
+
+
+//        userLatLng = new LatLng(51.6516833, -0.1771449);  //  15 SC
+//
+//        user = new markedLocation("You", "", userLatLng, "");
+
+
+        Favourites.loadFavs();
+        Favourites.sortMyList();
 
     }
 
@@ -198,13 +257,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void groupRideClicked(View view) {
-        Toast.makeText(MainActivity.this, "Not yet implemented", Toast.LENGTH_LONG).show();
+        Intent intent = new Intent(getApplicationContext(), GroupRide.class);
+        startActivity(intent);
     }
 
     public void emergencyClicked(View view) {
         Toast.makeText(MainActivity.this, "Not yet implemented", Toast.LENGTH_LONG).show();
     }
 
+    public void loadWeather(View view){
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.bbc.co.uk/weather/"));
+        startActivity(browserIntent);
+    }
 
     public static void initialiseTracks() {
 

@@ -31,20 +31,20 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.MainActivity.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MainActivity.geocoder;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 import static com.androidandyuk.bikersbestfriend.Traffic.trafficEvents;
+import static  com.androidandyuk.bikersbestfriend.MainActivity.locationListener;
+import static  com.androidandyuk.bikersbestfriend.MainActivity.locationManager;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private static GoogleMap mMap;
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    LocationManager locationManager;
 
-    LocationListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -323,11 +323,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Favourites.saveFavs();
 
-        Favourites.arrayAdapter.notifyDataSetChanged();
+//        Favourites.arrayAdapter.notifyDataSetChanged();
 
         Toast.makeText(this, "Location " + locality + " saved", Toast.LENGTH_SHORT).show();
     }
-
 
     @Override
     protected void onPause() {

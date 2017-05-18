@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.xml.sax.SAXException;
 
@@ -19,6 +20,8 @@ import java.util.Collections;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import static com.androidandyuk.bikersbestfriend.R.raw.allevents;
 
 public class Traffic extends AppCompatActivity {
 
@@ -40,14 +43,24 @@ public class Traffic extends AppCompatActivity {
         // download traffic here
         Log.i("Traffic","Download Here");
 
+        Toast.makeText(this, "This is not working yet and showing static information from one download", Toast.LENGTH_SHORT).show();
+
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             SAXParser parser = parserFactory.newSAXParser();
 
             SAXHandler handler = new SAXHandler();
 
+//            String fileURL = "http://m.highways.gov.uk/feeds/rss/AllEvents.xml";
+//            String saveDir = "raw";
+//            try {
+//                DownloadFromURL.downloadFile(fileURL, saveDir);
+//            } catch (IOException ex) {
+//                ex.printStackTrace();
+//            }
+
             Resources res = this.getResources();
-            InputStream source = res.openRawResource(R.raw.allevents);
+            InputStream source = res.openRawResource(allevents);
             parser.parse(source, handler);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();

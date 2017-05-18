@@ -31,10 +31,10 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         Date fuelDate = new Date();
         this.date = sdf.format(fuelDate);
         if(mileage == 0) {
-            Garage.bikes.get(activeBike).estMileage += miles;
+            MainActivity.bikes.get(activeBike).estMileage += miles;
             return;
         } else if (mileage > 0) {
-            Garage.bikes.get(activeBike).estMileage = mileage;
+            MainActivity.bikes.get(activeBike).estMileage = mileage;
         }
     }
 
@@ -58,8 +58,8 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         String formattedDate = sdf.format(todaysDate);
         // check if it's still the same day, allow mileage to be changed
         if (date.equals(formattedDate)) {
-            if (mileage != 0 && mileage > Garage.bikes.get(activeBike).estMileage) {
-                Garage.bikes.get(activeBike).estMileage = mileage;
+            if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
+                MainActivity.bikes.get(activeBike).estMileage = mileage;
             } else if (mileage != 0) {
                 Context context = App.getContext();
                 Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();

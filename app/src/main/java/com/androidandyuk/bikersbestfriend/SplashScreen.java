@@ -10,10 +10,6 @@ import android.util.Log;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
-import static com.androidandyuk.bikersbestfriend.MainActivity.loadBikes;
-import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
-
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -44,9 +40,9 @@ public class SplashScreen extends Activity {
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
 
-        loadBikes();
-        loadFuels();
-        loadLogs();
+//        loadBikes();
+//        loadFuels();
+//        loadLogs();
         MainActivity.initialiseTracks();
 
     }

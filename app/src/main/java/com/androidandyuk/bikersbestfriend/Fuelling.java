@@ -2,7 +2,7 @@ package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.icu.text.DecimalFormat;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -26,18 +26,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
-import static com.androidandyuk.bikersbestfriend.Garage.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.Maintenance.ed;
 import static com.androidandyuk.bikersbestfriend.R.id.maintList;
 import static com.androidandyuk.bikersbestfriend.R.id.mileage;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class Fuelling extends AppCompatActivity {
 
     static ArrayAdapter arrayAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
-    static SharedPreferences sharedPreferences;
     static int lastHowManyFuels = 10;
 
     ListView listView;
@@ -52,7 +52,7 @@ public class Fuelling extends AppCompatActivity {
     int itemLongPressedPosition = 0;
     fuellingDetails itemLongPressed;
     String editDate = "";
-    
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +60,9 @@ public class Fuelling extends AppCompatActivity {
         setContentView(R.layout.activity_fueling);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        // until I implement landscape view, lock the orientation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
@@ -70,7 +73,6 @@ public class Fuelling extends AppCompatActivity {
         initiateList();
 
         //needed for editing a fueling
-
 
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -158,7 +160,7 @@ public class Fuelling extends AppCompatActivity {
         double totalMiles = 0;
         double totalLitres = 0;
         int count = 0;
-        Bike thisBike = Garage.bikes.get(bikeID);
+        Bike thisBike = MainActivity.bikes.get(bikeID);
         if (numberOfFuelings > thisBike.fuelings.size()) {
             numberOfFuelings = thisBike.fuelings.size();
         }
@@ -171,12 +173,14 @@ public class Fuelling extends AppCompatActivity {
 
         }
         Log.i("Calculating MPG", "" + count);
-        double mpg = totalMiles / (totalLitres / 4.54609);
-        DecimalFormat numberFormat = new DecimalFormat("#.0");
-        return numberFormat.format(mpg);
+        if (totalLitres > 0) {
+            double mpg = totalMiles / (totalLitres / 4.54609);
+            DecimalFormat numberFormat = new DecimalFormat("#.0");
+            return numberFormat.format(mpg);
+        } else return "No Fuels";
     }
 
-    public void addFuelingClicked (View view){
+    public void addFuelingClicked(View view) {
         addFueling();
     }
 
@@ -207,7 +211,7 @@ public class Fuelling extends AppCompatActivity {
 
             View thisView = this.getCurrentFocus();
             if (thisView != null) {
-                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(thisView.getWindowToken(), 0);
             }
 
@@ -230,9 +234,12 @@ public class Fuelling extends AppCompatActivity {
         if (bikes.get(activeBike).fuelings.size() < fuelingsForAve) {
             fuelingsForAve = bikes.get(activeBike).fuelings.size();
         }
-        mpgView.setText("Ave MPG over the last " + fuelingsForAve + " stops is " +
-
-                aveMPG(activeBike, fuelingsForAve) + " mpg");
+        String mpg = aveMPG(activeBike, fuelingsForAve);
+        if (mpg.equals("No Fuels")) {
+            mpgView.setText("Your average will appear here once you've recorded a refuel");
+        } else {
+            mpgView.setText("Ave MPG over the last " + fuelingsForAve + " stops is " + mpg + " mpg");
+        }
     }
 
     @Override
@@ -244,7 +251,7 @@ public class Fuelling extends AppCompatActivity {
 
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i+1, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i + 1, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
 
         return true;

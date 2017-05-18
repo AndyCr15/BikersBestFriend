@@ -3,6 +3,7 @@ package com.androidandyuk.bikersbestfriend;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,15 +21,14 @@ import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-import java.util.ArrayList;
-
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
-import static com.androidandyuk.bikersbestfriend.Maintenance.calculateMaintSpend;
+import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
 
 public class Garage extends AppCompatActivity {
 
-    public static ArrayList<Bike> bikes = new ArrayList<>();
+//    public static ArrayList<Bike> bikes = new ArrayList<>();
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -60,6 +60,9 @@ public class Garage extends AppCompatActivity {
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
 
+        // until I implement landscape view, lock the orientation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 //        if (bikes.size() == 0) {
 //            // for testing
 //            Bike newBike = new Bike("KTM", "Superduke R", "2016");
@@ -78,6 +81,7 @@ public class Garage extends AppCompatActivity {
 
         Log.i("Active Bike", "" + activeBike);
 
+        loadLogs();
         garageSetup();
 
     }
@@ -111,6 +115,17 @@ public class Garage extends AppCompatActivity {
             }
             bikeNotes.setText(bikes.get(activeBike).notes);
         }
+    }
+
+    public static double calculateMaintSpend(Bike bike) {
+        Log.i("Garage", "Calculating Spend on " + bike);
+        Log.i("Number of logs", "" + bike.maintenanceLogs.size());
+        double spend = 0;
+        for (maintenanceLogDetails log : bike.maintenanceLogs) {
+            Log.i("Price", "" + log.price);
+            spend += log.price;
+        }
+        return spend;
     }
 
     public void TextViewClicked(View view) {

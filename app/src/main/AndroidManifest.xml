@@ -9,6 +9,10 @@
     -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".App"
@@ -64,9 +68,9 @@
             android:label="@string/title_activity_location_info"
             android:theme="@style/AppTheme" />
         <activity
-        android:name=".Locations"
-        android:label="Locations"
-        android:theme="@style/AppTheme" />
+            android:name=".Locations"
+            android:label="Locations"
+            android:theme="@style/AppTheme" />
         <activity
             android:name=".Traffic"
             android:label="Traffic"
@@ -87,6 +91,11 @@
             android:name=".Maintenance"
             android:label="Maintenance Log"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name=".GroupRide"
+            android:label="Group Ride"
+            android:theme="@style/AppTheme"/>
+
     </application>
 
 </manifest>
