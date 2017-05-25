@@ -67,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
     public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy");
     public static SimpleDateFormat sdfShort = new SimpleDateFormat("dd MMM");
 
+    // to store if the user has given permission to storage and location
+    public static boolean storageAccepted;
+    public static boolean locationAccepted;
+
     static markedLocation user;
     static double conversion = 0.621;
     static Geocoder geocoder;
@@ -105,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         //      download the weather
         weatherText = (TextView) findViewById(R.id.weatherView);
         DownloadTask task = new DownloadTask();
-//        task.execute("http://api.openweathermap.org/data/2.5/weather?lat=35&lon=139&APPID=81e5e0ca31ad432ee9153dd761ed3b27");
 
         locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 
@@ -143,17 +146,19 @@ public class MainActivity extends AppCompatActivity {
 
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
-            user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
-
+            Log.i("lastKnownLocation", "" + lastKnownLocation);
+            if (lastKnownLocation != null) {
+                user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));
+            }
         }
 
-        if(user.location != null) {
+        if (user.location != null) {
             //change this to be users location
             double userLat = user.location.latitude;
             double userLon = user.location.longitude;
             String userLocation = "lat=" + userLat + "&lon=" + userLon;
             userLocationForWeather = "http://api.openweathermap.org/data/2.5/weather?" + userLocation + "&APPID=81e5e0ca31ad432ee9153dd761ed3b27";
-            Log.i("Getting Weather",userLocationForWeather);
+            Log.i("Getting Weather", userLocationForWeather);
             task.execute(userLocationForWeather);
 
         }
@@ -168,12 +173,12 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.bike_choice, menu);
 
         super.onCreateOptionsMenu(menu);
-
         menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
+        menu.add(0, 1, 0, "About").setShortcut('3', 'c');
 
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i+1, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i+2, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
 
         return true;
@@ -182,46 +187,50 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        Intent intent;
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                Toast.makeText(MainActivity.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
+                intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                startActivity(intent);
                 return true;
             case 1:
                 Log.i("Option", "1");
-                activeBike = 0;
+                // go to about me
+                intent = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(intent);
                 return true;
             case 2:
                 Log.i("Option", "2");
-                activeBike = 1;
+                activeBike = 0;
                 return true;
             case 3:
                 Log.i("Option", "3");
-                activeBike = 2;
+                activeBike = 1;
                 return true;
             case 4:
                 Log.i("Option", "4");
-                activeBike = 3;
+                activeBike = 2;
                 return true;
             case 5:
                 Log.i("Option", "5");
-                activeBike = 4;
+                activeBike = 3;
                 return true;
             case 6:
                 Log.i("Option", "6");
-                activeBike = 5;
+                activeBike = 4;
                 return true;
             case 7:
                 Log.i("Option", "7");
-                activeBike = 6;
+                activeBike = 5;
                 return true;
             case 8:
                 Log.i("Option", "8");
-                activeBike = 7;
+                activeBike = 6;
                 return true;
             case 9:
                 Log.i("Option", "9");
-                activeBike = 8;
+                activeBike = 7;
                 return true;
         }
 
@@ -256,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(MainActivity.this, "Not yet implemented", Toast.LENGTH_LONG).show();
     }
 
-    public void loadWeather(View view){
+    public void loadWeather(View view) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.bbc.co.uk/weather/"));
         startActivity(browserIntent);
     }

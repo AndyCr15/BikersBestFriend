@@ -2,7 +2,6 @@ package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -29,14 +28,12 @@ import java.util.Date;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class Maintenance extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
-
-
-    static SharedPreferences.Editor ed;
 
     static ArrayAdapter arrayAdapter;
     ListView maintList;

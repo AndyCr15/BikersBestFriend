@@ -29,9 +29,9 @@ import java.util.Date;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
-import static com.androidandyuk.bikersbestfriend.Maintenance.ed;
 import static com.androidandyuk.bikersbestfriend.R.id.maintList;
 import static com.androidandyuk.bikersbestfriend.R.id.mileage;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class Fuelling extends AppCompatActivity {

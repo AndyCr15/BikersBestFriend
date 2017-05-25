@@ -14,6 +14,7 @@
         android:layout_height="100dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_corners"
         android:onClick="goToFavourites"
         android:text="Favourites"
         android:textSize="14sp"
@@ -26,6 +27,7 @@
         android:layout_height="100dp"
         android:layout_marginLeft="8dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_corners"
         android:onClick="goToTracks"
         android:text="Race Tracks"
         app:layout_constraintLeft_toLeftOf="@+id/guideline2"
@@ -56,35 +58,18 @@
         android:layout_height="100dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_corners"
         android:onClick="goToHotSpots"
         android:text="Hot Spots"
         app:layout_constraintRight_toLeftOf="@+id/guideline2"
         app:layout_constraintTop_toBottomOf="@+id/favsButton" />
-
-    <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        ads:adSize="BANNER"
-        ads:adUnitId="@string/banner_ad_unit_id"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="8dp"
-        android:layout_marginRight="8dp"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintVertical_bias="0.88">
-    </com.google.android.gms.ads.AdView>
 
     <Button
         android:id="@+id/button12"
         android:layout_width="160dp"
         android:layout_height="100dp"
         android:layout_marginLeft="8dp"
+        android:background="@drawable/rounded_corners"
         android:onClick="goToTraffic"
         android:text="Traffic"
         app:layout_constraintBaseline_toBaselineOf="@+id/button6"

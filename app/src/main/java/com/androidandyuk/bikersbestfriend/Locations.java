@@ -1,13 +1,13 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.currentForecast;
@@ -19,7 +19,6 @@ public class Locations extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private AdView mAdView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,13 +27,36 @@ public class Locations extends AppCompatActivity {
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
-        mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
+        // requesting permissions to access storage and location
+        String[] perms = {"android.permission.READ_EXTERNAL_STORAGE","android.permission.ACCESS_FINE_LOCATION"};
+        int permsRequestCode = 200;
+        requestPermissions(perms, permsRequestCode);
+
+
 
         weatherText = (TextView)findViewById(R.id.weatherView);
         // take weather found in MainActivity
         weatherText.setText("Today's forecast: " + currentForecast);
+    }
+
+    @Override
+
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+
+        switch(permsRequestCode){
+
+            case 200:
+
+                MainActivity.storageAccepted = grantResults[0]== PackageManager.PERMISSION_GRANTED;
+
+                MainActivity.locationAccepted = grantResults[1]==PackageManager.PERMISSION_GRANTED;
+
+                Log.i("STRG " + MainActivity.storageAccepted,"LCTN " + MainActivity.locationAccepted);
+
+                break;
+
+        }
+
     }
 
     public void goToFavourites(View view) {

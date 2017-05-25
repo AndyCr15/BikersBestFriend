@@ -1,6 +1,10 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.icu.util.Calendar;
+
 import java.util.ArrayList;
+
+import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
 /**
  * Created by AndyCr15 on 09/05/2017.
@@ -40,35 +44,27 @@ public class Bike {
     }
 
     public Bike(String make, String model, String year) {
+
+        // any new bike has it's MOT and service set to today
+        Calendar cal = Calendar.getInstance();
+//        int yearNow = cal.get(Calendar.YEAR);
+//        int month = cal.get(Calendar.MONTH);
+//        int day = cal.get(Calendar.DAY_OF_MONTH);
+        String todaysDate = sdf.format(cal);
+
         this.make = make;
         this.model = model;
         this.registration = "unknown";
         this.bikeId = bikeCount;
         this.VIN = "";
-        this.serviceDue = "";
-        this.MOTdue = "";
+        this.serviceDue = todaysDate;
+        this.MOTdue = todaysDate;
         this.lastKnownService = "";
         this.lastKnownMOT = "";
         this.yearOfMan = year;
         this.estMileage = 0;
         bikeCount++;
     }
-
-    public Bike(String make, String model) {
-        this.make = make;
-        this.model = model;
-        this.bikeId = bikeCount;
-        this.registration = "unknown";
-        this.VIN = "";
-        this.serviceDue = "";
-        this.MOTdue = "";
-        this.lastKnownService = "";
-        this.lastKnownMOT = "";
-        this.yearOfMan = "";
-        this.estMileage = 0;
-        bikeCount++;
-    }
-
 
 
     @Override

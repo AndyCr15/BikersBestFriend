@@ -22,7 +22,7 @@
         android:logo="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
-        android:theme="@style/SplashTheme">
+        android:theme="@style/AppTheme">
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -94,8 +94,14 @@
         <activity
             android:name=".GroupRide"
             android:label="Group Ride"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings" />
+        <activity
+            android:name=".SendFeedback"
+            android:label="Send Feedback"
             android:theme="@style/AppTheme"/>
-
     </application>
 
 </manifest>

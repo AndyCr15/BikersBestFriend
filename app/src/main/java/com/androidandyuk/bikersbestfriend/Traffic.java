@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -23,11 +24,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
+import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class Traffic extends AppCompatActivity {
 
@@ -39,17 +44,14 @@ public class Traffic extends AppCompatActivity {
     private DownloadManager downloadManager;
     public static long downloadId;
     private Handler handlerUpdate;
+
+    public int trafficUpdatesMaximumMinutes = 30;
     private static boolean updateTraffic = true;
+    public static Calendar lastTrafficUpdate;
+    public static int lastTrafficUpdateDay;
+    public static int lastTrafficUpdateMins;
+//    public long secondsSinceUpdate;
 
-
-    private Runnable runnableUpdate = new Runnable() {
-        @Override
-        public void run() {
-            if (done)
-                return;
-            handlerUpdate.postDelayed(this, 1000);
-        }
-    };
     private volatile boolean done;
 
     @Override
@@ -60,35 +62,49 @@ public class Traffic extends AppCompatActivity {
         IntentFilter intentFilter = new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE);
         registerReceiver(new DownloadReceiver(), intentFilter);
 
-//        Log.i("Traffic","Setting update to True");
-//        updateTraffic = true;
-
         setTitle("Traffic");
 
-        // download traffic here
-        Log.i("Traffic", "Download Here");
+        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
+        SharedPreferences.Editor ed = sharedPreferences.edit();
 
-        if (updateTraffic) {
+        // decide if a new update is required
+        updateTraffic = false;
+
+        Calendar now = Calendar.getInstance();
+
+        int currentMins = now.get(Calendar.MINUTE) + (now.get(Calendar.HOUR_OF_DAY) * 60);
+
+        if (lastTrafficUpdateDay < now.get(Calendar.DAY_OF_YEAR)) {
+            updateTraffic = true;
+        } else if (lastTrafficUpdateMins + trafficUpdatesMaximumMinutes < currentMins) {
+            updateTraffic = true;
+        }
+        Log.i("Mins since update " + (currentMins - lastTrafficUpdateMins), "Update = " + updateTraffic);
+
+
+        if (updateTraffic && MainActivity.storageAccepted) {
             downloadTraffic();
-            updateTraffic = false;
+//            updateTraffic = false;
+        } else if (!MainActivity.storageAccepted) {
+            Toast.makeText(this, "Permissions to save the data to your Downloads folder is needed to receive traffic information", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private void parseList() {
+        Log.i("Traffic", "Parsing List");
         try {
             SAXParserFactory parserFactory = SAXParserFactory.newInstance();
             SAXParser parser = parserFactory.newSAXParser();
 
             SAXHandler handler = new SAXHandler();
 
-            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + File.separator +
-                    "allevents.xml");
-            Uri path = Uri.fromFile(file);
+//            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + File.separator +
+//                    "allevents.xml");
 
-            Log.i("File", "" + file);
-            Log.i("Path", "" + path);
-
-//            Resources res = this.getResources();
             InputStream source = new FileInputStream("/storage/emulated/0/Download/allevents.xml");
             parser.parse(source, handler);
+//            file.delete();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -96,12 +112,11 @@ public class Traffic extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         initiateList();
-
     }
 
     private void initiateList() {
+        Log.i("Traffic", "Initiating List");
         Collections.sort(trafficEvents);
         for (int i = 0; i < trafficEvents.size(); i++) {
             if (trafficEvents.get(i).delay.equals("No Delay")) {
@@ -111,7 +126,7 @@ public class Traffic extends AppCompatActivity {
             // if there's another entry, check if it's the same reason
             // if it is, remove it
             if (i + 1 < trafficEvents.size()) {
-                if (trafficEvents.get(i).title.equals(trafficEvents.get(i).title)) {
+                if (trafficEvents.get(i).title.equals(trafficEvents.get(i + 1).title)) {
                     trafficEvents.remove(i);
                 }
             }
@@ -123,6 +138,15 @@ public class Traffic extends AppCompatActivity {
         trafficList.setAdapter(arrayAdapter);
     }
 
+    private Runnable runnableUpdate = new Runnable() {
+        @Override
+        public void run() {
+            if (done)
+                return;
+            handlerUpdate.postDelayed(this, 1000);
+        }
+    };
+
     public void viewTrafficOnMap(View view) {
         Log.i("Traffic", "View on map called");
         Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
@@ -132,17 +156,40 @@ public class Traffic extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void forceUpdate(View view) {
+        updateTraffic = true;
+        if (updateTraffic && MainActivity.storageAccepted) {
+            downloadTraffic();
+//            updateTraffic = false;
+        } else if (!MainActivity.storageAccepted) {
+            Toast.makeText(this, "Permissions to save the data to your Downloads folder is needed to receive traffic information", Toast.LENGTH_LONG).show();
+        }
+    }
+
     public void downloadTraffic() {
+        Log.i("Traffic", "downloadTraffic");
         done = false;
+        // set when the last update happened
+        Calendar now = Calendar.getInstance();
+        lastTrafficUpdateDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
+        lastTrafficUpdateMins = (Calendar.getInstance().get(Calendar.HOUR_OF_DAY) * 60) + Calendar.getInstance().get(Calendar.MINUTE);
+        saveUpdateTime();
         Uri uriDownload = Uri.parse("http://m.highways.gov.uk/feeds/rss/AllEvents.xml");
         downloadFile(uriDownload);
     }
 
     private void downloadFile(Uri uri) {
+        Log.i("Traffic", "downloadFile");
+
+        // delete the old file before downloading a new one
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + File.separator +
+                "allevents.xml");
+        file.delete();
+
         downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
         DownloadManager.Request request = new DownloadManager.Request(uri);
         request.setTitle("allevents.xml");
-        request.setDescription("Downloading Traffic Demo");
+        request.setDescription("Downloading Traffic Info");
 
         request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "allevents.xml");
         downloadId = downloadManager.enqueue(request);
@@ -157,9 +204,41 @@ public class Traffic extends AppCompatActivity {
 
             if (refId == downloadId) {
                 Toast.makeText(context, "Traffic File Updated", Toast.LENGTH_SHORT).show();
-                initiateList();
+                parseList();
+//                initiateList();
             }
         }
+    }
+
+    public void saveUpdateTime(){
+        Log.i("Traffic","Saving Update Time");
+
+        ed.putInt("minsSinceUpdate" , lastTrafficUpdateMins).apply();
+        ed.putInt("daysSinceUpdate" , lastTrafficUpdateDay).apply();
+
+    }
+
+    public void loadUpdateTime(){
+        Log.i("Traffic","Loading Update Time");
+
+        lastTrafficUpdateMins = sharedPreferences.getInt("minsSinceUpdate", 0);
+        lastTrafficUpdateDay = sharedPreferences.getInt("daysSinceUpdate", 0);
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveUpdateTime();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.i("Traffic", "On Resume");
+        parseList();
+        initiateList();
+        loadUpdateTime();
     }
 
     @Override

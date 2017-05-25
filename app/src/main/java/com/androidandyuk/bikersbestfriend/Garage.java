@@ -1,9 +1,14 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,18 +17,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
-import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
+
+import java.text.ParseException;
+import java.util.Date;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
 
 public class Garage extends AppCompatActivity {
@@ -44,10 +53,15 @@ public class Garage extends AppCompatActivity {
     TextView bikeEstMileage;
     TextView amountSpent;
     TextView myRegView;
+    TextView MOTdue;
+    TextView serviceDue;
 
     TextView bikeTitle;
     ViewSwitcher regSwitcher;
     EditText bikeNotes;
+
+    private DatePickerDialog.OnDateSetListener MOTDateSetListener;
+    private DatePickerDialog.OnDateSetListener serviceDateSetListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +69,6 @@ public class Garage extends AppCompatActivity {
         setContentView(R.layout.activity_garage);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
-
-        mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
         // until I implement landscape view, lock the orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -78,11 +88,43 @@ public class Garage extends AppCompatActivity {
         bikeEstMileage = (TextView) findViewById(R.id.estMileage);
         amountSpent = (TextView) findViewById(R.id.amountSpent);
         myRegView = (TextView) findViewById(R.id.clickable_reg_view);
+        MOTdue = (TextView) findViewById(R.id.MOTdue);
+        serviceDue = (TextView) findViewById(R.id.serviceDue);
 
         Log.i("Active Bike", "" + activeBike);
 
         loadLogs();
         garageSetup();
+
+        MOTDateSetListener = new DatePickerDialog.OnDateSetListener()
+
+        {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                Log.i("MOT Date was: ", bikes.get(activeBike).MOTdue);
+                Calendar date = new GregorianCalendar();
+                date.set(year,month,day);
+                String sdfDate = sdf.format(date);
+                bikes.get(activeBike).MOTdue = sdfDate;
+                Log.i("MOT Date now: ", bikes.get(activeBike).MOTdue);
+                garageSetup();
+            }
+        };
+
+        serviceDateSetListener = new DatePickerDialog.OnDateSetListener()
+
+        {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                Log.i("Service Date was: ", bikes.get(activeBike).serviceDue);
+                Calendar date = new GregorianCalendar();
+                date.set(year,month,day);
+                String sdfDate = sdf.format(date);
+                bikes.get(activeBike).serviceDue = sdfDate;
+                Log.i("Service Date now: ", bikes.get(activeBike).serviceDue);
+                garageSetup();
+            }
+        };
 
     }
 
@@ -95,6 +137,8 @@ public class Garage extends AppCompatActivity {
         bikeNotes = (EditText) findViewById(R.id.bikeNotes);
         bikeNotes.setSelected(false);
         myRegView = (TextView) findViewById(R.id.clickable_reg_view);
+        MOTdue = (TextView) findViewById(R.id.MOTdue);
+        serviceDue = (TextView) findViewById(R.id.serviceDue);
 
 
         // check the user has a bike, then set all the views to it's current details
@@ -102,7 +146,7 @@ public class Garage extends AppCompatActivity {
             bikeTitle.setText(bikes.get(activeBike).yearOfMan + " " + bikes.get(activeBike).model);
             aveMPG.setText(Fuelling.aveMPG(activeBike, 10));
 
-            Log.i("Active Bike Reg"," " + (bikes.get(activeBike).registration));
+            Log.i("Active Bike Reg", " " + (bikes.get(activeBike).registration));
 
             myRegView.setText((bikes.get(activeBike).registration));
             myRegView.requestFocus();
@@ -114,8 +158,71 @@ public class Garage extends AppCompatActivity {
                 bikeEstMileage.setText(Double.toString(bikes.get(activeBike).estMileage));
             }
             bikeNotes.setText(bikes.get(activeBike).notes);
+
+            // check if an MOT date is set
+            Log.i("MOT Due ", bikes.get(activeBike).MOTdue);
+//            if (bikes.get(activeBike).MOTdue != null) {
+                MOTdue.setText(bikes.get(activeBike).MOTdue);
+//            }
+
+            // check if a Service date is set
+            Log.i("Service Due ", bikes.get(activeBike).serviceDue);
+//            if (bikes.get(activeBike).serviceDue != null) {
+                serviceDue.setText(bikes.get(activeBike).serviceDue);
+//            }
         }
     }
+
+    public void setMOTdue(View view) {
+        // this sets what date will show when the date picker shows
+        Date thisDate = new Date();
+        try {
+            thisDate = sdf.parse(bikes.get(activeBike).MOTdue);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // for some reasone I can't getYear from thisDate, so will just use the current year
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(thisDate);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(
+                Garage.this,
+                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                MOTDateSetListener,
+                year, month, day);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
+    public void setServiceDue(View view) {
+        // this sets what date will show when the date picker shows
+        Date thisDate = new Date();
+        try {
+            thisDate = sdf.parse(bikes.get(activeBike).serviceDue);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // for some reasone I can't getYear from thisDate, so will just use the current year
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(thisDate);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(
+                Garage.this,
+                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                serviceDateSetListener,
+                year, month, day);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
 
     public static double calculateMaintSpend(Bike bike) {
         Log.i("Garage", "Calculating Spend on " + bike);
@@ -180,7 +287,7 @@ public class Garage extends AppCompatActivity {
                 }
                 View addingBikeInfo = findViewById(R.id.addingBikeInfo);
                 addingBikeInfo.setVisibility(View.INVISIBLE);
-                onBackPressed();
+                invalidateOptionsMenu();
             } else {
 
                 Toast.makeText(Garage.this, "That year looks unlikely", Toast.LENGTH_LONG).show();
@@ -231,10 +338,11 @@ public class Garage extends AppCompatActivity {
 
         super.onCreateOptionsMenu(menu);
         menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
+        menu.add(0, 1, 0, "About").setShortcut('3', 'c');
 
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i+1, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i + 2, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
 
         return true;
@@ -255,47 +363,48 @@ public class Garage extends AppCompatActivity {
                 return true;
             case 1:
                 Log.i("Option", "1");
-                activeBike = 0;
-                garageSetup();
+                // go to about me
+                Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
+                startActivity(intent);
                 return true;
             case 2:
                 Log.i("Option", "2");
-                activeBike = 1;
+                activeBike = 0;
                 garageSetup();
                 return true;
             case 3:
                 Log.i("Option", "3");
-                activeBike = 2;
+                activeBike = 1;
                 garageSetup();
                 return true;
             case 4:
                 Log.i("Option", "4");
-                activeBike = 3;
+                activeBike = 2;
                 garageSetup();
                 return true;
             case 5:
                 Log.i("Option", "5");
-                activeBike = 4;
+                activeBike = 3;
                 garageSetup();
                 return true;
             case 6:
                 Log.i("Option", "6");
-                activeBike = 5;
+                activeBike = 4;
                 garageSetup();
                 return true;
             case 7:
                 Log.i("Option", "7");
-                activeBike = 6;
+                activeBike = 5;
                 garageSetup();
                 return true;
             case 8:
                 Log.i("Option", "8");
-                activeBike = 7;
+                activeBike = 6;
                 garageSetup();
                 return true;
             case 9:
                 Log.i("Option", "9");
-                activeBike = 8;
+                activeBike = 7;
                 garageSetup();
                 return true;
         }
