@@ -59,7 +59,7 @@ public class HotSpots extends AppCompatActivity {
         
         setContentView(R.layout.activity_hot_spots);
 
-        ListView listView = (ListView) findViewById(R.id.maintList);
+        ListView listView = (ListView) findViewById(R.id.favsList);
 
         if (hotspotLocations.size() == 0) {
             Log.i("Favourites", "Initializing Locations");

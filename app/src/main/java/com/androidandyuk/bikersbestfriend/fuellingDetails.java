@@ -52,7 +52,7 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         this.price = price;
         this.litres = litres;
         mpg = miles / (litres / 4.54609);
-        this.date = sdf.format(date);
+        this.date = date;
         // being sent in with a date means it's from an edit or a save
         Date todaysDate = new Date();
         String formattedDate = sdf.format(todaysDate);

@@ -32,6 +32,7 @@ import java.util.Date;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
+import static com.androidandyuk.bikersbestfriend.MainActivity.saveBikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
 
@@ -96,35 +97,46 @@ public class Garage extends AppCompatActivity {
         loadLogs();
         garageSetup();
 
-        MOTDateSetListener = new DatePickerDialog.OnDateSetListener()
+        if (bikes.size() > 0) {
+            MOTDateSetListener = new DatePickerDialog.OnDateSetListener()
 
-        {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                Log.i("MOT Date was: ", bikes.get(activeBike).MOTdue);
-                Calendar date = new GregorianCalendar();
-                date.set(year,month,day);
-                String sdfDate = sdf.format(date);
-                bikes.get(activeBike).MOTdue = sdfDate;
-                Log.i("MOT Date now: ", bikes.get(activeBike).MOTdue);
-                garageSetup();
-            }
-        };
+            {
+                @Override
+                public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                    Log.i("MOT Date was: ", bikes.get(activeBike).MOTdue);
+                    Calendar date = new GregorianCalendar();
+                    date.set(year, month, day);
+                    String sdfDate = sdf.format(date);
+                    bikes.get(activeBike).MOTdue = sdfDate;
+                    Log.i("MOT Date now: ", bikes.get(activeBike).MOTdue);
+                    garageSetup();
+                }
+            };
 
-        serviceDateSetListener = new DatePickerDialog.OnDateSetListener()
+            serviceDateSetListener = new DatePickerDialog.OnDateSetListener()
 
-        {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                Log.i("Service Date was: ", bikes.get(activeBike).serviceDue);
-                Calendar date = new GregorianCalendar();
-                date.set(year,month,day);
-                String sdfDate = sdf.format(date);
-                bikes.get(activeBike).serviceDue = sdfDate;
-                Log.i("Service Date now: ", bikes.get(activeBike).serviceDue);
-                garageSetup();
-            }
-        };
+            {
+                @Override
+                public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                    Log.i("Service Date was: ", bikes.get(activeBike).serviceDue);
+                    Calendar date = new GregorianCalendar();
+                    date.set(year, month, day);
+                    String sdfDate = sdf.format(date);
+                    bikes.get(activeBike).serviceDue = sdfDate;
+                    Log.i("Service Date now: ", bikes.get(activeBike).serviceDue);
+                    garageSetup();
+                }
+            };
+        }
+
+        /**
+         * Hides the soft keyboard
+         */
+        if (getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+
 
     }
 
@@ -161,14 +173,24 @@ public class Garage extends AppCompatActivity {
 
             // check if an MOT date is set
             Log.i("MOT Due ", bikes.get(activeBike).MOTdue);
-//            if (bikes.get(activeBike).MOTdue != null) {
-                MOTdue.setText(bikes.get(activeBike).MOTdue);
+            MOTdue.setText(bikes.get(activeBike).MOTdue);
+            Calendar testDate = new GregorianCalendar();
+            if (MainActivity.checkInRange(bikes.get(activeBike), testDate, 'M')) {
+                MOTdue.setTextColor(Color.parseColor("#ff0000"));
+            } else {
+                MOTdue.setTextColor(Color.parseColor("#808080"));
+            }
 //            }
 
             // check if a Service date is set
             Log.i("Service Due ", bikes.get(activeBike).serviceDue);
 //            if (bikes.get(activeBike).serviceDue != null) {
-                serviceDue.setText(bikes.get(activeBike).serviceDue);
+            serviceDue.setText(bikes.get(activeBike).serviceDue);
+            if (MainActivity.checkInRange(bikes.get(activeBike), testDate, 'S')) {
+                serviceDue.setTextColor(Color.parseColor("#ff0000"));
+            } else {
+                serviceDue.setTextColor(Color.parseColor("#808080"));
+            }
 //            }
         }
     }
@@ -182,7 +204,7 @@ public class Garage extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        // for some reasone I can't getYear from thisDate, so will just use the current year
+        // for some reason I can't getYear from thisDate, so will just use the current year
         Calendar cal = Calendar.getInstance();
         cal.setTime(thisDate);
         int year = cal.get(Calendar.YEAR);
@@ -223,7 +245,6 @@ public class Garage extends AppCompatActivity {
         dialog.show();
     }
 
-
     public static double calculateMaintSpend(Bike bike) {
         Log.i("Garage", "Calculating Spend on " + bike);
         Log.i("Number of logs", "" + bike.maintenanceLogs.size());
@@ -239,7 +260,7 @@ public class Garage extends AppCompatActivity {
         ViewSwitcher switcher = (ViewSwitcher) findViewById(R.id.regSwitcher);
         switcher.showNext(); //or switcher.showPrevious();
         myRegView = (TextView) switcher.findViewById(R.id.clickable_reg_view);
-        myRegView.setText("");
+//        myRegView.setText("");
         myRegView.setSelected(true);
         myRegView.requestFocus();
     }
@@ -422,10 +443,12 @@ public class Garage extends AppCompatActivity {
         }
 
         myRegView = (EditText) findViewById(R.id.hidden_reg_view);
-        // check there's actually a bike before saving the notes
-        if (myRegView != null && bikes.size() > 0) {
+        // check there's actually a bike before saving the reg
+        if (!myRegView.getText().toString().equals("") && bikes.size() > 0) {
             bikes.get(activeBike).registration = myRegView.getText().toString();
+            Log.i("Setting Reg"," to " + myRegView.getText().toString());
         }
+        saveBikes();
     }
 
     @Override

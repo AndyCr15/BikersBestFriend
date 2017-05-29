@@ -2,7 +2,7 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Define the background colour -->
-    <solid android:color="@color/colorAccent" />
+    <solid android:color="@color/colorGrey" />
 
     <!-- Define the border colour and thickness -->
     <stroke

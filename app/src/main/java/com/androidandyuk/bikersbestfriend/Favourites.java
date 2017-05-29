@@ -45,7 +45,7 @@ public class Favourites extends AppCompatActivity {
 
         setContentView(R.layout.activity_favourites);
 
-        ListView listView = (ListView) findViewById(R.id.maintList);
+        ListView listView = (ListView) findViewById(R.id.favsList);
 
         Button seeFavsMap = (Button) findViewById(R.id.seeFavsMap);
 

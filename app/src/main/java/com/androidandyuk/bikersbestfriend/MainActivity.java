@@ -1,12 +1,17 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.Manifest;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.icu.text.DecimalFormat;
 import android.icu.text.SimpleDateFormat;
+import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -38,6 +43,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 
 import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
@@ -63,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
     public static JSONObject jsonObject;
     public static TextView weatherText;
     public static String currentForecast;
+    public static int warningDays = 30;
 
     public static SimpleDateFormat sdf = new SimpleDateFormat("dd/MMM/yyyy");
-    public static SimpleDateFormat sdfShort = new SimpleDateFormat("dd MMM");
 
     // to store if the user has given permission to storage and location
     public static boolean storageAccepted;
@@ -100,6 +106,9 @@ public class MainActivity extends AppCompatActivity {
         loadBikes();
         loadFuels();
         loadLogs();
+
+        checkMOTwarning();
+        checkServiceWarning();
 
         // check if there are any bikes
         if (bikes.size() == 0) {
@@ -178,7 +187,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i+2, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i + 2, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
 
         return true;
@@ -237,6 +246,96 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static boolean checkInRange(Bike thisBike, Calendar testDate, Character type) {
+        // establish what date we're testing against
+//        Calendar testDate = new GregorianCalendar();
+        testDate.add(Calendar.DAY_OF_YEAR, warningDays);
+
+        // get the date this bikes MOT is due
+        Calendar thisDate = new GregorianCalendar();
+        try {
+            if (type.equals('M')) {
+                thisDate.setTime(sdf.parse(thisBike.MOTdue));
+            } else if (type.equals('S')) {
+                thisDate.setTime(sdf.parse(thisBike.serviceDue));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Log.i("MOT Check", "Date conversion failed");
+        }
+
+        if (thisDate.before(testDate)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void checkMOTwarning() {
+        for (Bike thisBike : bikes) {
+            Calendar testDate = new GregorianCalendar();
+            if (checkInRange(thisBike, testDate, 'M')) {
+                // this bike is within limits for a warning
+                Toast.makeText(MainActivity.this, "MOT Due for " + thisBike, Toast.LENGTH_LONG).show();
+                // give a notification if not had one before
+                if (!thisBike.MOTwarned) {
+
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 1, intent, 0);
+
+                    Notification notification = new Notification.Builder(getApplicationContext())
+                            .setContentTitle("MOT Due!")
+                            .setContentText("The MOT for " + thisBike + " is due within " + warningDays + " days")
+                            .setContentIntent(pendingIntent)
+//                            .addAction(android.R.drawable.btn_default, "Open App", pendingIntent)
+                            .setSmallIcon(android.R.drawable.alert_light_frame)
+                            .build();
+
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+                    notificationManager.notify(1, notification);
+                    thisBike.MOTwarned = true;
+
+                }
+            } else {
+                thisBike.MOTwarned = false;
+            }
+
+        }
+    }
+
+    public void checkServiceWarning() {
+        for (Bike thisBike : bikes) {
+            Calendar testDate = new GregorianCalendar();
+            if (checkInRange(thisBike, testDate, 'S')) {
+                // this bike is within limits for a warning
+                Toast.makeText(MainActivity.this, "Service Due for " + thisBike, Toast.LENGTH_LONG).show();
+                // give a notification if not had one before
+                if (!thisBike.serviceWarned) {
+
+                    Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 1, intent, 0);
+
+                    Notification notification = new Notification.Builder(getApplicationContext())
+                            .setContentTitle("Service Due!")
+                            .setContentText("The Service for " + thisBike + " is due within " + warningDays + " days")
+                            .setContentIntent(pendingIntent)
+//                            .addAction(android.R.drawable.btn_default, "Open App", pendingIntent)
+                            .setSmallIcon(android.R.drawable.alert_light_frame)
+                            .build();
+
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+                    notificationManager.notify(1, notification);
+                    thisBike.serviceWarned = true;
+
+                }
+            } else {
+                thisBike.serviceWarned = false;
+            }
+
+        }
+    }
+
     public void goToLocations(View view) {
         Intent intent = new Intent(getApplicationContext(), Locations.class);
         startActivity(intent);
@@ -286,6 +385,11 @@ public class MainActivity extends AppCompatActivity {
             RaceTracks.trackLocations.add(new markedLocation("Lydden Hill", new LatLng(51.1771493, 1.1987867), ""));
             RaceTracks.trackLocations.add(new markedLocation("Mallory Park", new LatLng(52.6006262, -1.3344846), ""));
             RaceTracks.trackLocations.add(new markedLocation("Rockingham", new LatLng(52.5156871, -0.6600846), ""));
+            RaceTracks.trackLocations.add(new markedLocation("Thruxton", new LatLng(51.185835, -1.55265), ""));
+            RaceTracks.trackLocations.add(new markedLocation("Knock Hill", new LatLng(56.1313905, -3.5111837), ""));
+            RaceTracks.trackLocations.add(new markedLocation("Pembrey Race Circuit", new LatLng(51.7052918, -4.3258864), ""));
+            RaceTracks.trackLocations.add(new markedLocation("Castle Combe", new LatLng(51.4935115, -2.2200441), ""));
+            RaceTracks.trackLocations.add(new markedLocation("Goodwood", new LatLng(50.859426, -0.753909), ""));
         }
     }
 
@@ -386,6 +490,8 @@ public class MainActivity extends AppCompatActivity {
                 ArrayList<String> yearOfMan = new ArrayList<>();
                 ArrayList<String> notes = new ArrayList<>();
                 ArrayList<String> estMileage = new ArrayList<>();
+                ArrayList<String> MOTwarned = new ArrayList<>();
+                ArrayList<String> serviceWarned = new ArrayList<>();
 
                 // I think these are new variables, so likely don't need clearing?
                 make.clear();
@@ -400,6 +506,8 @@ public class MainActivity extends AppCompatActivity {
                 yearOfMan.clear();
                 notes.clear();
                 estMileage.clear();
+                MOTwarned.clear();
+                serviceWarned.clear();
 
                 make.add(thisBike.make);
                 model.add(thisBike.model);
@@ -413,6 +521,8 @@ public class MainActivity extends AppCompatActivity {
                 yearOfMan.add(thisBike.yearOfMan);
                 notes.add(thisBike.notes);
                 estMileage.add(Double.toString(thisBike.estMileage));
+                MOTwarned.add(String.valueOf(thisBike.MOTwarned));
+                serviceWarned.add(String.valueOf(thisBike.serviceWarned));
 
                 Log.i("Saving Bikes", "Size :" + bikes.size());
                 ed.putString("make" + i, ObjectSerializer.serialize(make)).apply();
@@ -427,6 +537,8 @@ public class MainActivity extends AppCompatActivity {
                 ed.putString("yearOfMan" + i, ObjectSerializer.serialize(yearOfMan)).apply();
                 ed.putString("notes" + i, ObjectSerializer.serialize(notes)).apply();
                 ed.putString("estMileage" + i, ObjectSerializer.serialize(estMileage)).apply();
+                ed.putString("MOTwarned" + i, ObjectSerializer.serialize(MOTwarned)).apply();
+                ed.putString("serviceWarned" + i, ObjectSerializer.serialize(serviceWarned)).apply();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -439,7 +551,7 @@ public class MainActivity extends AppCompatActivity {
     public static void loadBikes() {
         Log.i("Main Activity", "Bikes Loading");
         int bikesSize = sharedPreferences.getInt("bikesSize", 0);
-
+        Log.i("Bikes Size", "" + bikesSize);
         bikes.clear();
 
         for (int i = 0; i < bikesSize; i++) {
@@ -456,6 +568,8 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<String> yearOfMan = new ArrayList<>();
             ArrayList<String> notes = new ArrayList<>();
             ArrayList<String> estMileage = new ArrayList<>();
+            ArrayList<String> MOTwarned = new ArrayList<>();
+            ArrayList<String> serviceWarned = new ArrayList<>();
 
             // I think these are new variables, so likely don't need clearing?
             make.clear();
@@ -470,6 +584,8 @@ public class MainActivity extends AppCompatActivity {
             yearOfMan.clear();
             notes.clear();
             estMileage.clear();
+            MOTwarned.clear();
+            serviceWarned.clear();
 
             try {
 
@@ -485,6 +601,8 @@ public class MainActivity extends AppCompatActivity {
                 yearOfMan = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("yearOfMan" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 notes = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("notes" + i, ObjectSerializer.serialize(new ArrayList<String>())));
                 estMileage = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("estMileage" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                MOTwarned = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("MOTwarned" + i, ObjectSerializer.serialize(new ArrayList<String>())));
+                serviceWarned = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("serviceWarned" + i, ObjectSerializer.serialize(new ArrayList<String>())));
 
                 Log.i("Bikes Restored ", "Count :" + make.size());
             } catch (Exception e) {
@@ -498,9 +616,14 @@ public class MainActivity extends AppCompatActivity {
                 if (make.size() == model.size() && model.size() == bikeId.size()) {
                     // we've checked each item has the same amount of info, nothing is missing
                     for (int x = 0; x < make.size(); x++) {
+                        Log.i("Retrieving", "Log " + x);
                         int thisId = Integer.parseInt(bikeId.get(x));
+                        Log.i("Est Mileage", estMileage.get(x));
                         double thisEstMileage = Double.parseDouble(estMileage.get(x));
-                        Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), lastKnownService.get(x), lastKnownMOT.get(x), yearOfMan.get(x), notes.get(x), thisEstMileage);
+                        boolean thisMOTwarned = Boolean.parseBoolean(MOTwarned.get(x));
+                        boolean thisServiceWarned = Boolean.parseBoolean(serviceWarned.get(x));
+                        Bike newBike = new Bike(thisId, make.get(x), model.get(x), reg.get(x), VIN.get(x), serviceDue.get(x), MOTdue.get(x), lastKnownService.get(x), lastKnownMOT.get(x),
+                                yearOfMan.get(x), notes.get(x), thisEstMileage, thisMOTwarned, thisServiceWarned);
                         Log.i("Adding", "" + x + "" + newBike);
                         bikes.add(newBike);
                     }

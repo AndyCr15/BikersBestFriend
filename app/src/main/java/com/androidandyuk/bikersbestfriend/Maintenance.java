@@ -1,12 +1,18 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,8 +20,10 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -27,6 +35,7 @@ import java.util.Date;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.checkInRange;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
@@ -43,13 +52,19 @@ public class Maintenance extends AppCompatActivity {
     EditText logString;
     EditText logCost;
     EditText logMilage;
+    TextView setLogDate;
     CheckBox isService;
     CheckBox isMOT;
+
+    private DatePickerDialog.OnDateSetListener logDateSetListener;
 
     // used to store what item might be being edited or deleted
     int itemLongPressedPosition = 0;
     maintenanceLogDetails itemLongPressed;
     String editDate = "";
+
+    private boolean showingMaintDetails = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +83,15 @@ public class Maintenance extends AppCompatActivity {
         logMilage = (EditText) findViewById(R.id.logMileage);
         isService = (CheckBox) findViewById(R.id.serviceCheckBox);
         isMOT = (CheckBox) findViewById(R.id.MOTCheckBox);
+        setLogDate = (TextView) findViewById(R.id.setLogDate);
 
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
+
+        // set the date for a new log to today
+        Calendar date = new GregorianCalendar();
+        String today = sdf.format(date);
+        setLogDate.setText(today);
 
         loadLogs();
 
@@ -84,6 +105,7 @@ public class Maintenance extends AppCompatActivity {
                 itemLongPressed = bikes.get(activeBike).maintenanceLogs.get(position);
                 Log.i("Maint List", "Tapped " + position);
 
+                setLogDate.setText(bikes.get(activeBike).maintenanceLogs.get(position).getDate());
                 logString.setText(bikes.get(activeBike).maintenanceLogs.get(position).getLog());
                 logCost.setText(Double.toString(bikes.get(activeBike).maintenanceLogs.get(position).getPrice()));
                 if (bikes.get(activeBike).maintenanceLogs.get(position).getWasService()) {
@@ -93,8 +115,9 @@ public class Maintenance extends AppCompatActivity {
                     isMOT.setChecked(true);
                 }
                 editDate = bikes.get(activeBike).maintenanceLogs.get(position).getDate();
-                bikes.get(activeBike).maintenanceLogs.remove(position);
+//                bikes.get(activeBike).maintenanceLogs.remove(position);
                 logDetails.setVisibility(View.VISIBLE);
+                showingMaintDetails = true;
 
             }
         });
@@ -130,15 +153,51 @@ public class Maintenance extends AppCompatActivity {
 
         });
 
+        logDateSetListener = new DatePickerDialog.OnDateSetListener()
+
+        {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                Calendar date = new GregorianCalendar();
+                date.set(year, month, day);
+                String sdfDate = sdf.format(date);
+                Log.i("Chosen Date", sdfDate);
+                setLogDate.setText(sdfDate);
+            }
+        };
+
     }
 
     public void showAddLog(View view) {
         // opens the add log dialog
         Log.i("Maintenance", "Adding a log");
         logDetails.setVisibility(View.VISIBLE);
+        showingMaintDetails = true;
+
+        // reset old information.  If editing, new info will overwrite anyway
+        logString.setText(null);
+        logString.clearFocus();
+        logCost.setText(null);
+        logCost.clearFocus();
+        // set the date for a new log to today
+        Calendar date = new GregorianCalendar();
+        String today = sdf.format(date);
+        setLogDate.setText(today);
+
+        // needs to be set back to "" to show the next item isn't being edited
+        // unless changed to a date by the onItemClick
+        editDate = "";
+
+        if (isService.isChecked()) {
+            isService.setChecked(false);
+        }
+        if (isMOT.isChecked()) {
+            isMOT.setChecked(false);
+        }
+
     }
 
-    public void addClicked(View view){
+    public void addClicked(View view) {
         addLog();
     }
 
@@ -161,6 +220,12 @@ public class Maintenance extends AppCompatActivity {
 
         } else {
 
+            // check if we're adding as it was being edited
+            if (itemLongPressed != null) {
+                bikes.get(activeBike).maintenanceLogs.remove(itemLongPressed);
+                itemLongPressed = null;
+            }
+
             isService = (CheckBox) findViewById(R.id.serviceCheckBox);
             isMOT = (CheckBox) findViewById(R.id.MOTCheckBox);
 
@@ -177,19 +242,70 @@ public class Maintenance extends AppCompatActivity {
             // check if this is a log that has been edited
             // if so, carry over the old date
             // if not, create without a date, which will set it to today
-            String date = editDate;
+            String date = setLogDate.getText().toString();
+            ;
             maintenanceLogDetails today = null;
             if (!date.equals("")) {
                 today = new maintenanceLogDetails(logInfo, cost, date, isAService, isAMOT, mileage);
-                Log.i("Created ","with old date");
+                Log.i("Created ", "with old date");
             } else {
                 today = new maintenanceLogDetails(logInfo, cost, isAService, isAMOT, mileage);
-                Log.i("Created ","with new date");
+                Log.i("Created ", "with new date");
             }
             bikes.get(activeBike).maintenanceLogs.add(today);
             Collections.sort(bikes.get(activeBike).maintenanceLogs);
             arrayAdapter.notifyDataSetChanged();
+
+            if (isAMOT) {
+                // create a new calendar item and then apply this bikes MOTdue to it
+                Calendar thisDate = new GregorianCalendar();
+                Date thisTestDate = null;
+                try {
+                    thisTestDate = sdf.parse(date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                thisDate.setTime(thisTestDate);
+                // check if the MOT date of the log is within range
+                if (checkInRange(bikes.get(activeBike),thisDate,'M')) {
+                    try {
+                        thisDate.setTime(sdf.parse(bikes.get(activeBike).MOTdue));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        Log.i("Adding an MOT","Date conversion failed");
+                    }
+                    Log.i("MOT Within Range","New date" + sdf.format(thisDate));
+                } else {
+                    try {
+                        thisDate.setTime(sdf.parse(date));
+                        Log.i("MOT Outside Range","New date" + thisDate);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // if it was within MOT range, add a year to the MOTdue
+                // if it was outside, add a year to the date of the log
+                thisDate.add(Calendar.YEAR,1);
+                bikes.get(activeBike).MOTdue = sdf.format(thisDate);
+
+            }
+
+            if (isAService) {
+                // if the log added is a service, add a year to the date of the log
+                Calendar thisDate = new GregorianCalendar();
+                try {
+                    thisDate.setTime(sdf.parse(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                thisDate.add(Calendar.YEAR,1);
+                bikes.get(activeBike).serviceDue = sdf.format(thisDate);
+
+            }
+
+
             logDetails.setVisibility(View.INVISIBLE);
+            showingMaintDetails = false;
 
             logString.setText(null);
             logString.clearFocus();
@@ -206,7 +322,6 @@ public class Maintenance extends AppCompatActivity {
                 isMOT.setChecked(false);
             }
 
-
             // Check if no view has focus:
             View thisView = this.getCurrentFocus();
             if (thisView != null) {
@@ -214,6 +329,36 @@ public class Maintenance extends AppCompatActivity {
                 imm.hideSoftInputFromWindow(thisView.getWindowToken(), 0);
             }
         }
+    }
+
+    public void setLogDate(View view) {
+        String thisDateString = "";
+        // this sets what date will show when the date picker shows
+        // first check if we're editing a current fueling
+        if (itemLongPressed != null) {
+            thisDateString = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getDate();
+        }
+        Date thisDate = new Date();
+        try {
+            thisDate = sdf.parse(thisDateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // for some reason I can't getYear from thisDate, so will just use the current year
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(thisDate);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(
+                Maintenance.this,
+                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                logDateSetListener,
+                year, month, day);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
     }
 
     @Override
@@ -291,7 +436,7 @@ public class Maintenance extends AppCompatActivity {
     }
 
     private void initiateList() {
-        maintList = (ListView) findViewById(R.id.maintList);
+        maintList = (ListView) findViewById(R.id.favsList);
 
         arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bikes.get(activeBike).maintenanceLogs);
 
@@ -299,8 +444,6 @@ public class Maintenance extends AppCompatActivity {
 
         setTitle("Maintenance: " + bikes.get(activeBike).model);
     }
-
-
 
     public static void saveLogs() {
 
@@ -407,12 +550,38 @@ public class Maintenance extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            // check if the back button was pressed with the add item view showing
+            // if it was, hide this view.  If not, carry on as normal.
+            if (showingMaintDetails) {
+
+                showingMaintDetails = false;
+                logDetails.setVisibility(View.INVISIBLE);
+                // reset the fuelling text boxes?
+
+            } else {
+                finish();
+                return true;
+            }
+        }
+        arrayAdapter.notifyDataSetChanged();
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         Log.i("Maintenance Activity", "On Pause");
         Log.i("On Pause", "Edit date " + editDate);
-        if (!editDate.equals("")){
-            Log.i("On Pause","While editing");
+        if (!editDate.equals("")) {
+            Log.i("On Pause", "While editing");
             addLog();
         }
         saveLogs();

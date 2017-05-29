@@ -24,10 +24,14 @@ public class Bike {
     String yearOfMan;
     String notes;
     double estMileage;
+    boolean MOTwarned;
+    boolean serviceWarned;
     ArrayList<fuellingDetails> fuelings = new ArrayList<>();
     ArrayList<maintenanceLogDetails> maintenanceLogs = new ArrayList<>();
 
-    public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue, String lastKnownService, String lastKnownMOT, String yearOfMan, String notes, double estMileage) {
+    public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue,
+                String lastKnownService, String lastKnownMOT, String yearOfMan, String notes, double estMileage,
+                boolean MOTwarned, boolean serviceWarned) {
         this.bikeId = bikeId;
         this.make = make;
         this.model = model;
@@ -40,6 +44,8 @@ public class Bike {
         this.yearOfMan = yearOfMan;
         this.notes = notes;
         this.estMileage = estMileage;
+        this.MOTwarned = MOTwarned;
+        this.serviceWarned = serviceWarned;
         // no bikeCount increment as this is only used by loading bikes, which restores the old bikeCount anyway
     }
 

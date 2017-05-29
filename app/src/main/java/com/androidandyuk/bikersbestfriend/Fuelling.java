@@ -1,19 +1,26 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.icu.text.DecimalFormat;
+import android.icu.util.Calendar;
+import android.icu.util.GregorianCalendar;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -29,7 +36,6 @@ import java.util.Date;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
-import static com.androidandyuk.bikersbestfriend.R.id.maintList;
 import static com.androidandyuk.bikersbestfriend.R.id.mileage;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
@@ -39,13 +45,19 @@ public class Fuelling extends AppCompatActivity {
     static ArrayAdapter arrayAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
     static int lastHowManyFuels = 10;
+    private boolean showingAddFueling = false;
+
+    private DatePickerDialog.OnDateSetListener fuelDateSetListener;
+
+    String fuelingDate;
 
     ListView listView;
     EditText milesDone;
     EditText petrolPrice;
     EditText litresUsed;
     EditText mileageText;
-    TextView mpgView;
+    TextView setFuelDate;
+
     View fuelingDetailsLayout;
 
     // used to store what item might be being edited or deleted
@@ -67,6 +79,13 @@ public class Fuelling extends AppCompatActivity {
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
 
+        // set the date for a new fueling to today
+        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
+        Calendar date = new GregorianCalendar();
+        String today = sdf.format(date);
+        setFuelDate.setText(today);
+
+
         Log.i("Fuelling", "Loading Fuels");
         loadFuels();
 
@@ -74,21 +93,23 @@ public class Fuelling extends AppCompatActivity {
 
         //needed for editing a fueling
 
-
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // this is for editing a fueling, it stores the info in itemLongPressed
                 itemLongPressedPosition = position;
                 itemLongPressed = bikes.get(activeBike).fuelings.get(position);
                 Log.i("Fuel List", "Tapped " + position);
 
+                setFuelDate.setText(bikes.get(activeBike).fuelings.get(position).getDate());
                 milesDone.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getMiles()));
                 petrolPrice.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getPrice()));
                 litresUsed.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getLitres()));
                 editDate = bikes.get(activeBike).fuelings.get(position).getDate();
-                bikes.get(activeBike).fuelings.remove(position);
+//                bikes.get(activeBike).fuelings.remove(position);
                 fuelingDetailsLayout.setVisibility(View.VISIBLE);
+                showingAddFueling = true;
 
             }
         });
@@ -124,14 +145,58 @@ public class Fuelling extends AppCompatActivity {
         });
 
 
+        fuelDateSetListener = new DatePickerDialog.OnDateSetListener()
+
+        {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                Calendar date = new GregorianCalendar();
+                date.set(year, month, day);
+                String sdfDate = sdf.format(date);
+                Log.i("Chosen Date", sdfDate);
+                setFuelDate.setText(sdfDate);
+            }
+        };
+
+    }
+
+    public void setFuelDate(View view) {
+        String thisDateString = "";
+        // this sets what date will show when the date picker shows
+        // first check if we're editing a current fueling
+        if (itemLongPressed != null) {
+            thisDateString = bikes.get(activeBike).fuelings.get(itemLongPressedPosition).getDate();
+        }
+        Date thisDate = new Date();
+        try {
+            thisDate = sdf.parse(thisDateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // for some reason I can't getYear from thisDate, so will just use the current year
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(thisDate);
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH);
+        int day = cal.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog dialog = new DatePickerDialog(
+                Fuelling.this,
+                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                fuelDateSetListener,
+                year, month, day);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
     }
 
     private void initiateList() {
         Log.i("Fuelling", "Initiating List");
-        listView = (ListView) findViewById(maintList);
+        listView = (ListView) findViewById(R.id.fuelList);
 
         fuelingDetailsLayout = findViewById(R.id.fuelingDetailsLayout);
 
+        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
         milesDone = (EditText) findViewById(R.id.milesDone);
         petrolPrice = (EditText) findViewById(R.id.petrolPrice);
         litresUsed = (EditText) findViewById(R.id.litresUsed);
@@ -153,6 +218,22 @@ public class Fuelling extends AppCompatActivity {
         // opens the add fueling dialog
         Log.i("Fuelling", "Adding fuel up");
         fuelingDetailsLayout.setVisibility(View.VISIBLE);
+        showingAddFueling = true;
+
+        // reset all info in the box. If it's an edit, this will be overwritten with info anyway
+        // set the date for a new fueling to today
+        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
+        Calendar date = new GregorianCalendar();
+        String today = sdf.format(date);
+        setFuelDate.setText(today);
+        // clear previous entries
+        milesDone.setText(null);
+        milesDone.clearFocus();
+        petrolPrice.setText(null);
+        petrolPrice.clearFocus();
+        litresUsed.setText(null);
+        litresUsed.clearFocus();
+
 
     }
 
@@ -192,6 +273,13 @@ public class Fuelling extends AppCompatActivity {
 
         } else {
 
+            // check if we're adding as it was being edited
+            if (itemLongPressed != null) {
+                bikes.get(activeBike).fuelings.remove(itemLongPressed);
+                itemLongPressed = null;
+            }
+
+            String date = setFuelDate.getText().toString();
             double miles = Double.parseDouble(milesDone.getText().toString());
             double price = Double.parseDouble(petrolPrice.getText().toString());
             double litres = Double.parseDouble(litresUsed.getText().toString());
@@ -201,11 +289,12 @@ public class Fuelling extends AppCompatActivity {
             } else {
                 mileage = Integer.parseInt(mileageText.getText().toString());
             }
-            fuellingDetails today = new fuellingDetails(miles, price, litres, mileage);
+            fuellingDetails today = new fuellingDetails(miles, price, litres, date, mileage);
             bikes.get(activeBike).fuelings.add(today);
             Collections.sort(bikes.get(activeBike).fuelings);
             arrayAdapter.notifyDataSetChanged();
             fuelingDetailsLayout.setVisibility(View.INVISIBLE);
+            showingAddFueling = false;
 
             updateAveMPG();
 
@@ -411,6 +500,33 @@ public class Fuelling extends AppCompatActivity {
             }
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            // check if the back button was pressed with the add item view showing
+            // if it was, hide this view.  If not, carry on as normal.
+            if (showingAddFueling) {
+
+                showingAddFueling = false;
+                fuelingDetailsLayout.setVisibility(View.INVISIBLE);
+                // reset the fuelling text boxes?
+
+            } else {
+                finish();
+                return true;
+            }
+        }
+        arrayAdapter.notifyDataSetChanged();
+        return super.onKeyDown(keyCode, event);
+    }
+
 
     @Override
     protected void onPause() {
