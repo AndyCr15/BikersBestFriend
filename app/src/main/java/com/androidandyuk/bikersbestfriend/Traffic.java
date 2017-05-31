@@ -12,9 +12,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.xml.sax.SAXException;
@@ -37,8 +40,7 @@ import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 public class Traffic extends AppCompatActivity {
 
     public static ArrayList<TrafficEvent> trafficEvents = new ArrayList<>();
-
-    static ArrayAdapter arrayAdapter;
+    static MyTrafficAdapter myAdapter;
     ListView trafficList;
 
     private DownloadManager downloadManager;
@@ -91,6 +93,49 @@ public class Traffic extends AppCompatActivity {
 
     }
 
+    private class MyTrafficAdapter extends BaseAdapter {
+        public ArrayList<TrafficEvent> trafficDataAdapter;
+
+        public MyTrafficAdapter(ArrayList<TrafficEvent> trafficDataAdapter) {
+            this.trafficDataAdapter = trafficDataAdapter;
+        }
+
+        @Override
+        public int getCount() {
+            return trafficDataAdapter.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater mInflater = getLayoutInflater();
+            View myView = mInflater.inflate(R.layout.traffic_listview, null);
+
+            final TrafficEvent s = trafficDataAdapter.get(position);
+
+            TextView trafficListRoad = (TextView) myView.findViewById(R.id.trafficListRoad);
+            trafficListRoad.setText(s.road);
+
+            TextView trafficListTitle = (TextView) myView.findViewById(R.id.trafficListTitle);
+            trafficListTitle.setText(s.title);
+
+            TextView trafficListDelay = (TextView) myView.findViewById(R.id.trafficListDelay);
+            trafficListDelay.setText(s.delay);
+
+            return myView;
+        }
+
+    }
+
     private void parseList() {
         Log.i("Traffic", "Parsing List");
         try {
@@ -99,12 +144,8 @@ public class Traffic extends AppCompatActivity {
 
             SAXHandler handler = new SAXHandler();
 
-//            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() + File.separator +
-//                    "allevents.xml");
-
             InputStream source = new FileInputStream("/storage/emulated/0/Download/allevents.xml");
             parser.parse(source, handler);
-//            file.delete();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {
@@ -117,11 +158,15 @@ public class Traffic extends AppCompatActivity {
 
     private void initiateList() {
         Log.i("Traffic", "Initiating List");
+        Boolean found = false;
         Collections.sort(trafficEvents);
         for (int i = 0; i < trafficEvents.size(); i++) {
-            if (trafficEvents.get(i).delay.equals("No Delay")) {
+            if (trafficEvents.get(i).delay.toLowerCase().contains("no delay")) {
+//                Log.i("Removed Traffic Item",trafficEvents.get(i).delay);
                 trafficEvents.remove(i);
-//                break;
+                found = true;
+            } else {
+//                Log.i("Traffic Item Kept",trafficEvents.get(i).delay);
             }
             // if there's another entry, check if it's the same reason
             // if it is, remove it
@@ -132,10 +177,16 @@ public class Traffic extends AppCompatActivity {
             }
         }
 
+        // check if the last initialisation found any 'No Delays'
+        // if it did, run it again
+        if (found) {
+            initiateList();
+        }
+
         Log.i("Initiating List", "List size " + trafficEvents.size());
         trafficList = (ListView) findViewById(R.id.trafficList);
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, trafficEvents);
-        trafficList.setAdapter(arrayAdapter);
+        myAdapter = new MyTrafficAdapter(trafficEvents);
+        trafficList.setAdapter(myAdapter);
     }
 
     private Runnable runnableUpdate = new Runnable() {
@@ -210,16 +261,16 @@ public class Traffic extends AppCompatActivity {
         }
     }
 
-    public void saveUpdateTime(){
-        Log.i("Traffic","Saving Update Time");
+    public void saveUpdateTime() {
+        Log.i("Traffic", "Saving Update Time");
 
-        ed.putInt("minsSinceUpdate" , lastTrafficUpdateMins).apply();
-        ed.putInt("daysSinceUpdate" , lastTrafficUpdateDay).apply();
+        ed.putInt("minsSinceUpdate", lastTrafficUpdateMins).apply();
+        ed.putInt("daysSinceUpdate", lastTrafficUpdateDay).apply();
 
     }
 
-    public void loadUpdateTime(){
-        Log.i("Traffic","Loading Update Time");
+    public void loadUpdateTime() {
+        Log.i("Traffic", "Loading Update Time");
 
         lastTrafficUpdateMins = sharedPreferences.getInt("minsSinceUpdate", 0);
         lastTrafficUpdateDay = sharedPreferences.getInt("daysSinceUpdate", 0);

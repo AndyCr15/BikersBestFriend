@@ -7,19 +7,19 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.icu.text.DecimalFormat;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -30,11 +30,13 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.R.id.mileage;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
@@ -42,7 +44,7 @@ import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class Fuelling extends AppCompatActivity {
 
-    static ArrayAdapter arrayAdapter;
+    static MyFuelAdapter myAdapter;
     private FirebaseAnalytics mFirebaseAnalytics;
     static int lastHowManyFuels = 10;
     private boolean showingAddFueling = false;
@@ -81,8 +83,8 @@ public class Fuelling extends AppCompatActivity {
 
         // set the date for a new fueling to today
         setFuelDate = (TextView) findViewById(R.id.setFuelDate);
-        Calendar date = new GregorianCalendar();
-        String today = sdf.format(date);
+        Calendar date = Calendar.getInstance();
+        String today = sdf.format(date.getTime());
         setFuelDate.setText(today);
 
 
@@ -150,9 +152,9 @@ public class Fuelling extends AppCompatActivity {
         {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                Calendar date = new GregorianCalendar();
+                Calendar date = Calendar.getInstance();
                 date.set(year, month, day);
-                String sdfDate = sdf.format(date);
+                String sdfDate = sdf.format(date.getTime());
                 Log.i("Chosen Date", sdfDate);
                 setFuelDate.setText(sdfDate);
             }
@@ -190,6 +192,50 @@ public class Fuelling extends AppCompatActivity {
         dialog.show();
     }
 
+    private class MyFuelAdapter extends BaseAdapter {
+        public ArrayList<fuellingDetails> fuelDataAdapter;
+
+        public MyFuelAdapter(ArrayList<fuellingDetails> fuelDataAdapter) {
+            this.fuelDataAdapter = fuelDataAdapter;
+        }
+
+        @Override
+        public int getCount() {
+            return fuelDataAdapter.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater mInflater = getLayoutInflater();
+            View myView = mInflater.inflate(R.layout.fuel_listview, null);
+
+            final fuellingDetails s = fuelDataAdapter.get(position);
+
+            TextView fuelDate = (TextView) myView.findViewById(R.id.fuelDate);
+            fuelDate.setText(s.date.substring(0, s.date.length() - 5));
+
+            TextView milesDone = (TextView) myView.findViewById(R.id.milesDone);
+            milesDone.setText(oneDecimal.format(s.miles) + " miles");
+
+            TextView fuelMPG = (TextView) myView.findViewById(R.id.fuelMPG);
+            fuelMPG.setText(oneDecimal.format(s.mpg) + "mpg");
+
+            return myView;
+        }
+
+    }
+
+
     private void initiateList() {
         Log.i("Fuelling", "Initiating List");
         listView = (ListView) findViewById(R.id.fuelList);
@@ -203,10 +249,10 @@ public class Fuelling extends AppCompatActivity {
         mileageText = (EditText) findViewById(mileage);
 
 
-        Log.i("Fuelling", "Setting arrayAdapter");
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bikes.get(activeBike).fuelings);
+        Log.i("Fuelling", "Setting myAdapter");
+        myAdapter = new MyFuelAdapter(bikes.get(activeBike).fuelings);
 
-        listView.setAdapter(arrayAdapter);
+        listView.setAdapter(myAdapter);
 
         updateAveMPG();
 
@@ -223,8 +269,8 @@ public class Fuelling extends AppCompatActivity {
         // reset all info in the box. If it's an edit, this will be overwritten with info anyway
         // set the date for a new fueling to today
         setFuelDate = (TextView) findViewById(R.id.setFuelDate);
-        Calendar date = new GregorianCalendar();
-        String today = sdf.format(date);
+        Calendar date = Calendar.getInstance();
+        String today = sdf.format(date.getTime());
         setFuelDate.setText(today);
         // clear previous entries
         milesDone.setText(null);
@@ -292,7 +338,7 @@ public class Fuelling extends AppCompatActivity {
             fuellingDetails today = new fuellingDetails(miles, price, litres, date, mileage);
             bikes.get(activeBike).fuelings.add(today);
             Collections.sort(bikes.get(activeBike).fuelings);
-            arrayAdapter.notifyDataSetChanged();
+            myAdapter.notifyDataSetChanged();
             fuelingDetailsLayout.setVisibility(View.INVISIBLE);
             showingAddFueling = false;
 
@@ -523,7 +569,7 @@ public class Fuelling extends AppCompatActivity {
                 return true;
             }
         }
-        arrayAdapter.notifyDataSetChanged();
+        myAdapter.notifyDataSetChanged();
         return super.onKeyDown(keyCode, event);
     }
 

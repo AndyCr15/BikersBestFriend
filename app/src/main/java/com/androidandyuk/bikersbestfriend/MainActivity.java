@@ -8,10 +8,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
-import android.icu.text.DecimalFormat;
-import android.icu.text.SimpleDateFormat;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,6 +15,7 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -37,23 +34,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
 import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
-
 public class MainActivity extends AppCompatActivity {
-    static ArrayList<markedLocation> favouriteLocations = new ArrayList<>();
     public static ArrayList<Bike> bikes = new ArrayList<>();
 
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static String userLocationForWeather;
 
-    public static final DecimalFormat precision = new DecimalFormat("0.00");
+    public static final DecimalFormat precision = new DecimalFormat("0.##");
+    public static final DecimalFormat oneDecimal = new DecimalFormat("0.#");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,8 +201,9 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                startActivity(intent);
+//                intent = new Intent(getApplicationContext(), SettingsActivity.class);
+//                startActivity(intent);
+                Toast.makeText(MainActivity.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
             case 1:
                 Log.i("Option", "1");
@@ -551,6 +553,7 @@ public class MainActivity extends AppCompatActivity {
     public static void loadBikes() {
         Log.i("Main Activity", "Bikes Loading");
         int bikesSize = sharedPreferences.getInt("bikesSize", 0);
+
         Log.i("Bikes Size", "" + bikesSize);
         bikes.clear();
 
@@ -634,6 +637,42 @@ public class MainActivity extends AppCompatActivity {
             loadLogs();
             loadFuels();
         }
+    }
+
+    public void SendLogcatMailView(View view) {
+        SendLogcatMail();
+    }
+
+    public void SendLogcatMail() {
+
+        // save logcat in file
+        File outputFile = new File(Environment.getExternalStorageDirectory(),
+                "logcat.txt");
+        try {
+            Runtime.getRuntime().exec(
+                    "logcat -f " + outputFile.getAbsolutePath());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        //send file using email
+        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+        // Set type to "email"
+        emailIntent.setType("vnd.android.cursor.dir/email");
+        String to[] = {"AndyCr15@gmail.com"};
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
+        // the attachment
+        emailIntent.putExtra(Intent.EXTRA_STREAM, outputFile.getAbsolutePath());
+        // the mail subject
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "BBF Feedbnack");
+        startActivity(Intent.createChooser(emailIntent, "Send email..."));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        SendLogcatMail();
     }
 
     @Override

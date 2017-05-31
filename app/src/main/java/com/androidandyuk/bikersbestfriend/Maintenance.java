@@ -6,8 +6,6 @@ import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -30,8 +28,10 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
@@ -89,8 +89,8 @@ public class Maintenance extends AppCompatActivity {
         ed = sharedPreferences.edit();
 
         // set the date for a new log to today
-        Calendar date = new GregorianCalendar();
-        String today = sdf.format(date);
+        Calendar date = Calendar.getInstance();
+        String today = sdf.format(date.getTime());
         setLogDate.setText(today);
 
         loadLogs();
@@ -158,9 +158,9 @@ public class Maintenance extends AppCompatActivity {
         {
             @Override
             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                Calendar date = new GregorianCalendar();
+                Calendar date = Calendar.getInstance();
                 date.set(year, month, day);
-                String sdfDate = sdf.format(date);
+                String sdfDate = sdf.format(date.getTime());
                 Log.i("Chosen Date", sdfDate);
                 setLogDate.setText(sdfDate);
             }
@@ -180,8 +180,8 @@ public class Maintenance extends AppCompatActivity {
         logCost.setText(null);
         logCost.clearFocus();
         // set the date for a new log to today
-        Calendar date = new GregorianCalendar();
-        String today = sdf.format(date);
+        Calendar date = Calendar.getInstance();
+        String today = sdf.format(date.getTime());
         setLogDate.setText(today);
 
         // needs to be set back to "" to show the next item isn't being edited
@@ -258,7 +258,7 @@ public class Maintenance extends AppCompatActivity {
 
             if (isAMOT) {
                 // create a new calendar item and then apply this bikes MOTdue to it
-                Calendar thisDate = new GregorianCalendar();
+                Calendar thisDate = Calendar.getInstance();
                 Date thisTestDate = null;
                 try {
                     thisTestDate = sdf.parse(date);

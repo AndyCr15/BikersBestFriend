@@ -1,78 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:ads="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_portrait" android:scaleType="fitXY"
-    tools:context="com.androidandyuk.bikersbestfriend.Locations">
+    tools:context="com.androidandyuk.bikersbestfriend.Locations"
+    tools:layout_editor_absoluteY="81dp"
+    tools:layout_editor_absoluteX="0dp">
 
-    <Button
-        android:id="@+id/favsButton"
-        android:layout_width="160dp"
-        android:layout_height="100dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_corners"
-        android:onClick="goToFavourites"
-        android:text="Favourites"
-        android:textSize="14sp"
-        app:layout_constraintRight_toLeftOf="@+id/guideline2"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/button3"
-        android:layout_width="160dp"
-        android:layout_height="100dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_corners"
-        android:onClick="goToTracks"
-        android:text="Race Tracks"
-        app:layout_constraintLeft_toLeftOf="@+id/guideline2"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <android.support.constraint.Guideline
-        android:id="@+id/guideline2"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/weatherView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        android:text="Today's Weather"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent" />
+        <Button
+            android:id="@+id/favsButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded_corners"
+            android:onClick="goToFavourites"
+            android:text="Favourites"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            tools:layout_editor_absoluteX="24dp"
+            tools:layout_editor_absoluteY="16dp" />
 
-    <Button
-        android:id="@+id/button6"
-        android:layout_width="160dp"
-        android:layout_height="100dp"
-        android:layout_marginRight="8dp"
-        android:layout_marginTop="16dp"
-        android:background="@drawable/rounded_corners"
-        android:onClick="goToHotSpots"
-        android:text="Hot Spots"
-        app:layout_constraintRight_toLeftOf="@+id/guideline2"
-        app:layout_constraintTop_toBottomOf="@+id/favsButton" />
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded_corners"
+            android:onClick="goToHotSpots"
+            android:text="Hot Spots"
+            android:textColor="@android:color/white"
+            tools:layout_editor_absoluteX="24dp"
+            tools:layout_editor_absoluteY="132dp" />
 
-    <Button
-        android:id="@+id/button12"
-        android:layout_width="160dp"
-        android:layout_height="100dp"
-        android:layout_marginLeft="8dp"
-        android:background="@drawable/rounded_corners"
-        android:onClick="goToTraffic"
-        android:text="Traffic"
-        app:layout_constraintBaseline_toBaselineOf="@+id/button6"
-        app:layout_constraintLeft_toLeftOf="@+id/guideline2" />
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded_corners"
+            android:onClick="goToTracks"
+            android:text="Race Tracks"
+            android:textColor="@android:color/white"
+            tools:layout_editor_absoluteX="200dp"
+            tools:layout_editor_absoluteY="16dp" />
 
-</android.support.constraint.ConstraintLayout>
+        <Button
+            android:id="@+id/button12"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:background="@drawable/rounded_corners"
+            android:onClick="goToTraffic"
+            android:text="Traffic"
+            android:textColor="@android:color/white"
+            tools:layout_editor_absoluteX="200dp"
+            tools:layout_editor_absoluteY="132dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/weatherView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_weight="0"
+                android:gravity="right"
+                android:onClick="loadWeather"
+                android:text="Today's Weather"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

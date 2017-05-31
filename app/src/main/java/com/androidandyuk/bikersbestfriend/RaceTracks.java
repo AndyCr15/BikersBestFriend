@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -15,9 +18,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
+
 public class RaceTracks extends AppCompatActivity {
     static List<markedLocation> trackLocations = new ArrayList<>();
-    static ArrayAdapter arrayAdapter;
+    static MyLocationAdapter myAdapter;
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
@@ -35,7 +40,47 @@ public class RaceTracks extends AppCompatActivity {
         Log.i("Sort List", "" + trackLocations.size());
         if (trackLocations.size() > 0) {
             Collections.sort(trackLocations);
-            arrayAdapter.notifyDataSetChanged();
+            myAdapter.notifyDataSetChanged();
+        }
+
+    }
+
+    public class MyLocationAdapter extends BaseAdapter {
+        public List<markedLocation> locationDataAdapter;
+
+        public MyLocationAdapter(List<markedLocation> locationDataAdapter) {
+            this.locationDataAdapter = locationDataAdapter;
+        }
+
+        @Override
+        public int getCount() {
+            return locationDataAdapter.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater mInflater = getLayoutInflater();
+            View myView = mInflater.inflate(R.layout.location_listview, null);
+
+            final markedLocation s = locationDataAdapter.get(position);
+
+            TextView locationListDistance = (TextView) myView.findViewById(R.id.locationListDistance);
+            locationListDistance.setText(oneDecimal.format(s.distance));
+
+            TextView locationListName = (TextView) myView.findViewById(R.id.locationListName);
+            locationListName.setText(s.name);
+
+            return myView;
         }
 
     }
@@ -51,9 +96,9 @@ public class RaceTracks extends AppCompatActivity {
 
         ListView listView = (ListView) findViewById(R.id.listTracks);
 
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, trackLocations);
+        myAdapter = new MyLocationAdapter(trackLocations);
 
-        listView.setAdapter(arrayAdapter);
+        listView.setAdapter(myAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 

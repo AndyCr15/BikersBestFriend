@@ -22,7 +22,7 @@ public class markedLocation implements Comparable<markedLocation> {
     LatLng location;
     String address;
     String comment;
-    int distance;
+    double distance;
 
     public markedLocation(String name, String address, LatLng location, String comment) {
         Log.i("New markedLocation", name);
@@ -43,7 +43,6 @@ public class markedLocation implements Comparable<markedLocation> {
     public double getDistance(markedLocation o) {
 //        Log.i("Get Distance", "called");
         if (o != null && this != o) {
-//            Log.i("Get Distance", "not null");
             double lat1 = this.location.latitude;
             double lng1 = this.location.longitude;
             double lat2 = o.location.latitude;
@@ -57,6 +56,7 @@ public class markedLocation implements Comparable<markedLocation> {
                             * Math.sin(dLon / 2) * Math.sin(dLon / 2);
             double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             double d = r * c;
+            this.distance = d;
             return d;
         }
         return 0;

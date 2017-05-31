@@ -7,11 +7,14 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -20,16 +23,14 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static com.androidandyuk.bikersbestfriend.MainActivity.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class Favourites extends AppCompatActivity {
-
-    static ArrayAdapter arrayAdapter;
+    static ArrayList<markedLocation> favouriteLocations = new ArrayList<>();
+    static MyLocationAdapter myAdapter;
 
     private FirebaseAnalytics mFirebaseAnalytics;
-    Button seeFavsMap;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +62,9 @@ public class Favourites extends AppCompatActivity {
             }
         });
 
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, favouriteLocations);
+        myAdapter = new MyLocationAdapter(favouriteLocations);
 
-        listView.setAdapter(arrayAdapter);
-
+        listView.setAdapter(myAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
@@ -97,7 +97,7 @@ public class Favourites extends AppCompatActivity {
                             public void onClick(DialogInterface dialog, int which) {
                                 Log.i("Removing", "Location");
                                 favouriteLocations.remove(favPosition);
-                                Favourites.arrayAdapter.notifyDataSetChanged();
+                                Favourites.myAdapter.notifyDataSetChanged();
                                 Toast.makeText(context,"Removed!", Toast.LENGTH_SHORT).show();
 
                             }
@@ -132,8 +132,48 @@ public class Favourites extends AppCompatActivity {
         Log.i("Sort List", "" + favouriteLocations.size());
         if (favouriteLocations.size() > 0) {
             Collections.sort(favouriteLocations);
-//            arrayAdapter.notifyDataSetChanged();
+//            myAdapter.notifyDataSetChanged();
         }
+    }
+
+    public class MyLocationAdapter extends BaseAdapter {
+        public ArrayList<markedLocation> locationDataAdapter;
+
+        public MyLocationAdapter(ArrayList<markedLocation> locationDataAdapter) {
+            this.locationDataAdapter = locationDataAdapter;
+        }
+
+        @Override
+        public int getCount() {
+            return locationDataAdapter.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            LayoutInflater mInflater = getLayoutInflater();
+            View myView = mInflater.inflate(R.layout.location_listview, null);
+
+            final markedLocation s = locationDataAdapter.get(position);
+
+            TextView locationListDistance = (TextView) myView.findViewById(R.id.locationListDistance);
+            locationListDistance.setText(oneDecimal.format(s.distance));
+
+            TextView locationListName = (TextView) myView.findViewById(R.id.locationListName);
+            locationListName.setText(s.name);
+
+            return myView;
+        }
+
     }
 
     public static void saveFavs() {
@@ -240,7 +280,7 @@ public class Favourites extends AppCompatActivity {
         Log.i("Favs Activity", "On Resume");
 
         sortMyList();
-        arrayAdapter.notifyDataSetChanged();
+        myAdapter.notifyDataSetChanged();
     }
 
 

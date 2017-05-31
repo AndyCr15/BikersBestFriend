@@ -23,6 +23,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -31,19 +32,18 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-import static com.androidandyuk.bikersbestfriend.MainActivity.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MainActivity.geocoder;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 import static com.androidandyuk.bikersbestfriend.Traffic.trafficEvents;
-import static  com.androidandyuk.bikersbestfriend.MainActivity.locationListener;
-import static  com.androidandyuk.bikersbestfriend.MainActivity.locationManager;
+import static com.androidandyuk.bikersbestfriend.MainActivity.locationListener;
+import static com.androidandyuk.bikersbestfriend.MainActivity.locationManager;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
     private static GoogleMap mMap;
     private FirebaseAnalytics mFirebaseAnalytics;
-
 
 
     @Override
@@ -179,7 +179,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
 
-
         }
 
     }
@@ -221,7 +220,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.i("Show Traffic Markers", "called");
         mMap.clear();
         for (TrafficEvent location : trafficEvents) {
-            mMap.addMarker(new MarkerOptions().position(location.location).title(location.title));
+            if (location.delay.contains("road closure")) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(location.location)
+                        .title(location.title)
+                        .snippet(location.delay)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)));
+            } else {
+                mMap.addMarker(new MarkerOptions()
+                        .position(location.location)
+                        .title(location.title)
+                        .snippet(location.delay)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 11));
     }
@@ -267,7 +278,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
 
-            Log.i("Center View on User","LK Location updated");
+            Log.i("Center View on User", "LK Location updated");
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
             MainActivity.user.setLocation(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()));

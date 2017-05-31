@@ -1,8 +1,7 @@
 package com.androidandyuk.bikersbestfriend;
 
-import android.icu.util.Calendar;
-
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
@@ -56,7 +55,7 @@ public class Bike {
 //        int yearNow = cal.get(Calendar.YEAR);
 //        int month = cal.get(Calendar.MONTH);
 //        int day = cal.get(Calendar.DAY_OF_MONTH);
-        String todaysDate = sdf.format(cal);
+        String todaysDate = sdf.format(cal.getTime());
 
         this.make = make;
         this.model = model;

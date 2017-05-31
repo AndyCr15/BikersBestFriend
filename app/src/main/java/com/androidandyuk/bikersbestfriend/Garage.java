@@ -7,8 +7,6 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.icu.util.Calendar;
-import android.icu.util.GregorianCalendar;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +25,10 @@ import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
@@ -96,17 +97,34 @@ public class Garage extends AppCompatActivity {
 
         loadLogs();
         garageSetup();
+        setListeners();
 
-        if (bikes.size() > 0) {
+
+        /**
+         * Hides the soft keyboard
+         */
+        if (getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+
+
+    }
+
+    public void setListeners() {
+
+        if (bikes.size() > 0)
+
+        {
             MOTDateSetListener = new DatePickerDialog.OnDateSetListener()
 
             {
                 @Override
                 public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                     Log.i("MOT Date was: ", bikes.get(activeBike).MOTdue);
-                    Calendar date = new GregorianCalendar();
+                    Calendar date = Calendar.getInstance(TimeZone.getDefault());
                     date.set(year, month, day);
-                    String sdfDate = sdf.format(date);
+                    String sdfDate = sdf.format(date.getTime());
                     bikes.get(activeBike).MOTdue = sdfDate;
                     Log.i("MOT Date now: ", bikes.get(activeBike).MOTdue);
                     garageSetup();
@@ -121,24 +139,15 @@ public class Garage extends AppCompatActivity {
                     Log.i("Service Date was: ", bikes.get(activeBike).serviceDue);
                     Calendar date = new GregorianCalendar();
                     date.set(year, month, day);
-                    String sdfDate = sdf.format(date);
+                    String sdfDate = sdf.format(date.getTime());
                     bikes.get(activeBike).serviceDue = sdfDate;
                     Log.i("Service Date now: ", bikes.get(activeBike).serviceDue);
                     garageSetup();
                 }
             };
         }
-
-        /**
-         * Hides the soft keyboard
-         */
-        if (getCurrentFocus() != null) {
-            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
-            inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        }
-
-
     }
+
 
     public void garageSetup() {
         bikeTitle = (TextView) findViewById(R.id.bikeTitle);
@@ -152,6 +161,7 @@ public class Garage extends AppCompatActivity {
         MOTdue = (TextView) findViewById(R.id.MOTdue);
         serviceDue = (TextView) findViewById(R.id.serviceDue);
 
+        setListeners();
 
         // check the user has a bike, then set all the views to it's current details
         if (bikes.size() > 0) {
@@ -166,6 +176,7 @@ public class Garage extends AppCompatActivity {
             // show only 2 decimal places.  Precision is declared in MainActivity to 2 decimal places
             String spend = "£" + precision.format(calculateMaintSpend(bikes.get(activeBike)));
             amountSpent.setText(spend);
+            bikeEstMileage.setText("tbc");
             if (bikes.get(activeBike).estMileage > 0) {
                 bikeEstMileage.setText(Double.toString(bikes.get(activeBike).estMileage));
             }
@@ -297,7 +308,7 @@ public class Garage extends AppCompatActivity {
                 bikes.add(newBike);
 
                 activeBike = bikes.size() - 1;
-
+                saveBikes();
                 garageSetup();
 
                 // hide keyboard
@@ -309,11 +320,13 @@ public class Garage extends AppCompatActivity {
                 View addingBikeInfo = findViewById(R.id.addingBikeInfo);
                 addingBikeInfo.setVisibility(View.INVISIBLE);
                 invalidateOptionsMenu();
+
             } else {
 
                 Toast.makeText(Garage.this, "That year looks unlikely", Toast.LENGTH_LONG).show();
 
             }
+
         }
     }
 
@@ -446,7 +459,7 @@ public class Garage extends AppCompatActivity {
         // check there's actually a bike before saving the reg
         if (!myRegView.getText().toString().equals("") && bikes.size() > 0) {
             bikes.get(activeBike).registration = myRegView.getText().toString();
-            Log.i("Setting Reg"," to " + myRegView.getText().toString());
+            Log.i("Setting Reg", " to " + myRegView.getText().toString());
         }
         saveBikes();
     }

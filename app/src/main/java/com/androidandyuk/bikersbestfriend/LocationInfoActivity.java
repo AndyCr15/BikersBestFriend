@@ -31,7 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import static com.androidandyuk.bikersbestfriend.MainActivity.favouriteLocations;
+import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MainActivity.jsonObject;
 import static com.androidandyuk.bikersbestfriend.MapsActivity.showMarkers;
