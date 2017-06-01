@@ -43,7 +43,6 @@ public class SplashScreen extends Activity {
 //        loadBikes();
 //        loadFuels();
 //        loadLogs();
-        MainActivity.initialiseTracks();
 
     }
 

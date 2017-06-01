@@ -286,7 +286,7 @@ public class Maintenance extends AppCompatActivity {
                 // if it was within MOT range, add a year to the MOTdue
                 // if it was outside, add a year to the date of the log
                 thisDate.add(Calendar.YEAR,1);
-                bikes.get(activeBike).MOTdue = sdf.format(thisDate);
+                bikes.get(activeBike).MOTdue = sdf.format(thisDate.getTime());
 
             }
 
@@ -299,7 +299,7 @@ public class Maintenance extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 thisDate.add(Calendar.YEAR,1);
-                bikes.get(activeBike).serviceDue = sdf.format(thisDate);
+                bikes.get(activeBike).serviceDue = sdf.format(thisDate.getTime());
 
             }
 

@@ -15,7 +15,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -34,7 +33,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -181,7 +179,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.bike_choice, menu);
-
         super.onCreateOptionsMenu(menu);
         menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
         menu.add(0, 1, 0, "About").setShortcut('3', 'c');
@@ -369,30 +366,6 @@ public class MainActivity extends AppCompatActivity {
     public void loadWeather(View view) {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.bbc.co.uk/weather/"));
         startActivity(browserIntent);
-    }
-
-    public static void initialiseTracks() {
-
-        if (RaceTracks.trackLocations.size() == 0) {
-            Log.i("Initialising Tracks", "Started");
-            RaceTracks.trackLocations.add(new markedLocation("Brands Hatch", new LatLng(51.3598711, 0.2586481), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Silverstone", new LatLng(52.0733006, -1.0168521), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Snetterton", new LatLng(52.4636482, 0.9436173), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Oulton Park", new LatLng(53.178469, -2.6189947), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Donington Park", new LatLng(52.8305468, -1.381029), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Anglesey", new LatLng(53.191994, -4.5038327), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Bedford Autodrome", new LatLng(52.2211337, -0.4819822), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Cadwell Park", new LatLng(53.3108261, -0.0737291), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Croft", new LatLng(54.4554809, -1.5580811), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Lydden Hill", new LatLng(51.1771493, 1.1987867), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Mallory Park", new LatLng(52.6006262, -1.3344846), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Rockingham", new LatLng(52.5156871, -0.6600846), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Thruxton", new LatLng(51.185835, -1.55265), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Knock Hill", new LatLng(56.1313905, -3.5111837), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Pembrey Race Circuit", new LatLng(51.7052918, -4.3258864), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Castle Combe", new LatLng(51.4935115, -2.2200441), ""));
-            RaceTracks.trackLocations.add(new markedLocation("Goodwood", new LatLng(50.859426, -0.753909), ""));
-        }
     }
 
     public class DownloadTask extends AsyncTask<String, Void, String> {
@@ -639,35 +612,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void SendLogcatMailView(View view) {
-        SendLogcatMail();
-    }
-
-    public void SendLogcatMail() {
-
-        // save logcat in file
-        File outputFile = new File(Environment.getExternalStorageDirectory(),
-                "logcat.txt");
-        try {
-            Runtime.getRuntime().exec(
-                    "logcat -f " + outputFile.getAbsolutePath());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        //send file using email
-        Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        // Set type to "email"
-        emailIntent.setType("vnd.android.cursor.dir/email");
-        String to[] = {"AndyCr15@gmail.com"};
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
-        // the attachment
-        emailIntent.putExtra(Intent.EXTRA_STREAM, outputFile.getAbsolutePath());
-        // the mail subject
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "BBF Feedbnack");
-        startActivity(Intent.createChooser(emailIntent, "Send email..."));
-    }
+//    public void SendLogcatMail(){
+//
+//
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_LOGS) == PackageManager.PERMISSION_GRANTED) {
+//            Log.d(getLocalClassName(), "Got READ_LOGS permissions");
+//        } else {
+//            Log.e(getLocalClassName(), "Don't have READ_LOGS permissions");
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_LOGS}, 103);
+//            Log.i(getLocalClassName(), "new READ_LOGS permission: " + ContextCompat.checkSelfPermission(this, Manifest.permission.READ_LOGS));
+//        }
+//
+//        // save logcat in file
+//        File outputFile = new File(downloadsDir,
+//                "logcat.txt");
+//        Log.i("SendLoagcatMail: ", "logcat file is " + outputFile.getAbsolutePath());
+//        try {
+//            Runtime.getRuntime().exec(
+//                    "logcat -f " + outputFile.getAbsolutePath());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            Log.e(getLocalClassName(), "Alas error! ", e);
+//        }
+//
+//        //send file using email
+//        Intent emailIntent = new Intent(Intent.ACTION_SEND);
+//        // Set type to "email"
+//        emailIntent.setType("vnd.android.cursor.dir/email");
+//        String to[] = {"vishvas.vasuki+STARDICTAPP@gmail.com"};
+//        emailIntent.putExtra(Intent.EXTRA_EMAIL, to);
+//        // the attachment
+//        emailIntent .putExtra(Intent.EXTRA_STREAM, Uri.fromFile(outputFile));
+//        // the mail subject
+//        emailIntent .putExtra(Intent.EXTRA_SUBJECT, "Stardict Updater App Failure report.");
+//        startActivity(Intent.createChooser(emailIntent , "Email failure report to maker?..."));
+//    }
 
     @Override
     protected void onDestroy() {

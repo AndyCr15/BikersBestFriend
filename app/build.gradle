@@ -9,8 +9,8 @@ android {
         applicationId "com.androidandyuk.bikersbestfriend"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 11
-        versionName "v0.5.4"
+        versionCode 12
+        versionName "v0.5.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

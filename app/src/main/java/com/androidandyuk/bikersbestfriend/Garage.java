@@ -209,10 +209,12 @@ public class Garage extends AppCompatActivity {
     public void setMOTdue(View view) {
         // this sets what date will show when the date picker shows
         Date thisDate = new Date();
-        try {
-            thisDate = sdf.parse(bikes.get(activeBike).MOTdue);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if (activeBike > -1) {
+            try {
+                thisDate = sdf.parse(bikes.get(activeBike).MOTdue);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
 
         // for some reason I can't getYear from thisDate, so will just use the current year
@@ -234,10 +236,12 @@ public class Garage extends AppCompatActivity {
     public void setServiceDue(View view) {
         // this sets what date will show when the date picker shows
         Date thisDate = new Date();
-        try {
-            thisDate = sdf.parse(bikes.get(activeBike).serviceDue);
-        } catch (ParseException e) {
-            e.printStackTrace();
+        if (activeBike > -1) {
+            try {
+                thisDate = sdf.parse(bikes.get(activeBike).serviceDue);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
 
         // for some reasone I can't getYear from thisDate, so will just use the current year
@@ -369,8 +373,8 @@ public class Garage extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.bike_choice, menu);
-
         super.onCreateOptionsMenu(menu);
+
         menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
         menu.add(0, 1, 0, "About").setShortcut('3', 'c');
 
@@ -385,10 +389,11 @@ public class Garage extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        // save any changes in Bike notes
-        bikeNotes = (EditText) findViewById(R.id.bikeNotes);
-        bikes.get(activeBike).notes = bikeNotes.getText().toString();
-
+        if (activeBike > -1) {
+            // save any changes in Bike notes
+            bikeNotes = (EditText) findViewById(R.id.bikeNotes);
+            bikes.get(activeBike).notes = bikeNotes.getText().toString();
+        }
         // change to bike selected
         switch (item.getItemId()) {
             case 0:
