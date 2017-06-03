@@ -1,9 +1,7 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,9 +13,6 @@ import com.google.android.gms.ads.AdView;
  * status bar and navigation/system bar) with user interaction.
  */
 public class SplashScreen extends Activity {
-
-    public static SharedPreferences sharedPreferences;
-    public static SharedPreferences.Editor ed;
 
     // for ads
     private static final String TAG = "MainActivity";
@@ -36,9 +31,6 @@ public class SplashScreen extends Activity {
         mAdView.loadAd(adRequest);
 
         // code that takes time
-
-        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
-        ed = sharedPreferences.edit();
 
 //        loadBikes();
 //        loadFuels();

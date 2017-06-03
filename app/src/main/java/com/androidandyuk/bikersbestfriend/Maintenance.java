@@ -37,8 +37,8 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.checkInRange;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
+import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
 public class Maintenance extends AppCompatActivity {
 

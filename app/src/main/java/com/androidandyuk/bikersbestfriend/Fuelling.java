@@ -39,8 +39,8 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.R.id.mileage;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
+import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
 public class Fuelling extends AppCompatActivity {
 

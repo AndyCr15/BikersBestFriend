@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
 public class Favourites extends AppCompatActivity {
     static ArrayList<markedLocation> favouriteLocations = new ArrayList<>();

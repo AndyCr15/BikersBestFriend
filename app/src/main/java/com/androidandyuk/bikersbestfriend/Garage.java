@@ -148,7 +148,6 @@ public class Garage extends AppCompatActivity {
         }
     }
 
-
     public void garageSetup() {
         bikeTitle = (TextView) findViewById(R.id.bikeTitle);
         regSwitcher = (ViewSwitcher) findViewById(R.id.regSwitcher);

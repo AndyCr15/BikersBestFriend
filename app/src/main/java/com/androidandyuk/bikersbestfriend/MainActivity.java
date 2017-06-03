@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.location.Geocoder;
@@ -48,10 +49,12 @@ import java.util.GregorianCalendar;
 
 import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
 import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
 
 public class MainActivity extends AppCompatActivity {
+
+    public static SharedPreferences sharedPreferences;
+    public static SharedPreferences.Editor ed;
+
     public static ArrayList<Bike> bikes = new ArrayList<>();
 
     private FirebaseAnalytics mFirebaseAnalytics;
@@ -101,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
         mAdView = (AdView) findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
+
+        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
+        ed = sharedPreferences.edit();
 
         loadBikes();
         loadFuels();

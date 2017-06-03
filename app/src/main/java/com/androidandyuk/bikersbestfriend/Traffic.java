@@ -34,8 +34,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import static com.androidandyuk.bikersbestfriend.SplashScreen.ed;
-import static com.androidandyuk.bikersbestfriend.SplashScreen.sharedPreferences;
+import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
 public class Traffic extends AppCompatActivity {
 
