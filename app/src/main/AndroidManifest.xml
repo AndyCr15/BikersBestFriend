@@ -103,7 +103,8 @@
             android:label="Send Feedback"
             android:theme="@style/AppTheme" />
         <activity android:name=".PetrolPrices" />
-        <activity android:name=".MaintenanceLog"></activity>
+        <activity android:name=".MaintenanceLog" />
+        <activity android:name=".PartsLog"></activity>
     </application>
 
 </manifest>

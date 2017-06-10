@@ -459,14 +459,14 @@ public class Fuelling extends AppCompatActivity {
                 ArrayList<String> miles = new ArrayList<>();
                 ArrayList<String> prices = new ArrayList<>();
                 ArrayList<String> litres = new ArrayList<>();
-                ArrayList<String> mileage = new ArrayList<>();
+                ArrayList<String> fuMileage = new ArrayList<>();
 
                 // I think these are new variables, so likely don't need clearing?
                 fdates.clear();
                 miles.clear();
                 prices.clear();
                 litres.clear();
-                mileage.clear();
+                fuMileage.clear();
 
                 for (fuellingDetails thisLog : thisBike.fuelings) {
 
@@ -474,7 +474,7 @@ public class Fuelling extends AppCompatActivity {
                     miles.add(Double.toString(thisLog.miles));
                     prices.add(Double.toString(thisLog.price));
                     litres.add(Double.toString(thisLog.litres));
-                    mileage.add(Double.toString(thisLog.mileage));
+                    fuMileage.add(Double.toString(thisLog.mileage));
 
                 }
 
@@ -483,7 +483,7 @@ public class Fuelling extends AppCompatActivity {
                 ed.putString("miles" + thisBike.bikeId, ObjectSerializer.serialize(miles)).apply();
                 ed.putString("prices" + thisBike.bikeId, ObjectSerializer.serialize(prices)).apply();
                 ed.putString("litres" + thisBike.bikeId, ObjectSerializer.serialize(litres)).apply();
-                ed.putString("mileage" + thisBike.bikeId, ObjectSerializer.serialize(mileage)).apply();
+                ed.putString("fuMileage" + thisBike.bikeId, ObjectSerializer.serialize(fuMileage)).apply();
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Adding fuellings", "Failed attempt");
@@ -502,14 +502,14 @@ public class Fuelling extends AppCompatActivity {
             ArrayList<String> miles = new ArrayList<>();
             ArrayList<String> prices = new ArrayList<>();
             ArrayList<String> litres = new ArrayList<>();
-            ArrayList<String> mileage = new ArrayList<>();
+            ArrayList<String> fuMileage = new ArrayList<>();
 
             // I think these are new variables, so likely don't need clearing?
             fdates.clear();
             miles.clear();
             prices.clear();
             litres.clear();
-            mileage.clear();
+            fuMileage.clear();
 
             try {
 
@@ -517,7 +517,7 @@ public class Fuelling extends AppCompatActivity {
                 miles = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("miles" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 prices = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("prices" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 litres = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("litres" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
-                mileage = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("mileage" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
+                fuMileage = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("fuMileage" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 Log.i("fDates for " + thisBike, "Count :" + fdates.size());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -536,7 +536,7 @@ public class Fuelling extends AppCompatActivity {
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
-                        fuellingDetails newLog = new fuellingDetails(Double.parseDouble(miles.get(x)), Double.parseDouble(prices.get(x)), Double.parseDouble(litres.get(x)), thisDate, Double.parseDouble(mileage.get(x)));
+                        fuellingDetails newLog = new fuellingDetails(Double.parseDouble(miles.get(x)), Double.parseDouble(prices.get(x)), Double.parseDouble(litres.get(x)), thisDate, Double.parseDouble(fuMileage.get(x)));
                         Log.i("Adding", "" + x + "" + newLog);
                         thisBike.fuelings.add(newLog);
                     }

@@ -48,6 +48,8 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
     }
 
     public fuellingDetails(double miles, double price, double litres, String date, double mileage) {
+        // adding a brand new fueling
+
         this.miles = miles;
         this.price = price;
         this.litres = litres;
@@ -60,10 +62,13 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         if (date.equals(formattedDate)) {
             if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
                 MainActivity.bikes.get(activeBike).estMileage = mileage;
+                this.mileage = mileage;
             } else if (mileage != 0) {
                 Context context = App.getContext();
                 Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
-
+            } else {
+                // mileage has been left blank
+                MainActivity.bikes.get(activeBike).estMileage += miles;
             }
         } else {
             Context context = App.getContext();

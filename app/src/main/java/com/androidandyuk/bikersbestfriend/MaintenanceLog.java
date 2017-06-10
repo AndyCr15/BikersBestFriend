@@ -29,7 +29,7 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.checkInRange;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
-import static com.androidandyuk.bikersbestfriend.Maintenance.arrayAdapter;
+import static com.androidandyuk.bikersbestfriend.Maintenance.myAdapter;
 import static com.androidandyuk.bikersbestfriend.Maintenance.itemLongPressed;
 import static com.androidandyuk.bikersbestfriend.Maintenance.itemLongPressedPosition;
 import static com.androidandyuk.bikersbestfriend.Maintenance.saveLogs;
@@ -177,19 +177,19 @@ public class MaintenanceLog extends AppCompatActivity {
         }
 
         String logInfo = logString.getText().toString();
+        Log.i("Log Info",logInfo);
 
         // check information has been entered
-        if (logInfo.isEmpty()) {
+        if (logInfo.isEmpty() && logInfo == null) {
 
             Toast.makeText(MaintenanceLog.this, "Please complete all necessary details", Toast.LENGTH_LONG).show();
 
         } else {
 
-            // check if we're adding as it was being edited
-            if (itemLongPressed != null) {
-                bikes.get(activeBike).maintenanceLogs.remove(itemLongPressed);
-                itemLongPressed = null;
-            }
+//            // check if we're adding as it was being edited
+//            if (itemLongPressed != null) {
+//                bikes.get(activeBike).maintenanceLogs.remove(itemLongPressed);
+//            }
 
 //            wasService = (CheckBox) findViewById(R.id.serviceCheckBox);
 //            wasMOT = (CheckBox) findViewById(R.id.MOTCheckBox);
@@ -220,9 +220,12 @@ public class MaintenanceLog extends AppCompatActivity {
             // if so, carry over the old date
             // if not, create without a date, which will set it to today
             String date = setLogDate.getText().toString();
-            ;
-            maintenanceLogDetails today = null;
-            if (!date.equals("")) {
+            Log.i("Log Date is", date);
+
+            maintenanceLogDetails today;
+            Log.i("itemLongPressed"," is " + itemLongPressed);
+            if (itemLongPressed != null) {
+                bikes.get(activeBike).maintenanceLogs.remove(itemLongPressed);
                 today = new maintenanceLogDetails(date, logInfo, cost, mileage, isAService, isAMOT, theseBrakePads, theseBrakeDiscs, theseFrontTyre, theseRearTyre,
                         theseOilChange, theseNewBattery, theseCoolantChange, theseSparkPlugs, theseAirFilter, theseBrakeFluid);
                 Log.i("Created ", "with old date");
@@ -233,7 +236,8 @@ public class MaintenanceLog extends AppCompatActivity {
             }
             bikes.get(activeBike).maintenanceLogs.add(today);
             Collections.sort(bikes.get(activeBike).maintenanceLogs);
-            arrayAdapter.notifyDataSetChanged();
+            myAdapter.notifyDataSetChanged();
+//            itemLongPressed = null;
 
             if (isAMOT) {
                 // create a new calendar item and then apply this bikes MOTdue to it
@@ -342,11 +346,11 @@ public class MaintenanceLog extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-                // save current log state?
-                finish();
-                return true;
+            addLog();
+            finish();
+            return true;
         }
-        arrayAdapter.notifyDataSetChanged();
+        myAdapter.notifyDataSetChanged();
         return super.onKeyDown(keyCode, event);
     }
 
@@ -354,11 +358,6 @@ public class MaintenanceLog extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.i("Maintenance Activity", "On Pause");
-        Log.i("On Pause", "Edit date " + editDate);
-        if (!editDate.equals("")) {
-            Log.i("On Pause", "While editing");
-            addLog();
-        }
         saveLogs();
     }
 

@@ -1,10 +1,8 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
-import android.icu.text.DecimalFormat;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -36,9 +34,12 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
 
     public maintenanceLogDetails(String date, String log, double price, double mileage, Boolean wasService, Boolean wasMOT, Boolean brakePads, Boolean brakeDiscs,
                                  Boolean frontTyre, Boolean rearTyre, Boolean oilChange, Boolean newBattery, Boolean coolantChange, Boolean sparkPlugs, Boolean airFilter, Boolean brakeFluid) {
+        // only used when editing a maintenance log
+
         this.date = date;
         this.log = log;
         this.price = price;
+        this.mileage = mileage;
         this.wasService = wasService;
         this.wasMOT = wasMOT;
         this.brakePads = brakePads;
@@ -51,19 +52,12 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         this.sparkPlugs = sparkPlugs;
         this.airFilter = airFilter;
         this.brakeFluid = brakeFluid;
-
-        if (mileage != 0 && mileage >= MainActivity.bikes.get(activeBike).estMileage) {
-            MainActivity.bikes.get(activeBike).estMileage = mileage;
-            this.mileage = mileage;
-        } else if (mileage != 0) {
-            Context context = App.getContext();
-            Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
-            this.mileage = MainActivity.bikes.get(activeBike).estMileage;
-        }
     }
 
     public maintenanceLogDetails(Date logDate, String log, double price, double mileage, Boolean wasService, Boolean wasMOT, Boolean brakePads, Boolean brakeDiscs,
                                  Boolean frontTyre, Boolean rearTyre, Boolean oilChange, Boolean newBattery, Boolean coolantChange, Boolean sparkPlugs, Boolean airFilter, Boolean brakeFluid) {
+        // this one is only used in loading logs after a save
+
         this.date = sdf.format(logDate);
         this.log = log;
         this.price = price;
@@ -79,19 +73,13 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         this.sparkPlugs = sparkPlugs;
         this.airFilter = airFilter;
         this.brakeFluid = brakeFluid;
-
-        if (mileage != 0 && mileage >= MainActivity.bikes.get(activeBike).estMileage) {
-            MainActivity.bikes.get(activeBike).estMileage = mileage;
-            this.mileage = mileage;
-        } else if (mileage != 0) {
-            Context context = App.getContext();
-            Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
-            this.mileage = MainActivity.bikes.get(activeBike).estMileage;
-        }
+        this.mileage = mileage;
     }
 
     public maintenanceLogDetails(String log, double price, double mileage, Boolean wasService, Boolean wasMOT, Boolean brakePads, Boolean brakeDiscs, Boolean frontTyre,
                                  Boolean rearTyre, Boolean oilChange, Boolean newBattery, Boolean coolantChange, Boolean sparkPlugs, Boolean airFilter, Boolean brakeFluid) {
+        // used for brand new maintenance log entries
+
         Date logDate = new Date();
         this.date = sdf.format(logDate);
         this.log = log;
@@ -116,16 +104,9 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
             Context context = App.getContext();
             Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
             this.mileage = MainActivity.bikes.get(activeBike).estMileage;
+        } else {
         }
     }
-
-//    public maintenanceLogDetails(String log, double price, Date logDate, Boolean wasService, Boolean wasMOT) {
-//        this.log = log;
-//        this.date = sdf.format(logDate);
-//        this.price = price;
-//        this.wasService = wasService;
-//        this.wasMOT = wasMOT;
-//    }
 
     public String getDate() {
         return date;
@@ -228,7 +209,7 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         }
 
 
-        DecimalFormat df = new DecimalFormat();
+        java.text.DecimalFormat df = new java.text.DecimalFormat();
         df.setMaximumFractionDigits(2);
 
         String tempLog = log;

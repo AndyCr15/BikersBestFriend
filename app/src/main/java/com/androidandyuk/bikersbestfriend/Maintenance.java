@@ -12,12 +12,13 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
+import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -41,17 +42,12 @@ public class Maintenance extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
 
-    static ArrayAdapter arrayAdapter;
+    static MyMaintenanceAdapter myAdapter;
     ListView maintList;
 
-    View logDetails;
-
-    EditText logString;
-    EditText logCost;
-    EditText logMilage;
     TextView setLogDate;
-    CheckBox isService;
-    CheckBox isMOT;
+
+    String searchItem = "";
 
     private DatePickerDialog.OnDateSetListener logDateSetListener;
 
@@ -135,6 +131,16 @@ public class Maintenance extends AppCompatActivity {
             }
         };
 
+    }
+
+    public void setSearch(View view) {
+        EditText search = (EditText) findViewById(R.id.searchBox);
+
+        searchItem = search.getText().toString();
+
+        Log.i("Search for", searchItem);
+
+        initiateList();
     }
 
     public void showAddLog(View view) {
@@ -247,37 +253,93 @@ public class Maintenance extends AppCompatActivity {
     }
 
     private void initiateList() {
-        maintList = (ListView) findViewById(R.id.favsList);
+        maintList = (ListView) findViewById(R.id.maintList);
 
-        arrayAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, bikes.get(activeBike).maintenanceLogs);
+        myAdapter = new MyMaintenanceAdapter(bikes.get(activeBike).maintenanceLogs);
 
-        maintList.setAdapter(arrayAdapter);
+        maintList.setAdapter(myAdapter);
+
 
         setTitle("Maintenance: " + bikes.get(activeBike).model);
     }
+
+    public class MyMaintenanceAdapter extends BaseAdapter {
+        public ArrayList<maintenanceLogDetails> maintDataAdapter;
+
+        public MyMaintenanceAdapter(ArrayList<maintenanceLogDetails> maintDataAdapter) {
+            this.maintDataAdapter = maintDataAdapter;
+        }
+
+        @Override
+        public int getCount() {
+            return maintDataAdapter.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            final maintenanceLogDetails s = maintDataAdapter.get(position);
+
+            if (searchItem == "" || s.log.toLowerCase().contains(searchItem.toLowerCase())) {
+                LayoutInflater mInflater = getLayoutInflater();
+                View myView = mInflater.inflate(R.layout.maintenance_listview, null);
+
+                TextView maintenanceListDate = (TextView) myView.findViewById(R.id.maintenanceListDate);
+                maintenanceListDate.setText(s.date);
+
+                TextView maintenanceListMileage = (TextView) myView.findViewById(R.id.maintenanceListMileage);
+                maintenanceListMileage.setText("Mi:" + Double.toString(s.mileage));
+
+                TextView maintenanceListLog = (TextView) myView.findViewById(R.id.maintenanceListLog);
+                maintenanceListLog.setText(s.log);
+
+                TextView maintenanceListCost = (TextView) myView.findViewById(R.id.maintenanceListCost);
+                maintenanceListCost.setText("£" + Double.toString(s.price));
+
+                return myView;
+            } else {
+                LayoutInflater mInflater = getLayoutInflater();
+                View myView = mInflater.inflate(R.layout.blank, null);
+                return myView;
+            }
+        }
+    }
+
 
     public static void saveLogs() {
 
         for (Bike thisBike : bikes) {
 
+            ArrayList<String> dates = new ArrayList<>();
+            ArrayList<String> logs = new ArrayList<>();
+            ArrayList<String> costs = new ArrayList<>();
+            ArrayList<String> mileage = new ArrayList<>();
+            ArrayList<String> wasService = new ArrayList<>();
+            ArrayList<String> wasMOT = new ArrayList<>();
+            ArrayList<String> brakePads = new ArrayList<>();
+            ArrayList<String> brakeDiscs = new ArrayList<>();
+            ArrayList<String> frontTyre = new ArrayList<>();
+            ArrayList<String> rearTyre = new ArrayList<>();
+            ArrayList<String> oilChange = new ArrayList<>();
+            ArrayList<String> newBattery = new ArrayList<>();
+            ArrayList<String> coolantChange = new ArrayList<>();
+            ArrayList<String> sparkPlugs = new ArrayList<>();
+            ArrayList<String> airFilter = new ArrayList<>();
+            ArrayList<String> brakeFluid = new ArrayList<>();
+
             Log.i("Saving Logs", "" + thisBike);
             try {
-                ArrayList<String> dates = new ArrayList<>();
-                ArrayList<String> logs = new ArrayList<>();
-                ArrayList<String> costs = new ArrayList<>();
-                ArrayList<String> mileage = new ArrayList<>();
-                ArrayList<String> wasService = new ArrayList<>();
-                ArrayList<String> wasMOT = new ArrayList<>();
-                ArrayList<String> brakePads = new ArrayList<>();
-                ArrayList<String> brakeDiscs = new ArrayList<>();
-                ArrayList<String> frontTyre = new ArrayList<>();
-                ArrayList<String> rearTyre = new ArrayList<>();
-                ArrayList<String> oilChange = new ArrayList<>();
-                ArrayList<String> newBattery = new ArrayList<>();
-                ArrayList<String> coolantChange = new ArrayList<>();
-                ArrayList<String> sparkPlugs = new ArrayList<>();
-                ArrayList<String> airFilter = new ArrayList<>();
-                ArrayList<String> brakeFluid = new ArrayList<>();
+
 
 //                // I think these are new variables, so likely don't need clearing?
 //                dates.clear();
@@ -307,7 +369,6 @@ public class Maintenance extends AppCompatActivity {
 
                 }
 
-                Log.i("Saving Logs", "Size :" + dates.size());
                 ed.putString("dates" + thisBike.bikeId, ObjectSerializer.serialize(dates)).apply();
                 ed.putString("logs" + thisBike.bikeId, ObjectSerializer.serialize(logs)).apply();
                 ed.putString("costs" + thisBike.bikeId, ObjectSerializer.serialize(costs)).apply();
@@ -337,8 +398,6 @@ public class Maintenance extends AppCompatActivity {
         for (Bike thisBike : bikes) {
             thisBike.maintenanceLogs.clear();
 
-            Log.i("Loading Logs", "" + thisBike);
-
             ArrayList<String> dates = new ArrayList<>();
             ArrayList<String> logs = new ArrayList<>();
             ArrayList<String> costs = new ArrayList<>();
@@ -355,6 +414,8 @@ public class Maintenance extends AppCompatActivity {
             ArrayList<String> sparkPlugs = new ArrayList<>();
             ArrayList<String> airFilter = new ArrayList<>();
             ArrayList<String> brakeFluid = new ArrayList<>();
+
+            Log.i("Loading Logs", "" + thisBike);
 
             // I think these are new variables, so likely don't need clearing?
 //            dates.clear();
@@ -382,14 +443,11 @@ public class Maintenance extends AppCompatActivity {
                 airFilter = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("airFilter" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 brakeFluid = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("brakeFluid" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
 
-                Log.i("Dates for " + thisBike, "Count :" + dates.size());
-
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Loading Maint Logs", "Failed attempt");
             }
 
-            Log.i("Retrieved info" + thisBike, "Log count :" + dates.size());
             if (dates.size() > 0 && logs.size() > 0 && costs.size() > 0) {
                 // we've checked there is some info
                 if (dates.size() == logs.size() && logs.size() == costs.size()) {
@@ -416,9 +474,6 @@ public class Maintenance extends AppCompatActivity {
                         Boolean wasAirFilter = Boolean.valueOf(airFilter.get(x));
                         Boolean wasBrakeFluid = Boolean.valueOf(brakeFluid.get(x));
 
-                        Log.i("Adding", "Costs:" + x + " " + costs.get(x));
-                        Log.i("Adding", "Mileage:" + x + " " + mileage.get(x));
-
                         maintenanceLogDetails newLog = new maintenanceLogDetails(thisDate, logs.get(x), Double.parseDouble(costs.get(x)), Double.parseDouble(mileage.get(x)), wasItAService, wasItAMOT, wasBrakePads
                                 , wasBrakeDiscs, wasFrontTyre, wasRearTyre, wasOilChange, wasNewBattery, wasCoolantChange, wasSparkPlugs, wasAirFilter, wasBrakeFluid);
 
@@ -443,7 +498,7 @@ public class Maintenance extends AppCompatActivity {
             finish();
             return true;
         }
-        arrayAdapter.notifyDataSetChanged();
+        myAdapter.notifyDataSetChanged();
         return super.onKeyDown(keyCode, event);
     }
 
