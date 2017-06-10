@@ -67,7 +67,7 @@ public class Bike {
         this.lastKnownService = "";
         this.lastKnownMOT = "";
         this.yearOfMan = year;
-        this.estMileage = 0;
+        this.estMileage = 1;
         bikeCount++;
     }
 

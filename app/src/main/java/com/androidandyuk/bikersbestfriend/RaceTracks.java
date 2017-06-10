@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,6 +142,21 @@ public class RaceTracks extends AppCompatActivity {
             RaceTracks.trackLocations.add(new markedLocation("Goodwood", new LatLng(50.859426, -0.753909), ""));
             RaceTracks.trackLocations.add(new markedLocation("Santa Pod", new LatLng(52.23485, -0.6022797), ""));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

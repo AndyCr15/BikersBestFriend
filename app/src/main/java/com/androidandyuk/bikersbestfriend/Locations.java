@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
 
@@ -69,6 +70,11 @@ public class Locations extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void goToPetrol(View view) {
+        Intent intent = new Intent(getApplicationContext(), PetrolPrices.class);
+        startActivity(intent);
+    }
+
     public void goToTracks(View view) {
         Intent intent = new Intent(getApplicationContext(), RaceTracks.class);
 
@@ -79,6 +85,22 @@ public class Locations extends AppCompatActivity {
         Intent intent = new Intent(getApplicationContext(), HotSpots.class);
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+                finish();
+                return true;
+
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
 }

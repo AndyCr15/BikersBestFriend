@@ -661,6 +661,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        invalidateOptionsMenu();
+        super.onResume();
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         Log.i("Logs Activity", "On Pause");
@@ -673,5 +679,4 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Logs Activity", "On Stop");
         saveBikes();
     }
-
 }

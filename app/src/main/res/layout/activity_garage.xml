@@ -54,7 +54,7 @@
         android:paddingRight="10dp"
         android:paddingStart="10dp"
         android:paddingTop="5dp"
-        android:text="Add your first bike"
+        android:text="Use blue button to add bike"
         android:textColor="@android:color/white"
         android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -237,6 +237,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="@drawable/rounded_corners_grey_orange"
+                android:onClick="cantSetMileage"
                 android:text="tbc"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -265,6 +266,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="@drawable/rounded_corners_grey_orange"
+                android:onClick="cantSetMPG"
                 android:text="tbc"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -294,6 +296,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="@drawable/rounded_corners_grey_orange"
+                android:onClick="cantSetSpent"
                 android:text="tbc"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -324,8 +327,9 @@
         android:id="@+id/addingBikeInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:alpha="0.8"
-        android:background="?attr/colorButtonNormal"
+        android:layout_margin="16dp"
+        android:alpha="1"
+        android:background="@drawable/rounded_corners_grey_orange"
         android:elevation="24dp"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -352,9 +356,10 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:layout_weight="1"
-                    android:background="@color/colorPrimary"
+                    android:background="@drawable/rounded_corners"
                     android:text="Make"
                     android:textAlignment="center"
+                    android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
                 <EditText
@@ -363,7 +368,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:layout_weight="2"
-                    android:background="@color/colorPrimary"
+                    android:background="@drawable/rounded_corners"
                     android:textAlignment="center"
                     android:textSize="18sp" />
 
@@ -380,9 +385,10 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:layout_weight="1"
-                    android:background="@color/colorPrimary"
+                    android:background="@drawable/rounded_corners"
                     android:text="Model"
                     android:textAlignment="center"
+                    android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
                 <EditText
@@ -391,7 +397,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:layout_weight="2"
-                    android:background="@color/colorPrimary"
+                    android:background="@drawable/rounded_corners"
                     android:textAlignment="center"
                     android:textSize="18sp" />
 
@@ -408,9 +414,10 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:layout_weight="1"
-                    android:background="@color/colorPrimary"
+                    android:background="@drawable/rounded_corners"
                     android:text="Year of Make"
                     android:textAlignment="center"
+                    android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
                 <EditText
@@ -419,9 +426,9 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
                     android:layout_weight="2"
-                    android:background="@color/colorPrimary"
-                    android:textAlignment="center"
+                    android:background="@drawable/rounded_corners"
                     android:inputType="number"
+                    android:textAlignment="center"
                     android:textSize="18sp" />
 
             </LinearLayout>
@@ -430,9 +437,12 @@
                 android:id="@+id/button7"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="8dp"
                 android:layout_weight="1"
+                android:background="@drawable/rounded_corners_reverse"
                 android:onClick="addNewBike"
-                android:text="Add Bike" />
+                android:text="Add Bike"
+                android:textColor="@android:color/white" />
 
         </LinearLayout>
 

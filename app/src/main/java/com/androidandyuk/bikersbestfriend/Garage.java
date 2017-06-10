@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -113,7 +114,7 @@ public class Garage extends AppCompatActivity {
 
     public void setListeners() {
 
-        if (bikes.size() > 0)
+        if (activeBike > -1)
 
         {
             MOTDateSetListener = new DatePickerDialog.OnDateSetListener()
@@ -214,7 +215,7 @@ public class Garage extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }
+
 
         // for some reason I can't getYear from thisDate, so will just use the current year
         Calendar cal = Calendar.getInstance();
@@ -230,6 +231,7 @@ public class Garage extends AppCompatActivity {
                 year, month, day);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.show();
+        }
     }
 
     public void setServiceDue(View view) {
@@ -241,22 +243,22 @@ public class Garage extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+
+            // for some reasone I can't getYear from thisDate, so will just use the current year
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(thisDate);
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH);
+            int day = cal.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog dialog = new DatePickerDialog(
+                    Garage.this,
+                    android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                    serviceDateSetListener,
+                    year, month, day);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.show();
         }
-
-        // for some reasone I can't getYear from thisDate, so will just use the current year
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(thisDate);
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
-
-        DatePickerDialog dialog = new DatePickerDialog(
-                Garage.this,
-                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
-                serviceDateSetListener,
-                year, month, day);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
     }
 
     public static double calculateMaintSpend(Bike bike) {
@@ -347,13 +349,15 @@ public class Garage extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             Log.i("Removing", "Bike");
+                            bikes.get(activeBike).fuelings.clear();
+                            bikes.get(activeBike).maintenanceLogs.clear();
                             bikes.remove(activeBike);
                             MainActivity.saveBikes();
                             Maintenance.saveLogs();
                             Fuelling.saveFuels();
                             activeBike = bikes.size() - 1;
-                            onBackPressed();
                             Toast.makeText(Garage.this, "Removed!", Toast.LENGTH_SHORT).show();
+                            finish();
                         }
                     })
                     .setNegativeButton("No", null)
@@ -367,6 +371,33 @@ public class Garage extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), Maintenance.class);
             startActivity(intent);
         }
+    }
+
+    public void cantSetMileage(View view) {
+        Toast.makeText(Garage.this, "Mileage is determined from entries in logs and fuel ups, not set here", Toast.LENGTH_LONG).show();
+    }
+
+    public void cantSetMPG(View view) {
+        Toast.makeText(Garage.this, "MPG is calculated from your fuel logs, not set here", Toast.LENGTH_LONG).show();
+    }
+
+    public void cantSetSpent(View view) {
+        Toast.makeText(Garage.this, "Costs are calculated from your maintenance logs, not set here", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+                finish();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

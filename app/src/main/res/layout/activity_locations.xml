@@ -64,6 +64,18 @@
             tools:layout_editor_absoluteX="200dp"
             tools:layout_editor_absoluteY="132dp" />
 
+        <Button
+            android:id="@+id/button21"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:layout_weight="0"
+            android:background="@drawable/rounded_corners"
+            android:onClick="goToPetrol"
+            android:text="Petrol"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

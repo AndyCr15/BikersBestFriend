@@ -4,6 +4,7 @@ import android.content.Context;
 import android.icu.text.DecimalFormat;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -19,67 +20,112 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
     String date;
     String log;
     double price;
+    double mileage;
     Boolean wasService;
     Boolean wasMOT;
+    Boolean brakePads;
+    Boolean brakeDiscs;
+    Boolean frontTyre;
+    Boolean rearTyre;
+    Boolean oilChange;
+    Boolean newBattery;
+    Boolean coolantChange;
+    Boolean sparkPlugs;
+    Boolean airFilter;
+    Boolean brakeFluid;
 
-    public maintenanceLogDetails(String log, Boolean wasService, Boolean wasMOT) {
+    public maintenanceLogDetails(String date, String log, double price, double mileage, Boolean wasService, Boolean wasMOT, Boolean brakePads, Boolean brakeDiscs,
+                                 Boolean frontTyre, Boolean rearTyre, Boolean oilChange, Boolean newBattery, Boolean coolantChange, Boolean sparkPlugs, Boolean airFilter, Boolean brakeFluid) {
+        this.date = date;
         this.log = log;
-        Date logDate = new Date();
-        this.date = sdf.format(logDate);
-        this.price = 0;
-        this.wasService = wasService;
-        this.wasMOT = wasMOT;
-    }
-
-    public maintenanceLogDetails(String log, double price, Date logDate, Boolean wasService, Boolean wasMOT) {
-        this.log = log;
-        this.date = sdf.format(logDate);
         this.price = price;
         this.wasService = wasService;
         this.wasMOT = wasMOT;
-    }
+        this.brakePads = brakePads;
+        this.brakeDiscs = brakeDiscs;
+        this.frontTyre = frontTyre;
+        this.rearTyre = rearTyre;
+        this.oilChange = oilChange;
+        this.newBattery = newBattery;
+        this.coolantChange = coolantChange;
+        this.sparkPlugs = sparkPlugs;
+        this.airFilter = airFilter;
+        this.brakeFluid = brakeFluid;
 
-    public maintenanceLogDetails(String log, double price, Boolean wasService, Boolean wasMOT, int mileage) {
-        this.log = log;
-        Date logDate = new Date();
-        this.date = sdf.format(logDate);
-        this.price = price;
-        this.wasService = wasService;
-        this.wasMOT = wasMOT;
-
-        if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
+        if (mileage != 0 && mileage >= MainActivity.bikes.get(activeBike).estMileage) {
             MainActivity.bikes.get(activeBike).estMileage = mileage;
+            this.mileage = mileage;
         } else if (mileage != 0) {
             Context context = App.getContext();
             Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
-
+            this.mileage = MainActivity.bikes.get(activeBike).estMileage;
         }
     }
 
-    public maintenanceLogDetails(String log, double price, String date, Boolean wasService, Boolean wasMOT, int mileage) {
+    public maintenanceLogDetails(Date logDate, String log, double price, double mileage, Boolean wasService, Boolean wasMOT, Boolean brakePads, Boolean brakeDiscs,
+                                 Boolean frontTyre, Boolean rearTyre, Boolean oilChange, Boolean newBattery, Boolean coolantChange, Boolean sparkPlugs, Boolean airFilter, Boolean brakeFluid) {
+        this.date = sdf.format(logDate);
         this.log = log;
-        this.date = date;
         this.price = price;
         this.wasService = wasService;
         this.wasMOT = wasMOT;
+        this.brakePads = brakePads;
+        this.brakeDiscs = brakeDiscs;
+        this.frontTyre = frontTyre;
+        this.rearTyre = rearTyre;
+        this.oilChange = oilChange;
+        this.newBattery = newBattery;
+        this.coolantChange = coolantChange;
+        this.sparkPlugs = sparkPlugs;
+        this.airFilter = airFilter;
+        this.brakeFluid = brakeFluid;
 
-        // being sent in with a date means it's from an edit or a save
-        Date todaysDate = new Date();
-        String formattedDate = sdf.format(todaysDate);
-        // check if it's still the same day, allow mileage to be changed
-        if (date.equals(formattedDate)) {
-            if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
-                MainActivity.bikes.get(activeBike).estMileage = mileage;
-            } else if (mileage != 0) {
-                Context context = App.getContext();
-                Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
-
-            }
-        } else {
+        if (mileage != 0 && mileage >= MainActivity.bikes.get(activeBike).estMileage) {
+            MainActivity.bikes.get(activeBike).estMileage = mileage;
+            this.mileage = mileage;
+        } else if (mileage != 0) {
             Context context = App.getContext();
-            Toast.makeText(context, "You can't change mileage from previous days entries. It will update the next time you provide the mileage", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
+            this.mileage = MainActivity.bikes.get(activeBike).estMileage;
         }
     }
+
+    public maintenanceLogDetails(String log, double price, double mileage, Boolean wasService, Boolean wasMOT, Boolean brakePads, Boolean brakeDiscs, Boolean frontTyre,
+                                 Boolean rearTyre, Boolean oilChange, Boolean newBattery, Boolean coolantChange, Boolean sparkPlugs, Boolean airFilter, Boolean brakeFluid) {
+        Date logDate = new Date();
+        this.date = sdf.format(logDate);
+        this.log = log;
+        this.price = price;
+        this.wasService = wasService;
+        this.wasMOT = wasMOT;
+        this.brakePads = brakePads;
+        this.brakeDiscs = brakeDiscs;
+        this.frontTyre = frontTyre;
+        this.rearTyre = rearTyre;
+        this.oilChange = oilChange;
+        this.newBattery = newBattery;
+        this.coolantChange = coolantChange;
+        this.sparkPlugs = sparkPlugs;
+        this.airFilter = airFilter;
+        this.brakeFluid = brakeFluid;
+
+        if (mileage != 0 && mileage >= MainActivity.bikes.get(activeBike).estMileage) {
+            MainActivity.bikes.get(activeBike).estMileage = mileage;
+            this.mileage = mileage;
+        } else if (mileage != 0) {
+            Context context = App.getContext();
+            Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
+            this.mileage = MainActivity.bikes.get(activeBike).estMileage;
+        }
+    }
+
+//    public maintenanceLogDetails(String log, double price, Date logDate, Boolean wasService, Boolean wasMOT) {
+//        this.log = log;
+//        this.date = sdf.format(logDate);
+//        this.price = price;
+//        this.wasService = wasService;
+//        this.wasMOT = wasMOT;
+//    }
 
     public String getDate() {
         return date;
@@ -93,12 +139,56 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         return price;
     }
 
+    public double getMileage() {
+        return mileage;
+    }
+
     public Boolean getWasService() {
         return wasService;
     }
 
     public Boolean getWasMOT() {
         return wasMOT;
+    }
+
+    public Boolean getBrakePads() {
+        return brakePads;
+    }
+
+    public Boolean getBrakeDiscs() {
+        return brakeDiscs;
+    }
+
+    public Boolean getFrontTyre() {
+        return frontTyre;
+    }
+
+    public Boolean getRearTyre() {
+        return rearTyre;
+    }
+
+    public Boolean getOilChange() {
+        return oilChange;
+    }
+
+    public Boolean getNewBattery() {
+        return newBattery;
+    }
+
+    public Boolean getCoolantChange() {
+        return coolantChange;
+    }
+
+    public Boolean getSparkPlugs() {
+        return sparkPlugs;
+    }
+
+    public Boolean getAirFilter() {
+        return airFilter;
+    }
+
+    public Boolean getBrakeFluid() {
+        return brakeFluid;
     }
 
     @Override

@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -149,6 +150,21 @@ public class HotSpots extends AppCompatActivity {
             hotspotLocations.add(new markedLocation("Bike Shed", new LatLng(51.527171, -0.0805737), "Own parking, often with security. Food can be pricey."));
             hotspotLocations.add(new markedLocation("Hartside Cafe", new LatLng(54.6360254, -2.5316498), ""));
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

@@ -16,6 +16,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -35,10 +36,10 @@ import java.util.Locale;
 import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MainActivity.geocoder;
-import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
-import static com.androidandyuk.bikersbestfriend.Traffic.trafficEvents;
 import static com.androidandyuk.bikersbestfriend.MainActivity.locationListener;
 import static com.androidandyuk.bikersbestfriend.MainActivity.locationManager;
+import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
+import static com.androidandyuk.bikersbestfriend.Traffic.trafficEvents;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener {
 
@@ -337,6 +338,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //        Favourites.arrayAdapter.notifyDataSetChanged();
 
         Toast.makeText(this, "Location " + locality + " saved", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override

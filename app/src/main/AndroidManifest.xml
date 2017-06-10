@@ -101,7 +101,9 @@
         <activity
             android:name=".SendFeedback"
             android:label="Send Feedback"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
+        <activity android:name=".PetrolPrices" />
+        <activity android:name=".MaintenanceLog"></activity>
     </application>
 
 </manifest>

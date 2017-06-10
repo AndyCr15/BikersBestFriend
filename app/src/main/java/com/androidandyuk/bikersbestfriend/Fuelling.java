@@ -235,7 +235,6 @@ public class Fuelling extends AppCompatActivity {
 
     }
 
-
     private void initiateList() {
         Log.i("Fuelling", "Initiating List");
         listView = (ListView) findViewById(R.id.fuelList);

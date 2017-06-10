@@ -5,7 +5,7 @@
     <!-- Define the background colour -->
     <solid android:color="@color/colorPrimary" />
     <!-- Define text colour, not working -->
-    <color android:textColor="@android:color/white"/>
+    <color android:textColor="#ffffff"/>
     <!-- Define the border colour and thickness -->
     <stroke
         android:width="3dp"
