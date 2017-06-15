@@ -38,9 +38,11 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
-import static com.androidandyuk.bikersbestfriend.R.id.mileage;
+//import static com.androidandyuk.bikersbestfriend.R.id.mileage;
 import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
+import static com.androidandyuk.bikersbestfriend.R.id.mileage;
+import static com.androidandyuk.bikersbestfriend.R.id.milesDone;
 
 public class Fuelling extends AppCompatActivity {
 
@@ -63,9 +65,11 @@ public class Fuelling extends AppCompatActivity {
     View fuelingDetailsLayout;
 
     // used to store what item might be being edited or deleted
-    int itemLongPressedPosition = 0;
-    fuellingDetails itemLongPressed;
+    int itemLongPressedPosition = -1;
+    fuellingDetails itemLongPressed = null;
     String editDate = "";
+
+    double miles;
 
 
     @Override
@@ -81,12 +85,13 @@ public class Fuelling extends AppCompatActivity {
         sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
         ed = sharedPreferences.edit();
 
-        // set the date for a new fueling to today
-        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
-        Calendar date = Calendar.getInstance();
-        String today = sdf.format(date.getTime());
-        setFuelDate.setText(today);
+        fuelingDetailsLayout = findViewById(R.id.fuelingDetailsLayout);
 
+        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
+        milesDone = (EditText) findViewById(R.id.milesDone);
+        petrolPrice = (EditText) findViewById(R.id.petrolPrice);
+        litresUsed = (EditText) findViewById(R.id.litresUsed);
+        mileageText = (EditText) findViewById(R.id.mileage);
 
         Log.i("Fuelling", "Loading Fuels");
         loadFuels();
@@ -108,6 +113,7 @@ public class Fuelling extends AppCompatActivity {
                 milesDone.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getMiles()));
                 petrolPrice.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getPrice()));
                 litresUsed.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getLitres()));
+                mileageText.setText(Double.toString(bikes.get(activeBike).fuelings.get(position).getMileage()));
                 editDate = bikes.get(activeBike).fuelings.get(position).getDate();
 //                bikes.get(activeBike).fuelings.remove(position);
                 fuelingDetailsLayout.setVisibility(View.VISIBLE);
@@ -239,15 +245,6 @@ public class Fuelling extends AppCompatActivity {
         Log.i("Fuelling", "Initiating List");
         listView = (ListView) findViewById(R.id.fuelList);
 
-        fuelingDetailsLayout = findViewById(R.id.fuelingDetailsLayout);
-
-        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
-        milesDone = (EditText) findViewById(R.id.milesDone);
-        petrolPrice = (EditText) findViewById(R.id.petrolPrice);
-        litresUsed = (EditText) findViewById(R.id.litresUsed);
-        mileageText = (EditText) findViewById(mileage);
-
-
         Log.i("Fuelling", "Setting myAdapter");
         myAdapter = new MyFuelAdapter(bikes.get(activeBike).fuelings);
 
@@ -265,12 +262,20 @@ public class Fuelling extends AppCompatActivity {
         fuelingDetailsLayout.setVisibility(View.VISIBLE);
         showingAddFueling = true;
 
-        // reset all info in the box. If it's an edit, this will be overwritten with info anyway
         // set the date for a new fueling to today
-        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
+
         Calendar date = Calendar.getInstance();
         String today = sdf.format(date.getTime());
         setFuelDate.setText(today);
+
+
+
+//        // reset all info in the box. If it's an edit, this will be overwritten with info anyway
+//        // set the date for a new fueling to today
+//        setFuelDate = (TextView) findViewById(R.id.setFuelDate);
+//        Calendar date = Calendar.getInstance();
+//        String today = sdf.format(date.getTime());
+//        setFuelDate.setText(today);
         // clear previous entries
         milesDone.setText(null);
         milesDone.clearFocus();
@@ -278,6 +283,8 @@ public class Fuelling extends AppCompatActivity {
         petrolPrice.clearFocus();
         litresUsed.setText(null);
         litresUsed.clearFocus();
+        mileageText.setText(null);
+        mileageText.clearFocus();
 
 
     }
@@ -311,6 +318,10 @@ public class Fuelling extends AppCompatActivity {
     }
 
     public void addFueling() {
+
+        Double mileage = 1.0;
+        fuellingDetails today;
+
         // only add the details if all three important details have information in
         if (milesDone.getText().toString().isEmpty() || petrolPrice.getText().toString().isEmpty() || litresUsed.getText().toString().isEmpty()) {
 
@@ -318,23 +329,19 @@ public class Fuelling extends AppCompatActivity {
 
         } else {
 
-            // check if we're adding as it was being edited
-            if (itemLongPressed != null) {
-                bikes.get(activeBike).fuelings.remove(itemLongPressed);
-                itemLongPressed = null;
-            }
-
             String date = setFuelDate.getText().toString();
-            double miles = Double.parseDouble(milesDone.getText().toString());
+            miles = Double.parseDouble(milesDone.getText().toString());
             double price = Double.parseDouble(petrolPrice.getText().toString());
             double litres = Double.parseDouble(litresUsed.getText().toString());
-            int mileage;
-            if (mileageText.getText().toString().isEmpty()) {
-                mileage = 0;
-            } else {
-                mileage = Integer.parseInt(mileageText.getText().toString());
+
+            // it's a new log, set mileage to 9999999 so we can find it after to verify the user set mileage
+            Double marker = 9999999.0;
+            // check if we're adding as it was being edited
+            if (itemLongPressed != null) {
+                // adding back in an edited log, so remove the old one
+                bikes.get(activeBike).fuelings.remove(itemLongPressed);
             }
-            fuellingDetails today = new fuellingDetails(miles, price, litres, date, mileage);
+            today = new fuellingDetails(miles, price, litres, date, marker);
             bikes.get(activeBike).fuelings.add(today);
             Collections.sort(bikes.get(activeBike).fuelings);
             myAdapter.notifyDataSetChanged();
@@ -342,6 +349,16 @@ public class Fuelling extends AppCompatActivity {
             showingAddFueling = false;
 
             updateAveMPG();
+
+            // now check if it was a new log, does the mileage fit the correct range
+            for (int i = 0; i < bikes.get(activeBike).fuelings.size(); i++) {
+                if (bikes.get(activeBike).fuelings.get(i).mileage == 9999999.0) {
+                    itemLongPressed = bikes.get(activeBike).fuelings.get(i);
+                    itemLongPressedPosition = i;
+                    bikes.get(activeBike).fuelings.get(i).mileage = verifyMileage();
+                }
+            }
+
 
             View thisView = this.getCurrentFocus();
             if (thisView != null) {
@@ -357,6 +374,9 @@ public class Fuelling extends AppCompatActivity {
             litresUsed.setText(null);
             litresUsed.clearFocus();
         }
+        Log.i("Reset","itemLongPressed");
+        itemLongPressed = null;
+        itemLongPressedPosition = -1;
     }
 
     public void updateAveMPG() {
@@ -374,6 +394,62 @@ public class Fuelling extends AppCompatActivity {
         } else {
             mpgView.setText("Ave MPG over the last " + fuelingsForAve + " stops is " + mpg + " mpg");
         }
+    }
+
+    public Double verifyMileage() {
+        double thisMileage = 1;
+
+        Log.i("Item Pos", "" + itemLongPressedPosition);
+
+        if (!mileageText.getText().toString().isEmpty()) {
+            // the box is not empty, so read the figure
+            thisMileage = Double.parseDouble(mileageText.getText().toString());
+        } else {
+//            double miles = Double.parseDouble(milesDone.getText().toString());
+            bikes.get(activeBike).estMileage += miles;
+        }
+
+
+        if (itemLongPressed != null) {
+            // editing, with a number in the box
+            int numLogs = (bikes.get(activeBike).fuelings.size() - 1);
+            if (itemLongPressedPosition == 0) {
+                // this is the last log entry, check it's after a previous
+                if(thisMileage > bikes.get(activeBike).estMileage){
+                    // it's the most recent log and it's higher than the est mileage
+                    bikes.get(activeBike).estMileage = thisMileage;
+                }
+                if (numLogs > 0) {
+                    // there is more than one entry, check it's after the last one
+                    if (thisMileage < bikes.get(activeBike).fuelings.get(itemLongPressedPosition + 1).mileage) {
+                        // it's lower than the previous item, so set it to the previous item
+                        thisMileage = bikes.get(activeBike).fuelings.get(itemLongPressedPosition + 1).mileage;
+                    }
+                } else {
+                    // it's the only entry
+                    thisMileage = Double.parseDouble(mileageText.getText().toString());
+                    bikes.get(activeBike).estMileage = thisMileage;
+                }
+            } else if (itemLongPressedPosition < numLogs) {
+                // it's not the last item, but it's not the first item
+                if (thisMileage > bikes.get(activeBike).fuelings.get(itemLongPressedPosition - 1).mileage) {
+                    // it's higher than the next item, so set it to the next item
+                    thisMileage = bikes.get(activeBike).fuelings.get(itemLongPressedPosition - 1).mileage;
+                }
+                if (thisMileage < bikes.get(activeBike).fuelings.get(itemLongPressedPosition + 1).mileage) {
+                    // it's lower than the previous item, so set it to the previous item
+                    thisMileage = bikes.get(activeBike).fuelings.get(itemLongPressedPosition + 1).mileage;
+                }
+                // if we made it here, it's within the range of previous and last, so can be left as is
+            } else {
+                // it's the first log
+                if (thisMileage > bikes.get(activeBike).fuelings.get(itemLongPressedPosition - 1).mileage) {
+                    // it's higher than the next item, so set it to the next item
+                    thisMileage = bikes.get(activeBike).fuelings.get(itemLongPressedPosition - 1).mileage;
+                }
+            }
+        }
+        return thisMileage;
     }
 
     @Override
@@ -558,12 +634,15 @@ public class Fuelling extends AppCompatActivity {
             // check if the back button was pressed with the add item view showing
             // if it was, hide this view.  If not, carry on as normal.
             if (showingAddFueling) {
-
+                // editing or adding a fueling, so hide the box
                 showingAddFueling = false;
                 fuelingDetailsLayout.setVisibility(View.INVISIBLE);
+                Log.i("Reset","itemLongPressed");
+                itemLongPressed = null;
+                itemLongPressedPosition = -1;
                 // reset the fuelling text boxes?
-
             } else {
+
                 finish();
                 return true;
             }
@@ -571,7 +650,6 @@ public class Fuelling extends AppCompatActivity {
         myAdapter.notifyDataSetChanged();
         return super.onKeyDown(keyCode, event);
     }
-
 
     @Override
     protected void onPause() {

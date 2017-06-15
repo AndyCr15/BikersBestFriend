@@ -292,7 +292,7 @@ public class MainActivity extends AppCompatActivity {
                             .setContentText("The MOT for " + thisBike + " is due within " + warningDays + " days")
                             .setContentIntent(pendingIntent)
 //                            .addAction(android.R.drawable.btn_default, "Open App", pendingIntent)
-                            .setSmallIcon(android.R.drawable.alert_light_frame)
+                            .setSmallIcon(R.drawable.icon)
                             .build();
 
                     NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
@@ -458,37 +458,23 @@ public class MainActivity extends AppCompatActivity {
         int i = 0;
         for (Bike thisBike : bikes) {
             Log.i("Saving Bikes", "" + thisBike);
-            try {
-                ArrayList<String> make = new ArrayList<>();
-                ArrayList<String> model = new ArrayList<>();
-                ArrayList<String> reg = new ArrayList<>();
-                ArrayList<String> bikeId = new ArrayList<>();
-                ArrayList<String> VIN = new ArrayList<>();
-                ArrayList<String> serviceDue = new ArrayList<>();
-                ArrayList<String> MOTdue = new ArrayList<>();
-                ArrayList<String> lastKnownService = new ArrayList<>();
-                ArrayList<String> lastKnownMOT = new ArrayList<>();
-                ArrayList<String> yearOfMan = new ArrayList<>();
-                ArrayList<String> notes = new ArrayList<>();
-                ArrayList<String> estMileage = new ArrayList<>();
-                ArrayList<String> MOTwarned = new ArrayList<>();
-                ArrayList<String> serviceWarned = new ArrayList<>();
 
-                // I think these are new variables, so likely don't need clearing?
-                make.clear();
-                model.clear();
-                reg.clear();
-                bikeId.clear();
-                VIN.clear();
-                serviceDue.clear();
-                MOTdue.clear();
-                lastKnownService.clear();
-                lastKnownMOT.clear();
-                yearOfMan.clear();
-                notes.clear();
-                estMileage.clear();
-                MOTwarned.clear();
-                serviceWarned.clear();
+            ArrayList<String> make = new ArrayList<>();
+            ArrayList<String> model = new ArrayList<>();
+            ArrayList<String> reg = new ArrayList<>();
+            ArrayList<String> bikeId = new ArrayList<>();
+            ArrayList<String> VIN = new ArrayList<>();
+            ArrayList<String> serviceDue = new ArrayList<>();
+            ArrayList<String> MOTdue = new ArrayList<>();
+            ArrayList<String> lastKnownService = new ArrayList<>();
+            ArrayList<String> lastKnownMOT = new ArrayList<>();
+            ArrayList<String> yearOfMan = new ArrayList<>();
+            ArrayList<String> notes = new ArrayList<>();
+            ArrayList<String> estMileage = new ArrayList<>();
+            ArrayList<String> MOTwarned = new ArrayList<>();
+            ArrayList<String> serviceWarned = new ArrayList<>();
+
+            try {
 
                 make.add(thisBike.make);
                 model.add(thisBike.model);
@@ -536,38 +522,22 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Bikes Size", "" + bikesSize);
         bikes.clear();
 
+        ArrayList<String> make = new ArrayList<>();
+        ArrayList<String> model = new ArrayList<>();
+        ArrayList<String> reg = new ArrayList<>();
+        ArrayList<String> bikeId = new ArrayList<>();
+        ArrayList<String> VIN = new ArrayList<>();
+        ArrayList<String> serviceDue = new ArrayList<>();
+        ArrayList<String> MOTdue = new ArrayList<>();
+        ArrayList<String> lastKnownService = new ArrayList<>();
+        ArrayList<String> lastKnownMOT = new ArrayList<>();
+        ArrayList<String> yearOfMan = new ArrayList<>();
+        ArrayList<String> notes = new ArrayList<>();
+        ArrayList<String> estMileage = new ArrayList<>();
+        ArrayList<String> MOTwarned = new ArrayList<>();
+        ArrayList<String> serviceWarned = new ArrayList<>();
+
         for (int i = 0; i < bikesSize; i++) {
-
-            ArrayList<String> make = new ArrayList<>();
-            ArrayList<String> model = new ArrayList<>();
-            ArrayList<String> reg = new ArrayList<>();
-            ArrayList<String> bikeId = new ArrayList<>();
-            ArrayList<String> VIN = new ArrayList<>();
-            ArrayList<String> serviceDue = new ArrayList<>();
-            ArrayList<String> MOTdue = new ArrayList<>();
-            ArrayList<String> lastKnownService = new ArrayList<>();
-            ArrayList<String> lastKnownMOT = new ArrayList<>();
-            ArrayList<String> yearOfMan = new ArrayList<>();
-            ArrayList<String> notes = new ArrayList<>();
-            ArrayList<String> estMileage = new ArrayList<>();
-            ArrayList<String> MOTwarned = new ArrayList<>();
-            ArrayList<String> serviceWarned = new ArrayList<>();
-
-            // I think these are new variables, so likely don't need clearing?
-            make.clear();
-            model.clear();
-            reg.clear();
-            bikeId.clear();
-            VIN.clear();
-            serviceDue.clear();
-            MOTdue.clear();
-            lastKnownService.clear();
-            lastKnownMOT.clear();
-            yearOfMan.clear();
-            notes.clear();
-            estMileage.clear();
-            MOTwarned.clear();
-            serviceWarned.clear();
 
             try {
 

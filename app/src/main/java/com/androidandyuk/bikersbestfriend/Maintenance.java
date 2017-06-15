@@ -315,38 +315,29 @@ public class Maintenance extends AppCompatActivity {
         }
     }
 
-
     public static void saveLogs() {
+
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<String> logs = new ArrayList<>();
+        ArrayList<String> costs = new ArrayList<>();
+        ArrayList<String> mileage = new ArrayList<>();
+        ArrayList<String> wasService = new ArrayList<>();
+        ArrayList<String> wasMOT = new ArrayList<>();
+        ArrayList<String> brakePads = new ArrayList<>();
+        ArrayList<String> brakeDiscs = new ArrayList<>();
+        ArrayList<String> frontTyre = new ArrayList<>();
+        ArrayList<String> rearTyre = new ArrayList<>();
+        ArrayList<String> oilChange = new ArrayList<>();
+        ArrayList<String> newBattery = new ArrayList<>();
+        ArrayList<String> coolantChange = new ArrayList<>();
+        ArrayList<String> sparkPlugs = new ArrayList<>();
+        ArrayList<String> airFilter = new ArrayList<>();
+        ArrayList<String> brakeFluid = new ArrayList<>();
 
         for (Bike thisBike : bikes) {
 
-            ArrayList<String> dates = new ArrayList<>();
-            ArrayList<String> logs = new ArrayList<>();
-            ArrayList<String> costs = new ArrayList<>();
-            ArrayList<String> mileage = new ArrayList<>();
-            ArrayList<String> wasService = new ArrayList<>();
-            ArrayList<String> wasMOT = new ArrayList<>();
-            ArrayList<String> brakePads = new ArrayList<>();
-            ArrayList<String> brakeDiscs = new ArrayList<>();
-            ArrayList<String> frontTyre = new ArrayList<>();
-            ArrayList<String> rearTyre = new ArrayList<>();
-            ArrayList<String> oilChange = new ArrayList<>();
-            ArrayList<String> newBattery = new ArrayList<>();
-            ArrayList<String> coolantChange = new ArrayList<>();
-            ArrayList<String> sparkPlugs = new ArrayList<>();
-            ArrayList<String> airFilter = new ArrayList<>();
-            ArrayList<String> brakeFluid = new ArrayList<>();
-
             Log.i("Saving Logs", "" + thisBike);
             try {
-
-
-//                // I think these are new variables, so likely don't need clearing?
-//                dates.clear();
-//                logs.clear();
-//                costs.clear();
-//                wasService.clear();
-//                wasMOT.clear();
 
                 for (maintenanceLogDetails thisLog : thisBike.maintenanceLogs) {
 
@@ -395,34 +386,27 @@ public class Maintenance extends AppCompatActivity {
 
     public static void loadLogs() {
 
+        ArrayList<String> dates = new ArrayList<>();
+        ArrayList<String> logs = new ArrayList<>();
+        ArrayList<String> costs = new ArrayList<>();
+        ArrayList<String> mileage = new ArrayList<>();
+        ArrayList<String> wasService = new ArrayList<>();
+        ArrayList<String> wasMOT = new ArrayList<>();
+        ArrayList<String> brakePads = new ArrayList<>();
+        ArrayList<String> brakeDiscs = new ArrayList<>();
+        ArrayList<String> frontTyre = new ArrayList<>();
+        ArrayList<String> rearTyre = new ArrayList<>();
+        ArrayList<String> oilChange = new ArrayList<>();
+        ArrayList<String> newBattery = new ArrayList<>();
+        ArrayList<String> coolantChange = new ArrayList<>();
+        ArrayList<String> sparkPlugs = new ArrayList<>();
+        ArrayList<String> airFilter = new ArrayList<>();
+        ArrayList<String> brakeFluid = new ArrayList<>();
+
         for (Bike thisBike : bikes) {
             thisBike.maintenanceLogs.clear();
 
-            ArrayList<String> dates = new ArrayList<>();
-            ArrayList<String> logs = new ArrayList<>();
-            ArrayList<String> costs = new ArrayList<>();
-            ArrayList<String> mileage = new ArrayList<>();
-            ArrayList<String> wasService = new ArrayList<>();
-            ArrayList<String> wasMOT = new ArrayList<>();
-            ArrayList<String> brakePads = new ArrayList<>();
-            ArrayList<String> brakeDiscs = new ArrayList<>();
-            ArrayList<String> frontTyre = new ArrayList<>();
-            ArrayList<String> rearTyre = new ArrayList<>();
-            ArrayList<String> oilChange = new ArrayList<>();
-            ArrayList<String> newBattery = new ArrayList<>();
-            ArrayList<String> coolantChange = new ArrayList<>();
-            ArrayList<String> sparkPlugs = new ArrayList<>();
-            ArrayList<String> airFilter = new ArrayList<>();
-            ArrayList<String> brakeFluid = new ArrayList<>();
-
             Log.i("Loading Logs", "" + thisBike);
-
-            // I think these are new variables, so likely don't need clearing?
-//            dates.clear();
-//            logs.clear();
-//            costs.clear();
-//            wasService.clear();
-//            wasMOT.clear();
 
             try {
 

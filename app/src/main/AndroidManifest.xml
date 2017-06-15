@@ -104,7 +104,9 @@
             android:theme="@style/AppTheme" />
         <activity android:name=".PetrolPrices" />
         <activity android:name=".MaintenanceLog" />
-        <activity android:name=".PartsLog"></activity>
+        <activity android:name=".PartsLog" />
+        <activity android:name=".ToDo" />
+        <activity android:name=".ToDoLog" />
     </application>
 
 </manifest>

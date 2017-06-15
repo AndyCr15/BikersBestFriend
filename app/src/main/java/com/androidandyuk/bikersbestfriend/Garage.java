@@ -380,6 +380,13 @@ public class Garage extends AppCompatActivity {
         }
     }
 
+    public void goToToDo(View view) {
+        if (activeBike > -1) {
+            Intent intent = new Intent(getApplicationContext(), ToDo.class);
+            startActivity(intent);
+        }
+    }
+
     public void cantSetMileage(View view) {
         Toast.makeText(Garage.this, "Mileage is determined from entries in logs and fuel ups, not set here", Toast.LENGTH_LONG).show();
     }

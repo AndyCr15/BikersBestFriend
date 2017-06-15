@@ -23,21 +23,6 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
     double mpg;
     double mileage = 0;
 
-    public fuellingDetails(double miles, double price, double litres, double mileage) {
-        this.miles = miles;
-        this.price = price;
-        this.litres = litres;
-        mpg = miles / (litres / 4.54609);
-        Date fuelDate = new Date();
-        this.date = sdf.format(fuelDate);
-        if(mileage == 0) {
-            MainActivity.bikes.get(activeBike).estMileage += miles;
-            return;
-        } else if (mileage > 0) {
-            MainActivity.bikes.get(activeBike).estMileage = mileage;
-        }
-    }
-
     public fuellingDetails(double miles, double price, double litres, Date date, double mileage) {
         this.miles = miles;
         this.price = price;
@@ -55,25 +40,27 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         this.litres = litres;
         mpg = miles / (litres / 4.54609);
         this.date = date;
-        // being sent in with a date means it's from an edit or a save
-        Date todaysDate = new Date();
-        String formattedDate = sdf.format(todaysDate);
-        // check if it's still the same day, allow mileage to be changed
-        if (date.equals(formattedDate)) {
-            if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
-                MainActivity.bikes.get(activeBike).estMileage = mileage;
-                this.mileage = mileage;
-            } else if (mileage != 0) {
-                Context context = App.getContext();
-                Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
-            } else {
-                // mileage has been left blank
-                MainActivity.bikes.get(activeBike).estMileage += miles;
-            }
-        } else {
-            Context context = App.getContext();
-            Toast.makeText(context, "You can't change mileage from previous days entries. It will update the next time you provide the mileage", Toast.LENGTH_LONG).show();
-        }
+        this.mileage = mileage;
+
+//        // being sent in with a date means it's from an edit or a save
+//        Date todaysDate = new Date();
+//        String formattedDate = sdf.format(todaysDate);
+//        // check if it's still the same day, allow mileage to be changed
+//        if (date.equals(formattedDate)) {
+//            if (mileage != 0 && mileage > MainActivity.bikes.get(activeBike).estMileage) {
+//                MainActivity.bikes.get(activeBike).estMileage = mileage;
+//                this.mileage = mileage;
+//            } else if (mileage != 0) {
+//                Context context = App.getContext();
+//                Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
+//            } else {
+//                // mileage has been left blank
+//                MainActivity.bikes.get(activeBike).estMileage += miles;
+//            }
+//        } else {
+//            Context context = App.getContext();
+//            Toast.makeText(context, "You can't change mileage from previous days entries. It will update the next time you provide the mileage", Toast.LENGTH_LONG).show();
+//        }
     }
 
     public String getDate() {
@@ -126,6 +113,7 @@ public class fuellingDetails implements Comparable<fuellingDetails> {
         if (oDate.after(thisDate)) {
             return 1;
         }
-        return 0;
+        // if we're here, they're the same date, so use mileage to decide
+        return (int) o.mileage - (int) this.mileage;
     }
 }

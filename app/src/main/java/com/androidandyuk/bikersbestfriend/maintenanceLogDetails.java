@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 
 /**
@@ -74,6 +75,8 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         this.airFilter = airFilter;
         this.brakeFluid = brakeFluid;
         this.mileage = mileage;
+
+
     }
 
     public maintenanceLogDetails(String log, double price, double mileage, Boolean wasService, Boolean wasMOT, Boolean brakePads, Boolean brakeDiscs, Boolean frontTyre,
@@ -97,13 +100,13 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         this.airFilter = airFilter;
         this.brakeFluid = brakeFluid;
 
-        if (mileage != 0 && mileage >= MainActivity.bikes.get(activeBike).estMileage) {
-            MainActivity.bikes.get(activeBike).estMileage = mileage;
+        if (mileage != 0 && mileage >= bikes.get(activeBike).estMileage) {
+            bikes.get(activeBike).estMileage = mileage;
             this.mileage = mileage;
         } else if (mileage != 0) {
             Context context = App.getContext();
             Toast.makeText(context, "The mileage appears to be lower than current est mileage. Not applied", Toast.LENGTH_LONG).show();
-            this.mileage = MainActivity.bikes.get(activeBike).estMileage;
+            this.mileage = bikes.get(activeBike).estMileage;
         } else {
         }
     }
@@ -192,7 +195,9 @@ public class maintenanceLogDetails implements Comparable<maintenanceLogDetails> 
         if (oDate.after(thisDate)) {
             return 1;
         }
-        return 0;
+
+        // if we're here, they're the same date, so use mileage to decide
+        return (int) o.mileage - (int) this.mileage;
     }
 
     @Override

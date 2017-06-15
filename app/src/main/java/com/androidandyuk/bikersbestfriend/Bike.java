@@ -27,6 +27,8 @@ public class Bike {
     boolean serviceWarned;
     ArrayList<fuellingDetails> fuelings = new ArrayList<>();
     ArrayList<maintenanceLogDetails> maintenanceLogs = new ArrayList<>();
+    ArrayList<ToDoDetails> toDoList = new ArrayList<>();
+
 
     public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue,
                 String lastKnownService, String lastKnownMOT, String yearOfMan, String notes, double estMileage,

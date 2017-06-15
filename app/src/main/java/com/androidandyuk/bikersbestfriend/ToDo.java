@@ -1,0 +1,386 @@
+package com.androidandyuk.bikersbestfriend;
+
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.analytics.FirebaseAnalytics;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
+
+
+public class ToDo extends AppCompatActivity {
+    private FirebaseAnalytics mFirebaseAnalytics;
+
+    static MyToDoAdapter myAdapter;
+    ListView toDoList;
+
+    EditText toDoDetails;
+    EditText toDoURL;
+    EditText toDoCost;
+    Spinner prioritySpinner;
+
+    View toDoDetailsLayout;
+
+    Boolean addToDoShowing = false;
+
+    //used for checking the url is valid
+    public static final String URL_REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
+    Pattern urlCheck = Pattern.compile(URL_REGEX);
+
+    // used to store what item might be being edited or deleted
+    static int itemLongPressedPosition = 0;
+    static ToDoDetails itemLongPressed = null;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_to_do);
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        // until I implement landscape view, lock the orientation
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
+        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
+        ed = sharedPreferences.edit();
+
+        toDoDetailsLayout = findViewById(R.id.toDoDetailsLayout);
+
+        toDoDetails = (EditText) findViewById(R.id.toDoDetails);
+        toDoURL = (EditText) findViewById(R.id.toDoURL);
+        toDoCost = (EditText) findViewById(R.id.toDoCost);
+        prioritySpinner = (Spinner) findViewById(R.id.prioritySpinner);
+
+        prioritySpinner.setAdapter(new ArrayAdapter<ToDoPriority>(this, android.R.layout.simple_spinner_item, ToDoPriority.values()));
+        // load the to Do list
+
+        Log.i("Fuelling", "Loading ToDos");
+        loadToDos();
+
+        initiateList();
+
+        toDoList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                itemLongPressedPosition = position;
+                itemLongPressed = bikes.get(activeBike).toDoList.get(position);
+                Log.i("ToDo List", "Tapped " + position);
+
+                // show the log editing view
+                toDoDetails.setText(bikes.get(activeBike).toDoList.get(position).getLog());
+                toDoURL.setText(bikes.get(activeBike).toDoList.get(position).getUrl());
+                toDoCost.setText(Double.toString(bikes.get(activeBike).toDoList.get(position).getPrice()));
+                prioritySpinner.setSelection(bikes.get(activeBike).toDoList.get(position).getPriority().getValue() - 1);
+                toDoDetailsLayout.setVisibility(View.VISIBLE);
+                addToDoShowing = true;
+            }
+        });
+
+        toDoList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                final int logPosition = position;
+                final Context context = App.getContext();
+
+                new AlertDialog.Builder(ToDo.this)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setTitle("Are you sure?")
+                        .setMessage("You're about to delete this To Do item forever...")
+                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Log.i("Removing", "ToDo " + logPosition);
+                                bikes.get(activeBike).toDoList.remove(logPosition);
+                                initiateList();
+                                Toast.makeText(context, "Deleted!", Toast.LENGTH_SHORT).show();
+
+                            }
+                        })
+                        .setNegativeButton("No", null)
+                        .show();
+
+                return true;
+            }
+
+
+        });
+
+
+    }
+
+    private void initiateList() {
+        toDoList = (ListView) findViewById(R.id.toDoList);
+
+        myAdapter = new MyToDoAdapter(bikes.get(activeBike).toDoList);
+
+        toDoList.setAdapter(myAdapter);
+
+        setTitle("To Do List: " + bikes.get(activeBike));
+    }
+
+    public void showToDoClicked(View view) {
+        showToDo();
+    }
+
+    public void showToDo() {
+        // opens the add fueling dialog
+        Log.i("ToDo", "Show To Do layout");
+        toDoDetailsLayout.setVisibility(View.VISIBLE);
+        addToDoShowing = true;
+    }
+
+    public void addToDoClicked(View view) {
+        addToDo();
+    }
+
+    public void addToDo() {
+
+        if (toDoDetails.getText().toString().isEmpty()) {
+
+            Toast.makeText(ToDo.this, "Please complete all necessary details", Toast.LENGTH_LONG).show();
+
+        } else {
+            // there is at least a To Do item, so make a new to do and add it
+
+            String details = toDoDetails.getText().toString();
+            String url = toDoURL.getText().toString();
+
+            Matcher m = urlCheck.matcher(url);
+            Log.i("URL " + url, "m " + m);
+            // todo need to check if it's empty, then don't toast
+            if (!toDoURL.getText().toString().isEmpty() && !m.find()) {
+                Toast.makeText(getApplicationContext(), "Not a valid URL", Toast.LENGTH_SHORT).show();
+                url = "";
+            }
+
+
+            double cost = 0;
+            try {
+                cost = Double.parseDouble(toDoCost.getText().toString());
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+            ToDoPriority priority = (ToDoPriority) prioritySpinner.getSelectedItem();
+
+            if (itemLongPressed != null) {
+                // adding back in an edited log, so remove the old one
+                bikes.get(activeBike).toDoList.remove(itemLongPressed);
+            }
+
+            ToDoDetails newToDo = new ToDoDetails(details, cost, url, priority);
+            bikes.get(activeBike).toDoList.add(newToDo);
+            Collections.sort(bikes.get(activeBike).toDoList);
+            myAdapter.notifyDataSetChanged();
+            toDoDetailsLayout.setVisibility(View.INVISIBLE);
+            addToDoShowing = false;
+
+            // clear previous entries
+            toDoDetails.setText(null);
+            toDoDetails.clearFocus();
+            toDoCost.setText(null);
+            toDoCost.clearFocus();
+            toDoURL.setText(null);
+            toDoURL.clearFocus();
+
+        }
+        Log.i("Reset", "itemLongPressed");
+        itemLongPressed = null;
+        itemLongPressedPosition = -1;
+    }
+
+    public class MyToDoAdapter extends BaseAdapter {
+        public ArrayList<ToDoDetails> toDoDataAdapter;
+
+        public MyToDoAdapter(ArrayList<ToDoDetails> toDoDataAdapter) {
+            this.toDoDataAdapter = toDoDataAdapter;
+        }
+
+        @Override
+        public int getCount() {
+            return toDoDataAdapter.size();
+        }
+
+        @Override
+        public String getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+
+            final ToDoDetails s = toDoDataAdapter.get(position);
+
+            // this has not been set to ToDo list, copied from maint
+
+            LayoutInflater mInflater = getLayoutInflater();
+            View myView = mInflater.inflate(R.layout.todo_listview, null);
+
+            TextView toDoListURL = (TextView) myView.findViewById(R.id.toDoURL);
+            toDoListURL.setText(s.url);
+            toDoListURL.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getApplicationContext(), "Opening in Browser", Toast.LENGTH_SHORT).show();
+                    try {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(s.url));
+                        startActivity(browserIntent);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+            TextView toDoListLog = (TextView) myView.findViewById(R.id.toDoLog);
+            toDoListLog.setText(s.log);
+
+            TextView toDoListCost = (TextView) myView.findViewById(R.id.toDoCost);
+            toDoListCost.setText("£" + Double.toString(s.price));
+
+            return myView;
+        }
+    }
+
+    public static void saveToDos() {
+
+        for (Bike thisBike : bikes) {
+
+            Log.i("Saving To Dos", "" + thisBike);
+            try {
+                ArrayList<String> tdDetails = new ArrayList<>();
+                ArrayList<String> tdPrices = new ArrayList<>();
+                ArrayList<String> tdUrls = new ArrayList<>();
+                ArrayList<String> tdPriority = new ArrayList<>();
+
+                for (ToDoDetails thisTD : thisBike.toDoList) {
+
+                    tdDetails.add(thisTD.log);
+                    tdPrices.add(Double.toString(thisTD.price));
+                    tdUrls.add(thisTD.url);
+                    tdPriority.add(Integer.toString(thisTD.priority.getValue()));
+
+                }
+
+                Log.i("Saving ToDos", "Size :" + tdDetails.size());
+                ed.putString("tdDetails" + thisBike.bikeId, ObjectSerializer.serialize(tdDetails)).apply();
+                ed.putString("tdPrices" + thisBike.bikeId, ObjectSerializer.serialize(tdPrices)).apply();
+                ed.putString("tdUrls" + thisBike.bikeId, ObjectSerializer.serialize(tdUrls)).apply();
+                ed.putString("tdPriority" + thisBike.bikeId, ObjectSerializer.serialize(tdPriority)).apply();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Adding ToDos", "Failed attempt");
+            }
+        }
+    }
+
+    public static void loadToDos() {
+
+        for (Bike thisBike : bikes) {
+            thisBike.toDoList.clear();
+
+            Log.i("Loading ToDos", "" + thisBike);
+
+            ArrayList<String> tdDetails = new ArrayList<>();
+            ArrayList<String> tdPrices = new ArrayList<>();
+            ArrayList<String> tdUrls = new ArrayList<>();
+            ArrayList<String> tdPriority = new ArrayList<>();
+
+            try {
+
+                tdDetails = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("tdDetails" + thisBike.bikeId, ""));
+                tdPrices = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("tdPrices" + thisBike.bikeId, "0"));
+                tdUrls = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("tdUrls" + thisBike.bikeId, ""));
+                tdPriority = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("tdPriority" + thisBike.bikeId, "1"));
+                Log.i("tdDetails for " + thisBike, "Count :" + tdDetails.size());
+
+
+                Log.i("Retrieved info" + thisBike, "ToDo count :" + tdDetails.size());
+                if (tdDetails.size() > 0 && tdPrices.size() > 0 && tdUrls.size() > 0 && tdPriority.size() > 0) {
+                    // we've checked there is some info
+                    if (tdDetails.size() == tdPrices.size() && tdPrices.size() == tdUrls.size() && tdUrls.size() == tdPriority.size()) {
+                        // we've checked each item has the same amount of info, nothing is missing
+                        for (int x = 0; x < tdDetails.size(); x++) {
+
+                            ToDoDetails newToDo = new ToDoDetails(tdDetails.get(x), Double.parseDouble(tdPrices.get(x)), tdUrls.get(x), Integer.parseInt(tdPriority.get(x)));
+                            Log.i("Adding", "" + x + "" + newToDo);
+                            thisBike.toDoList.add(newToDo);
+                        }
+
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Log.i("Loading ToDo details", "Failed attempt");
+            }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // this must be empty as back is being dealt with in onKeyDown
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            // check if the back button was pressed with the add item view showing
+            // if it was, hide this view.  If not, carry on as normal.
+            if (addToDoShowing) {
+                // editing or adding a To Do, so hide the box
+                addToDoShowing = false;
+                toDoDetailsLayout.setVisibility(View.INVISIBLE);
+                Log.i("Reset", "itemLongPressed");
+                itemLongPressed = null;
+                itemLongPressedPosition = -1;
+                // reset the fuelling text boxes?
+            } else {
+                finish();
+                return true;
+            }
+        }
+        myAdapter.notifyDataSetChanged();
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.i("ToDo Activity", "On Pause");
+        saveToDos();
+    }
+}

@@ -258,6 +258,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
+            android:background="@drawable/rounded_corners_grey"
             android:onClick="addFuelingClicked"
             android:text="Add fueling"
             android:textAlignment="center"
