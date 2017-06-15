@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -32,6 +34,7 @@ import java.util.regex.Pattern;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
+import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
 
@@ -218,6 +221,80 @@ public class ToDo extends AppCompatActivity {
         itemLongPressedPosition = -1;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.bike_choice, menu);
+
+        super.onCreateOptionsMenu(menu);
+
+        menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
+
+        for (int i = 0; i < bikes.size(); i++) {
+            String bikeMakeMenu = bikes.get(i).model;
+            menu.add(0, i + 1, 0, bikeMakeMenu).setShortcut('3', 'c');
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case 0:
+                Log.i("Option", "0");
+                Toast.makeText(ToDo.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
+                return true;
+            case 1:
+                Log.i("Option", "1");
+                activeBike = 0;
+                initiateList();
+                return true;
+            case 2:
+                Log.i("Option", "2");
+                activeBike = 1;
+                initiateList();
+                return true;
+            case 3:
+                Log.i("Option", "3");
+                activeBike = 2;
+                initiateList();
+                return true;
+            case 4:
+                Log.i("Option", "4");
+                activeBike = 3;
+                initiateList();
+                return true;
+            case 5:
+                Log.i("Option", "5");
+                activeBike = 4;
+                initiateList();
+                return true;
+            case 6:
+                Log.i("Option", "6");
+                activeBike = 5;
+                initiateList();
+                return true;
+            case 7:
+                Log.i("Option", "7");
+                activeBike = 6;
+                initiateList();
+                return true;
+            case 8:
+                Log.i("Option", "8");
+                activeBike = 7;
+                initiateList();
+                return true;
+            case 9:
+                Log.i("Option", "9");
+                activeBike = 8;
+                initiateList();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     public class MyToDoAdapter extends BaseAdapter {
         public ArrayList<ToDoDetails> toDoDataAdapter;
 
@@ -269,7 +346,11 @@ public class ToDo extends AppCompatActivity {
             toDoListLog.setText(s.log);
 
             TextView toDoListCost = (TextView) myView.findViewById(R.id.toDoCost);
-            toDoListCost.setText("£" + Double.toString(s.price));
+            String text = "£" + precision.format(s.price);
+            if(s.price == 0){
+                text= "";
+            }
+            toDoListCost.setText(text);
 
             return myView;
         }

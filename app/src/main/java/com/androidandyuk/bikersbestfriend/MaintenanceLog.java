@@ -342,7 +342,7 @@ public class MaintenanceLog extends AppCompatActivity {
     }
 
     public Double verifyMileage() {
-        double thisMileage = 1;
+        double thisMileage = 1d;
 
         Log.i("Item Pos", "" + itemLongPressedPosition);
         Log.i("Mileage", "" + mileage);
@@ -353,11 +353,13 @@ public class MaintenanceLog extends AppCompatActivity {
                 thisMileage = bikes.get(activeBike).estMileage;
             } else {
                 // we're editing but the box is now empty, so set it what it was before the edit began
-                thisMileage = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).mileage;
+                if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).mileage != 9999999.0) {
+                    thisMileage = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).mileage;
+                }
             }
         } else {
             // the box is not empty
-            Log.i("The Box is"," Not empty");
+            Log.i("The Box is", " Not empty");
             thisMileage = Double.parseDouble(logMilage.getText().toString());
             if (itemLongPressed != null) {
                 // editing, with a number in the box

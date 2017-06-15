@@ -35,6 +35,7 @@ import java.util.Date;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
+import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
@@ -304,7 +305,11 @@ public class Maintenance extends AppCompatActivity {
                 maintenanceListLog.setText(s.log);
 
                 TextView maintenanceListCost = (TextView) myView.findViewById(R.id.maintenanceListCost);
-                maintenanceListCost.setText("£" + Double.toString(s.price));
+                String text = "£" + precision.format(s.price);
+                if(s.price == 0){
+                    text= "";
+                }
+                maintenanceListCost.setText(text);
 
                 return myView;
             } else {
@@ -317,26 +322,27 @@ public class Maintenance extends AppCompatActivity {
 
     public static void saveLogs() {
 
-        ArrayList<String> dates = new ArrayList<>();
-        ArrayList<String> logs = new ArrayList<>();
-        ArrayList<String> costs = new ArrayList<>();
-        ArrayList<String> mileage = new ArrayList<>();
-        ArrayList<String> wasService = new ArrayList<>();
-        ArrayList<String> wasMOT = new ArrayList<>();
-        ArrayList<String> brakePads = new ArrayList<>();
-        ArrayList<String> brakeDiscs = new ArrayList<>();
-        ArrayList<String> frontTyre = new ArrayList<>();
-        ArrayList<String> rearTyre = new ArrayList<>();
-        ArrayList<String> oilChange = new ArrayList<>();
-        ArrayList<String> newBattery = new ArrayList<>();
-        ArrayList<String> coolantChange = new ArrayList<>();
-        ArrayList<String> sparkPlugs = new ArrayList<>();
-        ArrayList<String> airFilter = new ArrayList<>();
-        ArrayList<String> brakeFluid = new ArrayList<>();
-
         for (Bike thisBike : bikes) {
 
             Log.i("Saving Logs", "" + thisBike);
+
+            ArrayList<String> dates = new ArrayList<>();
+            ArrayList<String> logs = new ArrayList<>();
+            ArrayList<String> costs = new ArrayList<>();
+            ArrayList<String> mileage = new ArrayList<>();
+            ArrayList<String> wasService = new ArrayList<>();
+            ArrayList<String> wasMOT = new ArrayList<>();
+            ArrayList<String> brakePads = new ArrayList<>();
+            ArrayList<String> brakeDiscs = new ArrayList<>();
+            ArrayList<String> frontTyre = new ArrayList<>();
+            ArrayList<String> rearTyre = new ArrayList<>();
+            ArrayList<String> oilChange = new ArrayList<>();
+            ArrayList<String> newBattery = new ArrayList<>();
+            ArrayList<String> coolantChange = new ArrayList<>();
+            ArrayList<String> sparkPlugs = new ArrayList<>();
+            ArrayList<String> airFilter = new ArrayList<>();
+            ArrayList<String> brakeFluid = new ArrayList<>();
+
             try {
 
                 for (maintenanceLogDetails thisLog : thisBike.maintenanceLogs) {
@@ -386,27 +392,27 @@ public class Maintenance extends AppCompatActivity {
 
     public static void loadLogs() {
 
-        ArrayList<String> dates = new ArrayList<>();
-        ArrayList<String> logs = new ArrayList<>();
-        ArrayList<String> costs = new ArrayList<>();
-        ArrayList<String> mileage = new ArrayList<>();
-        ArrayList<String> wasService = new ArrayList<>();
-        ArrayList<String> wasMOT = new ArrayList<>();
-        ArrayList<String> brakePads = new ArrayList<>();
-        ArrayList<String> brakeDiscs = new ArrayList<>();
-        ArrayList<String> frontTyre = new ArrayList<>();
-        ArrayList<String> rearTyre = new ArrayList<>();
-        ArrayList<String> oilChange = new ArrayList<>();
-        ArrayList<String> newBattery = new ArrayList<>();
-        ArrayList<String> coolantChange = new ArrayList<>();
-        ArrayList<String> sparkPlugs = new ArrayList<>();
-        ArrayList<String> airFilter = new ArrayList<>();
-        ArrayList<String> brakeFluid = new ArrayList<>();
-
         for (Bike thisBike : bikes) {
             thisBike.maintenanceLogs.clear();
 
             Log.i("Loading Logs", "" + thisBike);
+
+            ArrayList<String> dates = new ArrayList<>();
+            ArrayList<String> logs = new ArrayList<>();
+            ArrayList<String> costs = new ArrayList<>();
+            ArrayList<String> mileage = new ArrayList<>();
+            ArrayList<String> wasService = new ArrayList<>();
+            ArrayList<String> wasMOT = new ArrayList<>();
+            ArrayList<String> brakePads = new ArrayList<>();
+            ArrayList<String> brakeDiscs = new ArrayList<>();
+            ArrayList<String> frontTyre = new ArrayList<>();
+            ArrayList<String> rearTyre = new ArrayList<>();
+            ArrayList<String> oilChange = new ArrayList<>();
+            ArrayList<String> newBattery = new ArrayList<>();
+            ArrayList<String> coolantChange = new ArrayList<>();
+            ArrayList<String> sparkPlugs = new ArrayList<>();
+            ArrayList<String> airFilter = new ArrayList<>();
+            ArrayList<String> brakeFluid = new ArrayList<>();
 
             try {
 
@@ -427,45 +433,45 @@ public class Maintenance extends AppCompatActivity {
                 airFilter = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("airFilter" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
                 brakeFluid = (ArrayList<String>) ObjectSerializer.deserialize(sharedPreferences.getString("brakeFluid" + thisBike.bikeId, ObjectSerializer.serialize(new ArrayList<String>())));
 
+
+                if (dates.size() > 0 && logs.size() > 0 && costs.size() > 0) {
+                    // we've checked there is some info
+                    if (dates.size() == logs.size() && logs.size() == costs.size()) {
+                        // we've checked each item has the same amount of info, nothing is missing
+                        for (int x = 0; x < dates.size(); x++) {
+                            Date thisDate = new Date();
+                            try {
+                                thisDate = sdf.parse(dates.get(x));
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            Log.i("Trying to Add", "" + x);
+
+                            Boolean wasItAService = Boolean.valueOf(wasService.get(x));
+                            Boolean wasItAMOT = Boolean.valueOf(wasMOT.get(x));
+                            Boolean wasBrakePads = Boolean.valueOf(brakePads.get(x));
+                            Boolean wasBrakeDiscs = Boolean.valueOf(brakeDiscs.get(x));
+                            Boolean wasFrontTyre = Boolean.valueOf(frontTyre.get(x));
+                            Boolean wasRearTyre = Boolean.valueOf(rearTyre.get(x));
+                            Boolean wasOilChange = Boolean.valueOf(oilChange.get(x));
+                            Boolean wasNewBattery = Boolean.valueOf(newBattery.get(x));
+                            Boolean wasCoolantChange = Boolean.valueOf(coolantChange.get(x));
+                            Boolean wasSparkPlugs = Boolean.valueOf(sparkPlugs.get(x));
+                            Boolean wasAirFilter = Boolean.valueOf(airFilter.get(x));
+                            Boolean wasBrakeFluid = Boolean.valueOf(brakeFluid.get(x));
+
+                            maintenanceLogDetails newLog = new maintenanceLogDetails(thisDate, logs.get(x), Double.parseDouble(costs.get(x)), Double.parseDouble(mileage.get(x)), wasItAService, wasItAMOT, wasBrakePads
+                                    , wasBrakeDiscs, wasFrontTyre, wasRearTyre, wasOilChange, wasNewBattery, wasCoolantChange, wasSparkPlugs, wasAirFilter, wasBrakeFluid);
+
+                            Log.i("Added", "" + x + "" + newLog);
+                            thisBike.maintenanceLogs.add(newLog);
+                        }
+
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 Log.i("Loading Maint Logs", "Failed attempt");
-            }
-
-            if (dates.size() > 0 && logs.size() > 0 && costs.size() > 0) {
-                // we've checked there is some info
-                if (dates.size() == logs.size() && logs.size() == costs.size()) {
-                    // we've checked each item has the same amount of info, nothing is missing
-                    for (int x = 0; x < dates.size(); x++) {
-                        Date thisDate = new Date();
-                        try {
-                            thisDate = sdf.parse(dates.get(x));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        Log.i("Trying to Add", "" + x);
-
-                        Boolean wasItAService = Boolean.valueOf(wasService.get(x));
-                        Boolean wasItAMOT = Boolean.valueOf(wasMOT.get(x));
-                        Boolean wasBrakePads = Boolean.valueOf(brakePads.get(x));
-                        Boolean wasBrakeDiscs = Boolean.valueOf(brakeDiscs.get(x));
-                        Boolean wasFrontTyre = Boolean.valueOf(frontTyre.get(x));
-                        Boolean wasRearTyre = Boolean.valueOf(rearTyre.get(x));
-                        Boolean wasOilChange = Boolean.valueOf(oilChange.get(x));
-                        Boolean wasNewBattery = Boolean.valueOf(newBattery.get(x));
-                        Boolean wasCoolantChange = Boolean.valueOf(coolantChange.get(x));
-                        Boolean wasSparkPlugs = Boolean.valueOf(sparkPlugs.get(x));
-                        Boolean wasAirFilter = Boolean.valueOf(airFilter.get(x));
-                        Boolean wasBrakeFluid = Boolean.valueOf(brakeFluid.get(x));
-
-                        maintenanceLogDetails newLog = new maintenanceLogDetails(thisDate, logs.get(x), Double.parseDouble(costs.get(x)), Double.parseDouble(mileage.get(x)), wasItAService, wasItAMOT, wasBrakePads
-                                , wasBrakeDiscs, wasFrontTyre, wasRearTyre, wasOilChange, wasNewBattery, wasCoolantChange, wasSparkPlugs, wasAirFilter, wasBrakeFluid);
-
-                        Log.i("Added", "" + x + "" + newLog);
-                        thisBike.maintenanceLogs.add(newLog);
-                    }
-
-                }
             }
         }
     }

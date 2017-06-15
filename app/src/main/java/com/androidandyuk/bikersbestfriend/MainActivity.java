@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static String userLocationForWeather;
 
-    public static final DecimalFormat precision = new DecimalFormat("0.##");
+    public static final DecimalFormat precision = new DecimalFormat("0.00");
     public static final DecimalFormat oneDecimal = new DecimalFormat("0.#");
 
     @Override
