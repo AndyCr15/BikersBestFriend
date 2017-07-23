@@ -33,11 +33,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
+import static com.androidandyuk.bikersbestfriend.CarShows.carShows;
 import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
 import static com.androidandyuk.bikersbestfriend.MainActivity.geocoder;
 import static com.androidandyuk.bikersbestfriend.MainActivity.locationListener;
 import static com.androidandyuk.bikersbestfriend.MainActivity.locationManager;
+import static com.androidandyuk.bikersbestfriend.MainActivity.locationUpdatesTime;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
 import static com.androidandyuk.bikersbestfriend.Traffic.trafficEvents;
 
@@ -46,6 +48,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static GoogleMap mMap;
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    static String type = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +84,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // read in the reason the map has been called
         Intent intent = getIntent();
-        String type = "";
+
         if (intent.getStringExtra("Type") != null) {
             type = intent.getStringExtra("Type");
         }
@@ -118,6 +121,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Log.i("Track selected", "" + temp.name);
             } else if (favItem == 9998) {
                 showMarkers(trackLocations, 0);
+            }
+        }
+
+        if (type.equals("Shows")) {
+            if (favItem < 9998) {
+                // focus on favourite location
+                markedLocation temp = carShows.get(favItem);
+                centerMapOnLocation(temp.location, temp.name);
+                Log.i("Show selected", "" + temp.name);
+            } else if (favItem == 9998) {
+                showMarkers(carShows, 0);
             }
         }
 
@@ -162,13 +176,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (Build.VERSION.SDK_INT < 23) {
 
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, locationUpdatesTime, 1000, locationListener);
 
         } else {
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, locationUpdatesTime, 1000, locationListener);
 
 //                Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 //
@@ -192,7 +206,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, locationUpdatesTime, 1000, locationListener);
 
                 Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
@@ -212,7 +226,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //mMap.clear();
         for (markedLocation location : markedLocations) {
             Log.i("Marking", "" + location.getLocation());
-            mMap.addMarker(new MarkerOptions().position(location.getLocation()).title(location.name));
+            if (type.equals("Shows")) {
+                mMap.addMarker(new MarkerOptions()
+                        .position(location.getLocation())
+                        .title(location.name)
+                        .snippet(location.start + " to " + location.end)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+            } else {
+                mMap.addMarker(new MarkerOptions()
+                        .position(location.getLocation())
+                        .title(location.name));
+            }
         }
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(MainActivity.user.location, 8));
     }
@@ -277,7 +301,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, locationUpdatesTime, 1000, locationListener);
 
             Log.i("Center View on User", "LK Location updated");
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);

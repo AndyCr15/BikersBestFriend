@@ -4,6 +4,9 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.conversion;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
+
 /**
  * Created by AndyCr15 on 16/05/2017.
  */
@@ -37,6 +40,9 @@ public class TrafficEvent implements Comparable<TrafficEvent> {
                         * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double d = r * c;
+        if(milesSetting.equals("Miles")){
+            d = d * conversion;
+        }
         return d;
     }
 

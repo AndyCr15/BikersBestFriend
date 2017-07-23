@@ -2,7 +2,7 @@ package com.androidandyuk.bikersbestfriend;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,8 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -21,15 +21,16 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
 import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
+import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
 public class HotSpots extends AppCompatActivity {
     static ArrayList<markedLocation> hotspotLocations = new ArrayList<>();
     static MyLocationAdapter myAdapter;
 
-    static SharedPreferences sharedPreferences;
-    Button seeHotSpotMap;
-    ListView listview;
+    public static RelativeLayout main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +126,9 @@ public class HotSpots extends AppCompatActivity {
 
             final markedLocation s = locationDataAdapter.get(position);
 
+            TextView milesKM = (TextView)myView.findViewById(R.id.milesKM);
+            milesKM.setText(milesSetting);
+
             TextView locationListDistance = (TextView) myView.findViewById(R.id.locationListDistance);
             locationListDistance.setText(oneDecimal.format(s.distance));
 
@@ -136,11 +140,22 @@ public class HotSpots extends AppCompatActivity {
 
     }
 
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            HotSpots.main.setBackground(drawablePic);
+        } else {
+            HotSpots.main.setBackgroundColor(getResources().getColor(R.color.background));
+        }
+    }
+
     public void initialiseLocations() {
         if (hotspotLocations.size() == 0) {
             hotspotLocations.add(new markedLocation("Ace Cafe", new LatLng(51.5412794, -0.2799549), "The world famous Ace Cafe. Food not the best though. Friday nights are always busy"));
             hotspotLocations.add(new markedLocation("High Beach", new LatLng(51.657176, 0.0349883), ""));
-            hotspotLocations.add(new markedLocation("Rykers Cafe", new LatLng(51.255562, -0.3243657), ""));
+            hotspotLocations.add(new markedLocation("Ryka's Cafe", new LatLng(51.255562, -0.3243657), ""));
             hotspotLocations.add(new markedLocation("Loomies Cafe", new LatLng(51.030443, -1.0779103), "Great roads lead to it. Nice burger once you get there!"));
             hotspotLocations.add(new markedLocation("H Cafe", new LatLng(51.658486, -1.1781097), ""));
             hotspotLocations.add(new markedLocation("On Yer Bike", new LatLng(51.854932, -0.968651), ""));
@@ -176,7 +191,7 @@ public class HotSpots extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.i("Hot Spot Activity", "On Resume");
+        checkBackground();
     }
 
     @Override

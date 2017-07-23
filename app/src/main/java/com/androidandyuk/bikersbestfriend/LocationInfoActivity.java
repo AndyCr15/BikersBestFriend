@@ -2,13 +2,19 @@ package com.androidandyuk.bikersbestfriend;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.Spannable;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,8 +37,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import static com.androidandyuk.bikersbestfriend.CarShows.carShows;
 import static com.androidandyuk.bikersbestfriend.Favourites.favouriteLocations;
 import static com.androidandyuk.bikersbestfriend.HotSpots.hotspotLocations;
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
 import static com.androidandyuk.bikersbestfriend.MainActivity.jsonObject;
 import static com.androidandyuk.bikersbestfriend.MapsActivity.showMarkers;
 import static com.androidandyuk.bikersbestfriend.RaceTracks.trackLocations;
@@ -43,6 +51,8 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
     markedLocation temp;
     public static String thisForecast;
     private FirebaseAnalytics mFirebaseAnalytics;
+
+    public static RelativeLayout main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +147,38 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
             }
         }
 
+        if (type.equals("Show")) {
+            if (favItem < 9998) {
+                // focus on favourite location
+                temp = carShows.get(favItem);
+                centerMapOnLocation(temp.location, temp.name);
+                Log.i("Show selected", "" + temp.name);
+                locationName.setText(temp.name);
+                locationAddress.setText(temp.address);
+                String comment = temp.comment + "\n\nStarting " + temp.start + " and ends " + temp.end + ".\n\nWebsite : [" + temp.url + "]";
+
+                // make the website url clickable
+                // whatever is between [ and ] is made clickable
+                int i1 = comment.indexOf("[");
+                int i2 = comment.indexOf("]");
+                locationComment.setMovementMethod(LinkMovementMethod.getInstance());
+                locationComment.setText(comment, TextView.BufferType.SPANNABLE);
+                Spannable mySpannable = locationComment.getText();
+                ClickableSpan myClickableSpan = new ClickableSpan()
+                {
+                    @Override
+                    public void onClick(View widget) {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(temp.url));
+                        startActivity(browserIntent);
+                    }
+                };
+                mySpannable.setSpan(myClickableSpan, i1, i2 + 1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            } else if (favItem == 9998) {
+                showMarkers(trackLocations, 0);
+            }
+        }
+
     }
 
     public void saveChanges(View view) {
@@ -154,6 +196,17 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
 
         Toast.makeText(this, "Info updated for " + temp.name, Toast.LENGTH_LONG).show();
 
+    }
+
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            LocationInfoActivity.main.setBackground(drawablePic);
+        } else {
+            LocationInfoActivity.main.setBackgroundColor(getResources().getColor(R.color.background));
+        }
     }
 
     public void centerMapOnLocation(LatLng latLng, String title) {
@@ -271,4 +324,9 @@ public class LocationInfoActivity extends FragmentActivity implements OnMapReady
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkBackground();
+    }
 }

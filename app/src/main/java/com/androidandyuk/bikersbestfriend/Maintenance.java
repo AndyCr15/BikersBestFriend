@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import android.widget.BaseAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +35,13 @@ import java.util.Calendar;
 import java.util.Date;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.conversion;
+import static com.androidandyuk.bikersbestfriend.MainActivity.currencySetting;
 import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
+import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
@@ -45,6 +52,8 @@ public class Maintenance extends AppCompatActivity {
 
     static MyMaintenanceAdapter myAdapter;
     ListView maintList;
+
+    public static RelativeLayout main;
 
     TextView setLogDate;
 
@@ -67,9 +76,6 @@ public class Maintenance extends AppCompatActivity {
 
         // until I implement landscape view, lock the orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
-        sharedPreferences = this.getSharedPreferences("com.androidandyuk.bikersbestfriend", Context.MODE_PRIVATE);
-        ed = sharedPreferences.edit();
 
         loadLogs();
         initiateList();
@@ -172,10 +178,10 @@ public class Maintenance extends AppCompatActivity {
 
         DatePickerDialog dialog = new DatePickerDialog(
                 Maintenance.this,
-                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                R.style.datepicker,
                 logDateSetListener,
                 year, month, day);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.LTGRAY));
         dialog.show();
     }
 
@@ -201,7 +207,9 @@ public class Maintenance extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                Toast.makeText(Maintenance.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), Settings.class);
+                startActivity(intent);
+//                Toast.makeText(MainActivity.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
             case 1:
                 Log.i("Option", "1");
@@ -249,7 +257,6 @@ public class Maintenance extends AppCompatActivity {
                 initiateList();
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -299,15 +306,23 @@ public class Maintenance extends AppCompatActivity {
                 maintenanceListDate.setText(s.date);
 
                 TextView maintenanceListMileage = (TextView) myView.findViewById(R.id.maintenanceListMileage);
-                maintenanceListMileage.setText("Mi:" + Double.toString(s.mileage));
+                Double thisMiles = s.mileage;
+
+                // check what setting the user has, Miles or Km
+                // if Km, convert to Miles for display
+                if(milesSetting.equals("Km")){
+                    thisMiles = thisMiles / conversion;
+                }
+
+                maintenanceListMileage.setText(milesSetting + ":" +(oneDecimal.format(thisMiles)));
 
                 TextView maintenanceListLog = (TextView) myView.findViewById(R.id.maintenanceListLog);
                 maintenanceListLog.setText(s.log);
 
                 TextView maintenanceListCost = (TextView) myView.findViewById(R.id.maintenanceListCost);
-                String text = "£" + precision.format(s.price);
-                if(s.price == 0){
-                    text= "";
+                String text = currencySetting + precision.format(s.price);
+                if (s.price == 0) {
+                    text = "";
                 }
                 maintenanceListCost.setText(text);
 
@@ -317,6 +332,17 @@ public class Maintenance extends AppCompatActivity {
                 View myView = mInflater.inflate(R.layout.blank, null);
                 return myView;
             }
+        }
+    }
+
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            Maintenance.main.setBackground(drawablePic);
+        } else {
+            Maintenance.main.setBackgroundColor(getResources().getColor(R.color.background));
         }
     }
 
@@ -395,7 +421,7 @@ public class Maintenance extends AppCompatActivity {
         for (Bike thisBike : bikes) {
             thisBike.maintenanceLogs.clear();
 
-            Log.i("Loading Logs", "" + thisBike);
+            Log.i("LoadingMaintLogs", "" + thisBike);
 
             ArrayList<String> dates = new ArrayList<>();
             ArrayList<String> logs = new ArrayList<>();
@@ -506,4 +532,11 @@ public class Maintenance extends AppCompatActivity {
         saveLogs();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // might have just come back from settings, so update the list
+        myAdapter.notifyDataSetChanged();
+        checkBackground();
+    }
 }

@@ -17,12 +17,16 @@
     <application
         android:name=".App"
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:logo="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- android:backupAgent=".MyBackupAgent" -->
+
 
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -35,6 +39,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyArj442hrHRXeONxwuaUK8TUZLHrx5hIAo" />
+        <meta-data
+            android:name="com.google.android.backup.api_key"
+            android:value="AEdPqrEAAAAILBrSZaiKBIa1ylQupITalbvc9ZFsfI-Nvl-jiw" />
 
         <activity
             android:name=".SplashScreen"
@@ -63,6 +70,10 @@
             android:name=".RaceTracks"
             android:label="Tracks"
             android:theme="@style/AppTheme" />
+        <!-- <activity -->
+        <!-- android:name=".Settings" -->
+        <!-- android:label="Settings" -->
+        <!-- android:theme="@style/SettingsTheme" /> -->
         <activity
             android:name=".LocationInfoActivity"
             android:label="@string/title_activity_location_info"
@@ -89,8 +100,9 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".Maintenance"
-            android:label="Maintenance Log"
-            android:theme="@style/AppTheme" />
+            android:label="Maintenance"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".GroupRide"
             android:label="Group Ride"
@@ -103,10 +115,23 @@
             android:label="Send Feedback"
             android:theme="@style/AppTheme" />
         <activity android:name=".PetrolPrices" />
-        <activity android:name=".MaintenanceLog" />
-        <activity android:name=".PartsLog" />
-        <activity android:name=".ToDo" />
-        <activity android:name=".ToDoLog" />
+        <activity
+            android:name=".MaintenanceLog"
+            android:label="Maintenance Log"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".PartsLog"
+            android:label="Parts Log" />
+        <activity
+            android:name=".ToDo"
+            android:label="To Do List" />
+        <activity
+            android:name=".CarShows"
+            android:label="Auto Shows" />
+        <activity
+            android:name=".Settings"
+            android:label="Settings" />
+        <activity android:name=".AnnualReports"></activity>
     </application>
 
 </manifest>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -20,10 +21,13 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
@@ -32,7 +36,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.currencySetting;
 import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
 import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
@@ -41,8 +47,13 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 public class ToDo extends AppCompatActivity {
     private FirebaseAnalytics mFirebaseAnalytics;
 
+    private static final String TAG = "ToDo";
+    private AdView mAdView;
+
     static MyToDoAdapter myAdapter;
     ListView toDoList;
+
+    public static RelativeLayout main;
 
     EditText toDoDetails;
     EditText toDoURL;
@@ -68,6 +79,9 @@ public class ToDo extends AppCompatActivity {
         setContentView(R.layout.activity_to_do);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
 
         // until I implement landscape view, lock the orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -82,7 +96,7 @@ public class ToDo extends AppCompatActivity {
         toDoCost = (EditText) findViewById(R.id.toDoCost);
         prioritySpinner = (Spinner) findViewById(R.id.prioritySpinner);
 
-        prioritySpinner.setAdapter(new ArrayAdapter<ToDoPriority>(this, android.R.layout.simple_spinner_item, ToDoPriority.values()));
+        prioritySpinner.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, ToDoPriority.values()));
         // load the to Do list
 
         Log.i("Fuelling", "Loading ToDos");
@@ -221,6 +235,17 @@ public class ToDo extends AppCompatActivity {
         itemLongPressedPosition = -1;
     }
 
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            ToDo.main.setBackground(drawablePic);
+        } else {
+            ToDo.main.setBackgroundColor(getResources().getColor(R.color.background));
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.bike_choice, menu);
@@ -243,7 +268,9 @@ public class ToDo extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                Toast.makeText(ToDo.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), Settings.class);
+                startActivity(intent);
+//                Toast.makeText(MainActivity.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
             case 1:
                 Log.i("Option", "1");
@@ -322,13 +349,15 @@ public class ToDo extends AppCompatActivity {
 
             final ToDoDetails s = toDoDataAdapter.get(position);
 
-            // this has not been set to ToDo list, copied from maint
-
             LayoutInflater mInflater = getLayoutInflater();
             View myView = mInflater.inflate(R.layout.todo_listview, null);
 
             TextView toDoListURL = (TextView) myView.findViewById(R.id.toDoURL);
-            toDoListURL.setText(s.url);
+            String thisURL = s.url;
+            if (thisURL.length()>80){
+                thisURL = thisURL.substring(0,80);
+            }
+            toDoListURL.setText(thisURL);
             toDoListURL.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -346,7 +375,7 @@ public class ToDo extends AppCompatActivity {
             toDoListLog.setText(s.log);
 
             TextView toDoListCost = (TextView) myView.findViewById(R.id.toDoCost);
-            String text = "£" + precision.format(s.price);
+            String text = currencySetting + precision.format(s.price);
             if(s.price == 0){
                 text= "";
             }
@@ -463,5 +492,11 @@ public class ToDo extends AppCompatActivity {
         super.onPause();
         Log.i("ToDo Activity", "On Pause");
         saveToDos();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkBackground();
     }
 }

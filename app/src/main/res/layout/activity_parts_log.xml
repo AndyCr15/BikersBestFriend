@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.androidandyuk.bikersbestfriend.PartsLog">
@@ -65,7 +66,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="setMOTdue"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -77,7 +77,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="setMOTdue"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -105,7 +104,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="setServiceDue"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -117,7 +115,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="setServiceDue"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -147,7 +144,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -159,7 +155,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -190,7 +185,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetSpent"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -202,7 +196,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -232,7 +225,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetSpent"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -244,7 +236,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -274,7 +265,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetSpent"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -286,7 +276,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -316,7 +305,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetSpent"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -328,7 +316,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -358,7 +345,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetSpent"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -370,7 +356,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -400,7 +385,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetSpent"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -412,7 +396,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -442,7 +425,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetSpent"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />
@@ -454,7 +436,6 @@
                     android:layout_weight="2"
                     android:background="@drawable/rounded_corners_grey_orange"
                     android:gravity="center_vertical|center_horizontal"
-                    android:onClick="cantSetMPG"
                     android:text="n/a"
                     android:textAlignment="center"
                     android:textSize="14sp" />

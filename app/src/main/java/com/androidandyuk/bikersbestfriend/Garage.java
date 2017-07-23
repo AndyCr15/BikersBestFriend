@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,8 +18,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -31,8 +35,14 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import static com.androidandyuk.bikersbestfriend.Fuelling.loadFuels;
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.conversion;
+import static com.androidandyuk.bikersbestfriend.MainActivity.currencySetting;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
+import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 import static com.androidandyuk.bikersbestfriend.MainActivity.precision;
 import static com.androidandyuk.bikersbestfriend.MainActivity.saveBikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
@@ -40,13 +50,13 @@ import static com.androidandyuk.bikersbestfriend.Maintenance.loadLogs;
 
 public class Garage extends AppCompatActivity {
 
-//    public static ArrayList<Bike> bikes = new ArrayList<>();
-
     private FirebaseAnalytics mFirebaseAnalytics;
 
     private static final String TAG = "MainActivity";
 
     private AdView mAdView;
+
+    public static ConstraintLayout main;
 
     View addingBikeInfo;
     EditText bikeMake;
@@ -58,10 +68,13 @@ public class Garage extends AppCompatActivity {
     TextView myRegView;
     TextView MOTdue;
     TextView serviceDue;
+    Spinner taxDue;
 
     TextView bikeTitle;
     ViewSwitcher regSwitcher;
     EditText bikeNotes;
+
+    String detail;
 
     private DatePickerDialog.OnDateSetListener MOTDateSetListener;
     private DatePickerDialog.OnDateSetListener serviceDateSetListener;
@@ -93,6 +106,16 @@ public class Garage extends AppCompatActivity {
         myRegView = (TextView) findViewById(R.id.clickable_reg_view);
         MOTdue = (TextView) findViewById(R.id.MOTdue);
         serviceDue = (TextView) findViewById(R.id.serviceDue);
+        taxDue = (Spinner) findViewById(R.id.taxSpinner);
+
+
+        taxDue.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, TaxDue.values()));
+
+        if (activeBike > -1) {
+            int thisTax = getEnumPos(bikes.get(activeBike).taxDue);
+            Log.i("This Tax", bikes.get(activeBike).taxDue + " " + thisTax);
+            taxDue.setSelection(thisTax - 1);
+        }
 
         Log.i("Active Bike", "" + activeBike);
 
@@ -110,6 +133,36 @@ public class Garage extends AppCompatActivity {
         }
 
 
+    }
+
+    public int getEnumPos(String thisEnum) {
+        switch (thisEnum) {
+            case "JAN":
+                return 1;
+            case "FEB":
+                return 2;
+            case "MAR":
+                return 3;
+            case "APR":
+                return 4;
+            case "MAY":
+                return 5;
+            case "JUN":
+                return 6;
+            case "JUL":
+                return 7;
+            case "AUG":
+                return 8;
+            case "SEP":
+                return 9;
+            case "OCT":
+                return 10;
+            case "NOV":
+                return 11;
+            case "DEC":
+                return 12;
+        }
+        return 1;
     }
 
     public void setListeners() {
@@ -151,7 +204,7 @@ public class Garage extends AppCompatActivity {
 
     public void garageSetup() {
         bikeTitle = (TextView) findViewById(R.id.bikeTitle);
-        regSwitcher = (ViewSwitcher) findViewById(R.id.regSwitcher);
+//        regSwitcher = (ViewSwitcher) findViewById(R.id.regSwitcher);
         aveMPG = (TextView) findViewById(R.id.aveMPG);
         bikeEstMileage = (TextView) findViewById(R.id.estMileage);
         amountSpent = (TextView) findViewById(R.id.amountSpent);
@@ -160,8 +213,10 @@ public class Garage extends AppCompatActivity {
         myRegView = (TextView) findViewById(R.id.clickable_reg_view);
         MOTdue = (TextView) findViewById(R.id.MOTdue);
         serviceDue = (TextView) findViewById(R.id.serviceDue);
+        taxDue = (Spinner) findViewById(R.id.taxSpinner);
 
         setListeners();
+        calcEstMileage();
 
         // check the user has a bike, then set all the views to it's current details
         if (bikes.size() > 0) {
@@ -171,14 +226,23 @@ public class Garage extends AppCompatActivity {
             Log.i("Active Bike Reg", " " + (bikes.get(activeBike).registration));
 
             myRegView.setText((bikes.get(activeBike).registration));
-            myRegView.requestFocus();
 
             // show only 2 decimal places.  Precision is declared in MainActivity to 2 decimal places
-            String spend = "£" + precision.format(calculateMaintSpend(bikes.get(activeBike)));
+            String spend = currencySetting + precision.format(calculateMaintSpend(bikes.get(activeBike)));
             amountSpent.setText(spend);
             bikeEstMileage.setText("tbc");
             if (bikes.get(activeBike).estMileage > 0) {
-                bikeEstMileage.setText(Double.toString(bikes.get(activeBike).estMileage));
+                Double estMile = bikes.get(activeBike).estMileage;
+                // check what setting the user has, Miles or Km
+                // if Km, convert to Miles for display
+                String unit = "";
+                if (milesSetting.equals("Km")) {
+                    estMile = estMile / conversion;
+                    unit = " Km";
+                } else {
+                    unit = " Mi";
+                }
+                bikeEstMileage.setText(oneDecimal.format(estMile) + unit);
             }
             bikeNotes.setText(bikes.get(activeBike).notes);
 
@@ -186,10 +250,10 @@ public class Garage extends AppCompatActivity {
             Log.i("MOT Due ", bikes.get(activeBike).MOTdue);
             MOTdue.setText(bikes.get(activeBike).MOTdue);
             Calendar testDate = new GregorianCalendar();
-            if (MainActivity.checkInRange(bikes.get(activeBike), testDate, 'M')) {
-                MOTdue.setTextColor(Color.parseColor("#ff0000"));
+            if (MainActivity.checkInRange(bikes.get(activeBike).MOTdue, testDate)) {
+                MOTdue.setBackground(getResources().getDrawable(R.drawable.rounded_corners_red));
             } else {
-                MOTdue.setTextColor(Color.parseColor("#808080"));
+                MOTdue.setBackground(getResources().getDrawable(R.drawable.rounded_corners_grey_orange));
             }
 //            }
 
@@ -197,12 +261,35 @@ public class Garage extends AppCompatActivity {
             Log.i("Service Due ", bikes.get(activeBike).serviceDue);
 //            if (bikes.get(activeBike).serviceDue != null) {
             serviceDue.setText(bikes.get(activeBike).serviceDue);
-            if (MainActivity.checkInRange(bikes.get(activeBike), testDate, 'S')) {
-                serviceDue.setTextColor(Color.parseColor("#ff0000"));
+            testDate = new GregorianCalendar();
+            if (MainActivity.checkInRange(bikes.get(activeBike).serviceDue, testDate)) {
+                serviceDue.setBackground(getResources().getDrawable(R.drawable.rounded_corners_red));
             } else {
-                serviceDue.setTextColor(Color.parseColor("#808080"));
+                serviceDue.setBackground(getResources().getDrawable(R.drawable.rounded_corners_grey_orange));
             }
-//            }
+
+            // check Tax is due this month
+
+            int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
+            int taxMonth = getEnumPos(bikes.get(activeBike).taxDue);
+            Log.i("Current Month", "" + Calendar.getInstance().get(Calendar.MONTH));
+            Log.i("Tax Month", "" + getEnumPos(bikes.get(activeBike).taxDue));
+            if (currentMonth == taxMonth) {
+                taxDue.setBackground(getResources().getDrawable(R.drawable.rounded_corners_red));
+            } else {
+                taxDue.setBackground(getResources().getDrawable(R.drawable.rounded_corners_grey_orange));
+            }
+        }
+    }
+
+    public void checkBackground() {
+        main = (ConstraintLayout) findViewById(R.id.main);
+        if (backgroundsWanted) {
+            int resID = getResources().getIdentifier("background_portrait", "drawable", this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            Garage.main.setBackground(drawablePic);
+        } else {
+            Garage.main.setBackgroundColor(getResources().getColor(R.color.background));
         }
     }
 
@@ -217,20 +304,20 @@ public class Garage extends AppCompatActivity {
             }
 
 
-        // for some reason I can't getYear from thisDate, so will just use the current year
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(thisDate);
-        int year = cal.get(Calendar.YEAR);
-        int month = cal.get(Calendar.MONTH);
-        int day = cal.get(Calendar.DAY_OF_MONTH);
+            // for some reason I can't getYear from thisDate, so will just use the current year
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(thisDate);
+            int year = cal.get(Calendar.YEAR);
+            int month = cal.get(Calendar.MONTH);
+            int day = cal.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog dialog = new DatePickerDialog(
-                Garage.this,
-                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
-                MOTDateSetListener,
-                year, month, day);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        dialog.show();
+            DatePickerDialog dialog = new DatePickerDialog(
+                    Garage.this,
+                    R.style.datepicker,
+                    MOTDateSetListener,
+                    year, month, day);
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.LTGRAY));
+            dialog.show();
         }
     }
 
@@ -253,10 +340,10 @@ public class Garage extends AppCompatActivity {
 
             DatePickerDialog dialog = new DatePickerDialog(
                     Garage.this,
-                    android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                    R.style.datepicker,
                     serviceDateSetListener,
                     year, month, day);
-            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.LTGRAY));
             dialog.show();
         }
     }
@@ -273,12 +360,9 @@ public class Garage extends AppCompatActivity {
     }
 
     public void TextViewClicked(View view) {
-        ViewSwitcher switcher = (ViewSwitcher) findViewById(R.id.regSwitcher);
-        switcher.showNext(); //or switcher.showPrevious();
-        myRegView = (TextView) switcher.findViewById(R.id.clickable_reg_view);
-//        myRegView.setText("");
-        myRegView.setSelected(true);
-        myRegView.requestFocus();
+        if (activeBike > -1) {
+            getDetails("Enter Reg");
+        }
     }
 
     public void addBike(View view) {
@@ -366,6 +450,36 @@ public class Garage extends AppCompatActivity {
         }
     }
 
+    public void getDetails(String hint) {
+        Log.i("Get Details", hint);
+//        final String[] detail = new String[1];
+        final View getDetails = findViewById(R.id.getDetails);
+        getDetails.setVisibility(View.VISIBLE);
+        final EditText reg = (EditText) findViewById(R.id.getDetailsText);
+        reg.setHint(hint);
+
+        reg.setFocusableInTouchMode(true);
+        reg.requestFocus();
+
+        reg.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // Perform action on key press
+                    detail = reg.getText().toString().toUpperCase();
+                    getDetails.setVisibility(View.INVISIBLE);
+                    bikes.get(activeBike).registration = detail;
+                    myRegView = (TextView) findViewById(R.id.clickable_reg_view);
+                    myRegView.setText(detail);
+                    saveBikes();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
     public void goToMaintenanceLog(View view) {
         if (activeBike > -1) {
             Intent intent = new Intent(getApplicationContext(), Maintenance.class);
@@ -399,6 +513,78 @@ public class Garage extends AppCompatActivity {
         Toast.makeText(Garage.this, "Costs are calculated from your maintenance logs, not set here", Toast.LENGTH_LONG).show();
     }
 
+    public void calcEstMileage() {
+        if(activeBike>-1) {
+            loadLogs();
+            loadFuels();
+            Log.i("Garage", "calcEstMileage");
+            Bike thisBike = bikes.get(activeBike);
+            Date lastMaintDate = new Date(90, 1, 1);
+            Date lastFuelDate = new Date(90, 1, 1);
+            Date lastDate = new Date(90, 1, 1);
+            double lastMaintMileage = 0;
+            double lastFuelMileage = 0;
+            double lastMileage = 0;
+
+            int maintLogs = thisBike.maintenanceLogs.size();
+            int fuelLogs = thisBike.fuelings.size();
+
+            Log.i("LogCount", "M:" + maintLogs + " F:" + fuelLogs);
+
+            //find the last maintenance log with a mileage
+            for (int i = maintLogs - 1; i >= 0; i--) {
+                if (thisBike.maintenanceLogs.get(i).mileage > 0) {
+                    try {
+                        lastMaintDate = sdf.parse(thisBike.maintenanceLogs.get(i).date);
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    lastMaintMileage = thisBike.maintenanceLogs.get(i).mileage;
+                }
+            }
+            Log.i("LastMaint", "Mileage " + lastMaintMileage);
+
+            //find the last fuel log with a mileage
+            for (int i = fuelLogs - 1; i >= 0; i--) {
+                if (thisBike.fuelings.get(i).mileage > 1) {
+                    try {
+                        lastFuelDate = sdf.parse(thisBike.fuelings.get(i).date);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    lastFuelMileage = thisBike.fuelings.get(i).mileage;
+                }
+            }
+            Log.i("LastFuel", "Mileage " + lastFuelMileage);
+
+            //check which is newer and make that the mileage we're using
+            if (lastMaintDate.after(lastFuelDate)) {
+                lastMileage = lastMaintMileage;
+                lastDate = lastMaintDate;
+            } else {
+                lastMileage = lastFuelMileage;
+                lastDate = lastFuelDate;
+            }
+
+            Log.i("LastEither", "Mileage " + lastMileage);
+
+            // now add any miles from fuel ups that happened after the last date
+            for (int i = 0; i < fuelLogs; i++) {
+                Date testDate = null;
+                try {
+                    testDate = sdf.parse(thisBike.fuelings.get(i).date);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (testDate.after(lastDate)) {
+                    lastMileage += thisBike.fuelings.get(i).miles;
+                }
+            }
+            thisBike.estMileage = lastMileage;
+        }
+    }
+
     @Override
     public void onBackPressed() {
         // this must be empty as back is being dealt with in onKeyDown
@@ -407,9 +593,16 @@ public class Garage extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-
+            //assign the views that could be showing, to check if they are showing when back is pressed
+            View addingBikeInfo = findViewById(R.id.addingBikeInfo);
+            View getDetails = findViewById(R.id.getDetails);
+            if (addingBikeInfo.isShown() || getDetails.isShown()) {
+                addingBikeInfo.setVisibility(View.INVISIBLE);
+                getDetails.setVisibility(View.INVISIBLE);
+            } else {
                 finish();
                 return true;
+            }
         }
         return super.onKeyDown(keyCode, event);
     }
@@ -420,13 +613,11 @@ public class Garage extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
 
         menu.add(0, 0, 0, "Settings").setShortcut('3', 'c');
-        menu.add(0, 1, 0, "About").setShortcut('3', 'c');
 
         for (int i = 0; i < bikes.size(); i++) {
             String bikeMakeMenu = bikes.get(i).model;
-            menu.add(0, i + 2, 0, bikeMakeMenu).setShortcut('3', 'c');
+            menu.add(0, i + 1, 0, bikeMakeMenu).setShortcut('3', 'c');
         }
-
         return true;
     }
 
@@ -442,80 +633,86 @@ public class Garage extends AppCompatActivity {
         switch (item.getItemId()) {
             case 0:
                 Log.i("Option", "0");
-                Toast.makeText(Garage.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(getApplicationContext(), Settings.class);
+                startActivity(intent);
+//                Toast.makeText(MainActivity.this, "Settings not yet implemented", Toast.LENGTH_LONG).show();
                 return true;
             case 1:
-                Log.i("Option", "1");
-                // go to about me
-                Intent intent = new Intent(getApplicationContext(), AboutActivity.class);
-                startActivity(intent);
-                return true;
-            case 2:
                 Log.i("Option", "2");
                 activeBike = 0;
                 garageSetup();
                 return true;
+            case 2:
+                Log.i("Option", "2");
+                activeBike = 1;
+                garageSetup();
+                return true;
             case 3:
                 Log.i("Option", "3");
-                activeBike = 1;
+                activeBike = 2;
                 garageSetup();
                 return true;
             case 4:
                 Log.i("Option", "4");
-                activeBike = 2;
+                activeBike = 3;
                 garageSetup();
                 return true;
             case 5:
                 Log.i("Option", "5");
-                activeBike = 3;
+                activeBike = 4;
                 garageSetup();
                 return true;
             case 6:
                 Log.i("Option", "6");
-                activeBike = 4;
+                activeBike = 5;
                 garageSetup();
                 return true;
             case 7:
                 Log.i("Option", "7");
-                activeBike = 5;
+                activeBike = 6;
                 garageSetup();
                 return true;
             case 8:
                 Log.i("Option", "8");
-                activeBike = 6;
+                activeBike = 7;
                 garageSetup();
                 return true;
             case 9:
                 Log.i("Option", "9");
-                activeBike = 7;
+                activeBike = 8;
                 garageSetup();
                 return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        taxDue = (Spinner) findViewById(R.id.taxSpinner);
+        String thisTaxDue = taxDue.getSelectedItem().toString();
+        Log.i("Tax is due", thisTaxDue);
         bikeNotes = (EditText) findViewById(R.id.bikeNotes);
         // check there's actually a bike before saving the notes
         if (bikeNotes != null && bikes.size() > 0) {
             bikes.get(activeBike).notes = bikeNotes.getText().toString();
+            bikes.get(activeBike).taxDue = thisTaxDue;
         }
 
-        myRegView = (EditText) findViewById(R.id.hidden_reg_view);
-        // check there's actually a bike before saving the reg
-        if (!myRegView.getText().toString().equals("") && bikes.size() > 0) {
-            bikes.get(activeBike).registration = myRegView.getText().toString();
-            Log.i("Setting Reg", " to " + myRegView.getText().toString());
-        }
+//        myRegView = (EditText) findViewById(R.id.hidden_reg_view);
+//        // check there's actually a bike before saving the reg
+//        if (!myRegView.getText().toString().equals("") && bikes.size() > 0) {
+//            bikes.get(activeBike).registration = myRegView.getText().toString();
+//            Log.i("Setting Reg", " to " + myRegView.getText().toString());
+//        }
         saveBikes();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        Log.i("Garage","onResume");
         garageSetup();
+        checkBackground();
     }
 }

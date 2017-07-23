@@ -47,7 +47,7 @@
         android:layout_margin="4dp"
         android:layout_weight="0"
         android:text="Cost"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@color/colorAccent"
         android:textSize="24sp" />
 
 </LinearLayout>

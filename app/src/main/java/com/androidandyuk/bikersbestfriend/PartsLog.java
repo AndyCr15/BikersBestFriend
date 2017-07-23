@@ -1,15 +1,23 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
+import static com.androidandyuk.bikersbestfriend.MainActivity.conversion;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
+import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 
 
 public class PartsLog extends AppCompatActivity {
+
+    public static RelativeLayout main;
 
     TextView bikeTitle;
 
@@ -69,61 +77,77 @@ public class PartsLog extends AppCompatActivity {
         for (int i = (thisBike.maintenanceLogs.size()-1); i > -1; i--) {
             maintenanceLogDetails thisLog = thisBike.maintenanceLogs.get(i);
 
-            String milesSince = Integer.toString((int)(thisBike.estMileage - thisLog.mileage));
-            
+            Double miles = thisBike.estMileage - thisLog.mileage;
+            // check what setting the user has, Miles or Km
+            // if Km, convert to Miles for display
+            if(milesSetting.equals("Km")){
+                miles = miles / conversion;
+            }
+            String milesSince = oneDecimal.format(miles) + " ";
+
             if(thisLog.brakePads){
-                padsMiles.setText(milesSince + " miles ago");
+                padsMiles.setText(milesSince + milesSetting + " ago");
                 padsDate.setText(thisLog.date);
             }
 
             if(thisLog.brakeDiscs){
-                discsMiles.setText(milesSince + " miles ago");
+                discsMiles.setText(milesSince + milesSetting + " ago");
                 discsDate.setText(thisLog.date);
             }
 
             if(thisLog.frontTyre){
-                frontMiles.setText(milesSince + " miles ago");
+                frontMiles.setText(milesSince + milesSetting + " ago");
                 frontDate.setText(thisLog.date);
             }
 
             if(thisLog.rearTyre){
-                rearMiles.setText(milesSince + " miles ago");
+                rearMiles.setText(milesSince + milesSetting + " ago");
                 rearDate.setText(thisLog.date);
             }
 
             if(thisLog.oilChange){
-                oilMiles.setText(milesSince + " miles ago");
+                oilMiles.setText(milesSince + milesSetting + " ago");
                 oilDate.setText(thisLog.date);
             }
 
             if(thisLog.newBattery){
-                batteryMiles.setText(milesSince + " miles ago");
+                batteryMiles.setText(milesSince + milesSetting + " ago");
                 batteryDate.setText(thisLog.date);
             }
 
             if(thisLog.coolantChange){
-                coolantMiles.setText(milesSince + " miles ago");
+                coolantMiles.setText(milesSince + milesSetting + " ago");
                 coolantDate.setText(thisLog.date);
             }
 
             if(thisLog.sparkPlugs){
-                sparksMiles.setText(milesSince + " miles ago");
+                sparksMiles.setText(milesSince + milesSetting + " ago");
                 sparksDate.setText(thisLog.date);
             }
 
             if(thisLog.airFilter){
-                airMiles.setText(milesSince + " miles ago");
+                airMiles.setText(milesSince + milesSetting + " ago");
                 airDate.setText(thisLog.date);
             }
 
             if(thisLog.brakeFluid){
-                fluidMiles.setText(milesSince + " miles ago");
+                fluidMiles.setText(milesSince + milesSetting + " ago");
                 fluidDate.setText(thisLog.date);
             }
         }
 
     }
 
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            PartsLog.main.setBackground(drawablePic);
+        } else {
+            PartsLog.main.setBackgroundColor(getResources().getColor(R.color.background));
+        }
+    }
 
     @Override
     public void onBackPressed() {
@@ -138,5 +162,11 @@ public class PartsLog extends AppCompatActivity {
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkBackground();
     }
 }

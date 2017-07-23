@@ -34,7 +34,7 @@
         android:layout_weight="0"
         android:text="MPG"
         android:textAlignment="textEnd"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@color/colorAccent"
         android:textSize="18sp" />
 
 </LinearLayout>

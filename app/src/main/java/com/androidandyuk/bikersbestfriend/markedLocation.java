@@ -11,6 +11,8 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.List;
 import java.util.Locale;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.conversion;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
 import static com.androidandyuk.bikersbestfriend.MainActivity.user;
 
 /**
@@ -23,6 +25,19 @@ public class markedLocation implements Comparable<markedLocation> {
     String address;
     String comment;
     double distance;
+    String start;
+    String end;
+    String url;
+
+    public markedLocation(String name, LatLng location, String address, String comment, String start, String end, String url) {
+        this.name = name;
+        this.location = location;
+        this.address = address;
+        this.comment = comment;
+        this.start = start;
+        this.end = end;
+        this.url = url;
+    }
 
     public markedLocation(String name, String address, LatLng location, String comment) {
         Log.i("New markedLocation", name);
@@ -41,7 +56,6 @@ public class markedLocation implements Comparable<markedLocation> {
     }
 
     public double getDistance(markedLocation o) {
-//        Log.i("Get Distance", "called");
         if (o != null && this != o) {
             double lat1 = this.location.latitude;
             double lng1 = this.location.longitude;
@@ -56,6 +70,9 @@ public class markedLocation implements Comparable<markedLocation> {
                             * Math.sin(dLon / 2) * Math.sin(dLon / 2);
             double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             double d = r * c;
+            if(milesSetting.equals("Miles")){
+                d = d * conversion;
+            }
             this.distance = d;
             return d;
         }

@@ -2,9 +2,11 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background_portrait" android:scaleType="fitXY"
+    android:background="@drawable/background_portrait"
+    android:scaleType="fitXY"
     tools:context="com.androidandyuk.bikersbestfriend.AboutActivity">
 
     <TextView
@@ -113,7 +115,7 @@
         app:layout_constraintBottom_toTopOf="@+id/aboutInfo3"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="@+id/aboutInfo"
-        app:srcCompat="@drawable/ktmselfie"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/ktmselfie" />
 
 </android.support.constraint.ConstraintLayout>

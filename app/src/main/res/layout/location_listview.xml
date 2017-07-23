@@ -17,16 +17,18 @@
             android:gravity="center_vertical|center_horizontal"
             android:padding="4dp"
             android:text="No"
+            android:textColor="@android:color/white"
             android:textSize="18sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/milesKM"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_vertical|center_horizontal"
-            android:text="Miles" />
+            android:text="Miles"
+            android:textColor="@color/colorAccent" />
 
     </LinearLayout>
 

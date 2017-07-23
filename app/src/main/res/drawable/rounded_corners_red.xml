@@ -3,12 +3,12 @@
 
 
     <!-- Define the background colour -->
-    <solid android:color="@color/colorPrimary" />
+    <solid android:color="#ff8888" />
 
     <!-- Define the border colour and thickness -->
     <stroke
         android:width="3dp"
-        android:color="@color/colorPrimary" />
+        android:color="#ff0000" />
 
     <!-- Add some padding -->
     <padding

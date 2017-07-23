@@ -1,6 +1,7 @@
 package com.androidandyuk.bikersbestfriend;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
 import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 
 public class RaceTracks extends AppCompatActivity {
@@ -27,6 +31,8 @@ public class RaceTracks extends AppCompatActivity {
     static MyLocationAdapter myAdapter;
 
     private FirebaseAnalytics mFirebaseAnalytics;
+
+    public static RelativeLayout main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +113,9 @@ public class RaceTracks extends AppCompatActivity {
 
             final markedLocation s = locationDataAdapter.get(position);
 
+            TextView milesKM = (TextView)myView.findViewById(R.id.milesKM);
+            milesKM.setText(milesSetting);
+
             TextView locationListDistance = (TextView) myView.findViewById(R.id.locationListDistance);
             locationListDistance.setText(oneDecimal.format(s.distance));
 
@@ -118,6 +127,16 @@ public class RaceTracks extends AppCompatActivity {
 
     }
 
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            RaceTracks.main.setBackground(drawablePic);
+        } else {
+            RaceTracks.main.setBackgroundColor(getResources().getColor(R.color.background));
+        }
+    }
 
     public static void initialiseTracks() {
 
@@ -170,6 +189,7 @@ public class RaceTracks extends AppCompatActivity {
         super.onResume();
         Log.i("Race Tracks Activity", "On Resume");
         sortMyList();
+        checkBackground();
     }
 }
 

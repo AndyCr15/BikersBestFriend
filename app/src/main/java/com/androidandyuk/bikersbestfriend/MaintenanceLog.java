@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,10 +14,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.text.ParseException;
@@ -26,18 +30,21 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import static com.androidandyuk.bikersbestfriend.MainActivity.activeBike;
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
 import static com.androidandyuk.bikersbestfriend.MainActivity.bikes;
 import static com.androidandyuk.bikersbestfriend.MainActivity.checkInRange;
+import static com.androidandyuk.bikersbestfriend.MainActivity.conversion;
+import static com.androidandyuk.bikersbestfriend.MainActivity.milesSetting;
+import static com.androidandyuk.bikersbestfriend.MainActivity.oneDecimal;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
-import static com.androidandyuk.bikersbestfriend.Maintenance.myAdapter;
-import static com.androidandyuk.bikersbestfriend.Maintenance.itemLongPressed;
-import static com.androidandyuk.bikersbestfriend.Maintenance.itemLongPressedPosition;
-import static com.androidandyuk.bikersbestfriend.Maintenance.saveLogs;
-import static com.androidandyuk.bikersbestfriend.R.id.mileage;
 
 public class MaintenanceLog extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
+    private static final String TAG = "Maintenance Log";
+    private AdView mAdView;
+
+    public static RelativeLayout main;
 
     EditText logString;
     EditText logCost;
@@ -57,6 +64,9 @@ public class MaintenanceLog extends AppCompatActivity {
     ToggleButton wasService;
     ToggleButton wasMOT;
 
+    public static Date staticTodayDate;
+    public static String staticTodayString;
+
     String editDate = "";
 
     private DatePickerDialog.OnDateSetListener logDateSetListener;
@@ -67,6 +77,12 @@ public class MaintenanceLog extends AppCompatActivity {
         setContentView(R.layout.activity_maintenance_log);
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        mAdView = (AdView) findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        staticTodayDate = new Date();
+        staticTodayString = sdf.format(staticTodayDate);
 
         // until I implement landscape view, lock the orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -74,10 +90,7 @@ public class MaintenanceLog extends AppCompatActivity {
         logString = (EditText) findViewById(R.id.logString);
         logCost = (EditText) findViewById(R.id.logCost);
         logMilage = (EditText) findViewById(R.id.logMileage);
-//        wasService = (CheckBox) findViewById(R.id.serviceCheckBox);
-//        wasMOT = (CheckBox) findViewById(R.id.MOTCheckBox);
         setLogDate = (TextView) findViewById(R.id.setLogDate);
-
         brakePads = (ToggleButton) findViewById(R.id.brakePads);
         brakeDiscs = (ToggleButton) findViewById(R.id.brakeDiscs);
         frontTyre = (ToggleButton) findViewById(R.id.frontTyre);
@@ -92,58 +105,62 @@ public class MaintenanceLog extends AppCompatActivity {
         wasMOT = (ToggleButton) findViewById(R.id.fullMOT);
 
         // set the date for a new log to today
-        Calendar date = Calendar.getInstance();
-        String today = sdf.format(date.getTime());
-        setLogDate.setText(today);
+        setLogDate.setText(staticTodayString);
 
-        if (itemLongPressed != null) {
+        if (Maintenance.itemLongPressed != null) {
 
             // we're editing an old log, so load in the old logs settings
 
-            setLogDate.setText(bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getDate());
-            logString.setText(bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getLog());
-            logCost.setText(Double.toString(bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getPrice()));
-            logMilage.setText(Double.toString(bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getMileage()));
+            setLogDate.setText(bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getDate());
+            logString.setText(bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getLog());
+            logCost.setText(Double.toString(bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getPrice()));
+            Double miles = bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getMileage();
+            // check what setting the user has, Miles or Km
+            // if Km, convert to Miles for display
+            if (milesSetting.equals("Km")) {
+                miles = miles / conversion;
+            }
+            logMilage.setText(oneDecimal.format(miles));
 
             // set all the toggles to correct state
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getWasService()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getWasService()) {
                 wasService.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getWasMOT()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getWasMOT()) {
                 wasMOT.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getBrakePads()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getBrakePads()) {
                 brakePads.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getBrakeDiscs()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getBrakeDiscs()) {
                 brakeDiscs.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getFrontTyre()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getFrontTyre()) {
                 frontTyre.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getRearTyre()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getRearTyre()) {
                 rearTyre.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getOilChange()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getOilChange()) {
                 oilChange.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getNewBattery()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getNewBattery()) {
                 newBattery.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getCoolantChange()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getCoolantChange()) {
                 coolantChange.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getSparkPlugs()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getSparkPlugs()) {
                 sparkPlugs.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getAirFilter()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getAirFilter()) {
                 airFilter.setChecked(true);
             }
-            if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getBrakeFluid()) {
+            if (bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getBrakeFluid()) {
                 brakeFluid.setChecked(true);
             }
 
-            editDate = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getDate();
+            editDate = bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getDate();
         }
 
 
@@ -180,15 +197,12 @@ public class MaintenanceLog extends AppCompatActivity {
         String logInfo = logString.getText().toString();
         Log.i("Log Info", logInfo);
 
-        Double mileage = 1.0;
-
         // check information has been entered
         if (logInfo.isEmpty() || logInfo == null) {
 
             Toast.makeText(MaintenanceLog.this, "Please complete all necessary details", Toast.LENGTH_LONG).show();
 
         } else {
-
 
             Boolean isAService = wasService.isChecked();
             Boolean isAMOT = wasMOT.isChecked();
@@ -204,6 +218,16 @@ public class MaintenanceLog extends AppCompatActivity {
             Boolean theseAirFilter = airFilter.isChecked();
             Boolean theseBrakeFluid = brakeFluid.isChecked();
 
+            double mileage = 0;
+            try {
+                mileage = Double.parseDouble(logMilage.getText().toString());
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+            }
+
+            if (milesSetting.equals("Km")) {
+                mileage = mileage * conversion;
+            }
 
             // check if this is a log that has been edited
             // if so, carry over the old date
@@ -212,32 +236,19 @@ public class MaintenanceLog extends AppCompatActivity {
             Log.i("Log Date is", date);
 
             maintenanceLogDetails today;
-            Log.i("itemLongPressed", " is " + itemLongPressed);
+            Log.i("itemLongPressed", " is " + Maintenance.itemLongPressed);
 
-            // it's a new log, set mileage to 9999999 so we can find it after to verify the user set mileage
-            Double marker = 9999999.0;
-
-            if (itemLongPressed != null) {
-                // adding back in an edited log
-                bikes.get(activeBike).maintenanceLogs.remove(itemLongPressed);
-                today = new maintenanceLogDetails(date, logInfo, cost, marker, isAService, isAMOT, theseBrakePads, theseBrakeDiscs, theseFrontTyre, theseRearTyre,
-                        theseOilChange, theseNewBattery, theseCoolantChange, theseSparkPlugs, theseAirFilter, theseBrakeFluid);
-            } else {
-                today = new maintenanceLogDetails(date, logInfo, cost, marker, isAService, isAMOT, theseBrakePads, theseBrakeDiscs, theseFrontTyre, theseRearTyre,
-                        theseOilChange, theseNewBattery, theseCoolantChange, theseSparkPlugs, theseAirFilter, theseBrakeFluid);
+            if (Maintenance.itemLongPressed != null) {
+                // we're adding back in an edited log, so remove the old one
+                bikes.get(activeBike).maintenanceLogs.remove(Maintenance.itemLongPressed);
             }
+
+            today = new maintenanceLogDetails(date, logInfo, cost, mileage, isAService, isAMOT, theseBrakePads, theseBrakeDiscs, theseFrontTyre, theseRearTyre,
+                    theseOilChange, theseNewBattery, theseCoolantChange, theseSparkPlugs, theseAirFilter, theseBrakeFluid);
+
             bikes.get(activeBike).maintenanceLogs.add(today);
             Collections.sort(bikes.get(activeBike).maintenanceLogs);
-            myAdapter.notifyDataSetChanged();
-
-            // now check if it was a new log, does the mileage fit the correct range
-            for (int i = 0; i < bikes.get(activeBike).maintenanceLogs.size(); i++) {
-                if (bikes.get(activeBike).maintenanceLogs.get(i).mileage == 9999999.0) {
-                    itemLongPressed = bikes.get(activeBike).maintenanceLogs.get(i);
-                    itemLongPressedPosition = i;
-                    bikes.get(activeBike).maintenanceLogs.get(i).mileage = verifyMileage();
-                }
-            }
+            Maintenance.myAdapter.notifyDataSetChanged();
 
             if (isAMOT) {
                 // create a new calendar item and then apply this bikes MOTdue to it
@@ -250,7 +261,7 @@ public class MaintenanceLog extends AppCompatActivity {
                 }
                 thisDate.setTime(thisTestDate);
                 // check if the MOT date of the log is within range
-                if (checkInRange(bikes.get(activeBike), thisDate, 'M')) {
+                if (checkInRange(bikes.get(activeBike).MOTdue, thisDate)) {
                     try {
                         thisDate.setTime(sdf.parse(bikes.get(activeBike).MOTdue));
                     } catch (ParseException e) {
@@ -290,8 +301,8 @@ public class MaintenanceLog extends AppCompatActivity {
             logString.clearFocus();
             logCost.setText(null);
             logCost.clearFocus();
-            itemLongPressed = null;
-            itemLongPressedPosition = -1;
+            Maintenance.itemLongPressed = null;
+            Maintenance.itemLongPressedPosition = -1;
 
             if (wasService.isChecked()) {
                 wasService.setChecked(false);
@@ -315,8 +326,8 @@ public class MaintenanceLog extends AppCompatActivity {
         String thisDateString = "";
         // this sets what date will show when the date picker shows
         // first check if we're editing a current fueling
-        if (itemLongPressed != null) {
-            thisDateString = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).getDate();
+        if (Maintenance.itemLongPressed != null) {
+            thisDateString = bikes.get(activeBike).maintenanceLogs.get(Maintenance.itemLongPressedPosition).getDate();
         }
         Date thisDate = new Date();
         try {
@@ -334,70 +345,22 @@ public class MaintenanceLog extends AppCompatActivity {
 
         DatePickerDialog dialog = new DatePickerDialog(
                 MaintenanceLog.this,
-                android.R.style.Theme_Holo_Light_Dialog_MinWidth,
+                R.style.datepicker,
                 logDateSetListener,
                 year, month, day);
-        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.LTGRAY));
         dialog.show();
     }
 
-    public Double verifyMileage() {
-        double thisMileage = 1d;
-
-        Log.i("Item Pos", "" + itemLongPressedPosition);
-        Log.i("Mileage", "" + mileage);
-
-        if (logMilage.getText().toString().isEmpty()) {
-            if (itemLongPressed == null) {
-                // we're not editing so it must be a new entry, but empty
-                thisMileage = bikes.get(activeBike).estMileage;
-            } else {
-                // we're editing but the box is now empty, so set it what it was before the edit began
-                if (bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).mileage != 9999999.0) {
-                    thisMileage = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition).mileage;
-                }
-            }
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if (backgroundsWanted) {
+            int resID = getResources().getIdentifier("background_portrait", "drawable", this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            MaintenanceLog.main.setBackground(drawablePic);
         } else {
-            // the box is not empty
-            Log.i("The Box is", " Not empty");
-            thisMileage = Double.parseDouble(logMilage.getText().toString());
-            if (itemLongPressed != null) {
-                // editing, with a number in the box
-                int numLogs = (bikes.get(activeBike).maintenanceLogs.size() - 1);
-                if (itemLongPressedPosition == 0) {
-                    // this is the last log entry, check it's after a previous
-                    if (numLogs > 0) {
-                        // there is more than one entry, check it's after the last one
-                        if (thisMileage < bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition + 1).mileage) {
-                            // it's lower than the previous item, so set it to the previous item
-                            thisMileage = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition + 1).mileage;
-                        }
-                    } else {
-                        // it's the only entry
-                        thisMileage = Double.parseDouble(logMilage.getText().toString());
-                        bikes.get(activeBike).estMileage = thisMileage;
-                    }
-                } else if (itemLongPressedPosition < numLogs) {
-                    // it's not the last item, but it's not the first item
-                    if (thisMileage > bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition - 1).mileage) {
-                        // it's higher than the next item, so set it to the next item
-                        thisMileage = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition - 1).mileage;
-                    }
-                    if (thisMileage < bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition + 1).mileage) {
-                        // it's lower than the previous item, so set it to the previous item
-                        thisMileage = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition + 1).mileage;
-                    }
-                    // if we made it here, it's within the range of previous and last, so can be left as is
-                } else {
-                    // it's the first log
-                    if (thisMileage > bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition - 1).mileage) {
-                        // it's higher than the next item, so set it to the next item
-                        thisMileage = bikes.get(activeBike).maintenanceLogs.get(itemLongPressedPosition - 1).mileage;
-                    }
-                }
-            }
+            MaintenanceLog.main.setBackgroundColor(getResources().getColor(R.color.background));
         }
-        return thisMileage;
     }
 
     @Override
@@ -408,13 +371,13 @@ public class MaintenanceLog extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (itemLongPressed != null) {
+            if (Maintenance.itemLongPressed != null) {
                 addLog();
             }
             finish();
             return true;
         }
-        myAdapter.notifyDataSetChanged();
+        Maintenance.myAdapter.notifyDataSetChanged();
         return super.onKeyDown(keyCode, event);
     }
 
@@ -422,14 +385,19 @@ public class MaintenanceLog extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         Log.i("Maintenance Activity", "On Pause");
-        saveLogs();
+        Maintenance.saveLogs();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
         Log.i("Maintenance Activity", "On Stop");
-        saveLogs();
+        Maintenance.saveLogs();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkBackground();
+    }
 }

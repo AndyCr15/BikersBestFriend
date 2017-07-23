@@ -1,5 +1,7 @@
 package com.androidandyuk.bikersbestfriend;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -8,6 +10,46 @@ import static com.androidandyuk.bikersbestfriend.MainActivity.sdf;
 /**
  * Created by AndyCr15 on 09/05/2017.
  */
+
+enum TaxDue {
+    JAN(1), FEB(2), MAR(3), APR(4), MAY(5), JUN(6), JUL(7),AUG(8),SEP(9),OCT(10),NOV(11),DEC(12);
+    private final int value;
+
+    private TaxDue(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}
+
+enum MilesKM {
+    Miles(1), Km(2);
+    private final int value;
+
+    private MilesKM(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}
+
+enum Currency {
+    £(1), $(2),€(3);
+    private final int value;
+
+    private Currency(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
+}
+
 
 public class Bike {
     static int bikeCount;
@@ -22,6 +64,8 @@ public class Bike {
     String lastKnownMOT;
     String yearOfMan;
     String notes;
+    String taxDue;
+
     double estMileage;
     boolean MOTwarned;
     boolean serviceWarned;
@@ -32,7 +76,7 @@ public class Bike {
 
     public Bike(int bikeId, String make, String model, String registration, String VIN, String serviceDue, String MOTdue,
                 String lastKnownService, String lastKnownMOT, String yearOfMan, String notes, double estMileage,
-                boolean MOTwarned, boolean serviceWarned) {
+                boolean MOTwarned, boolean serviceWarned, String taxDue) {
         this.bikeId = bikeId;
         this.make = make;
         this.model = model;
@@ -47,6 +91,7 @@ public class Bike {
         this.estMileage = estMileage;
         this.MOTwarned = MOTwarned;
         this.serviceWarned = serviceWarned;
+        this.taxDue = taxDue;
         // no bikeCount increment as this is only used by loading bikes, which restores the old bikeCount anyway
     }
 
@@ -70,9 +115,24 @@ public class Bike {
         this.lastKnownMOT = "";
         this.yearOfMan = year;
         this.estMileage = 1;
+        this.taxDue = "JAN";
         bikeCount++;
     }
 
+    public static double annualMiles(Bike o, int year){
+        int miles = 0;
+        for(fuellingDetails thisFuel : o.fuelings){
+            // check what year this fuel happened in
+            String thisStr[] = thisFuel.date.split("/");
+            int thisYear = Integer.parseInt(thisStr[2]);
+            if(thisYear == year){
+                // in correct year, so add figures on
+                miles += thisFuel.miles;
+            }
+        }
+        Log.i("annualMiles ",year + " : " + miles);
+        return miles;
+    }
 
     @Override
     public String toString() {

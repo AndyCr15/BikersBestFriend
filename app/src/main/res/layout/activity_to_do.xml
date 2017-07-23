@@ -1,27 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background_portrait"
     android:scaleType="fitXY"
     tools:context="com.androidandyuk.bikersbestfriend.ToDo">
 
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/floatingActionButton2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="24dp"
-        android:layout_marginRight="24dp"
-        android:clickable="true"
-        android:onClick="showToDoClicked"
-        app:elevation="24dp"
-        app:fabSize="mini"
-        app:srcCompat="@drawable/plus" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -91,8 +79,10 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:layout_weight="1"
-                android:background="@drawable/rounded_corners_grey_orange"
+                android:background="@drawable/rounded_corners_grey"
                 android:hint="Enter to do details"
+                android:inputType="textCapSentences"
+                android:maxHeight="100dp"
                 android:textAlignment="textStart"
                 android:textSize="18sp" />
 
@@ -109,8 +99,9 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:layout_weight="2"
-                android:background="@drawable/rounded_corners_grey_orange"
+                android:background="@drawable/rounded_corners_grey"
                 android:hint="enter url"
+                android:maxHeight="100dp"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
@@ -120,7 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:layout_weight="2"
-                android:background="@drawable/rounded_corners_grey_orange"
+                android:background="@drawable/rounded_corners_grey"
                 android:hint="cost"
                 android:inputType="numberDecimal"
                 android:textAlignment="center"
@@ -155,9 +146,20 @@
                 android:layout_height="match_parent"
                 android:layout_margin="8dp"
                 android:layout_weight="2"
-                android:background="@drawable/rounded_corners_grey_orange" />
+                android:background="@drawable/rounded_corners_grey" />
 
         </LinearLayout>
+
+        <com.google.android.gms.ads.AdView
+            android:id="@+id/adView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            ads:adSize="BANNER"
+            ads:adUnitId="@string/banner_ad_unit_id"></com.google.android.gms.ads.AdView>
 
         <Button
             android:id="@+id/button6"
@@ -172,5 +174,19 @@
             tools:layout_editor_absoluteY="133dp" />
 
     </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/floatingActionButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="24dp"
+        android:layout_marginRight="24dp"
+        android:clickable="true"
+        android:onClick="showToDoClicked"
+        ads:elevation="12dp"
+        ads:fabSize="normal"
+        app:srcCompat="@drawable/plus" />
 
 </RelativeLayout>

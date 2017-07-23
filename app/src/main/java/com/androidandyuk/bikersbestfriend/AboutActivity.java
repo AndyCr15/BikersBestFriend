@@ -2,8 +2,11 @@ package com.androidandyuk.bikersbestfriend;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
@@ -12,18 +15,23 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import java.io.File;
 import java.io.IOException;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
+
 public class AboutActivity extends AppCompatActivity {
 
     private FirebaseAnalytics mFirebaseAnalytics;
+
+    public static ConstraintLayout main;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
-
+        checkBackground();
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
     }
 
     public void sendFeedback(View view){
@@ -32,6 +40,17 @@ public class AboutActivity extends AppCompatActivity {
 
     public void SendFeedbackMailView(View view) {
         SendFeedbackMail();
+    }
+
+    public void checkBackground() {
+        main = (ConstraintLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            AboutActivity.main.setBackground(drawablePic);
+        } else {
+            AboutActivity.main.setBackgroundColor(getResources().getColor(R.color.background));
+        }
     }
 
     public void SendFeedbackMail() {
@@ -56,8 +75,21 @@ public class AboutActivity extends AppCompatActivity {
         // the attachment
         emailIntent.putExtra(Intent.EXTRA_STREAM, outputFile.getAbsolutePath());
         // the mail subject
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "BBF Feedbnack");
+        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "BBF Feedback");
         startActivity(Intent.createChooser(emailIntent, "Send email..."));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            Settings.main.setBackground(drawablePic);
+        } else {
+            Settings.main.setBackgroundColor(Color.parseColor("#ffffff"));
+        }
+
+    }
 }

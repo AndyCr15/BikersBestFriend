@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +37,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import static com.androidandyuk.bikersbestfriend.MainActivity.backgroundsWanted;
 import static com.androidandyuk.bikersbestfriend.MainActivity.ed;
 import static com.androidandyuk.bikersbestfriend.MainActivity.sharedPreferences;
 
@@ -43,6 +46,8 @@ public class Traffic extends AppCompatActivity {
     public static ArrayList<TrafficEvent> trafficEvents = new ArrayList<>();
     static MyTrafficAdapter myAdapter;
     ListView trafficList;
+
+    public static RelativeLayout main;
 
     private DownloadManager downloadManager;
     public static long downloadId;
@@ -72,6 +77,8 @@ public class Traffic extends AppCompatActivity {
 
         // decide if a new update is required
         updateTraffic = false;
+
+        loadUpdateTime();
 
         Calendar now = Calendar.getInstance();
 
@@ -278,6 +285,17 @@ public class Traffic extends AppCompatActivity {
 
     }
 
+    public void checkBackground() {
+        main = (RelativeLayout) findViewById(R.id.main);
+        if(backgroundsWanted){
+            int resID = getResources().getIdentifier("background_portrait", "drawable",  this.getPackageName());
+            Drawable drawablePic = getResources().getDrawable(resID);
+            Traffic.main.setBackground(drawablePic);
+        } else {
+            Traffic.main.setBackgroundColor(getResources().getColor(R.color.background));
+        }
+    }
+
     @Override
     public void onBackPressed() {
         // this must be empty as back is being dealt with in onKeyDown
@@ -306,6 +324,7 @@ public class Traffic extends AppCompatActivity {
         parseList();
         initiateList();
         loadUpdateTime();
+        checkBackground();
     }
 
     @Override
