@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background_portrait"
     android:scaleType="fitXY"
-    tools:context="com.androidandyuk.bikersbestfriend.ToDo">
+    tools:context=".ToDo">
 
 
     <LinearLayout
@@ -44,6 +44,12 @@
             android:textColor="@android:color/white" />
 
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/shield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="shieldClicked" />
 
     <LinearLayout
         android:id="@+id/toDoDetailsLayout"
@@ -82,7 +88,7 @@
                 android:background="@drawable/rounded_corners_grey"
                 android:hint="Enter to do details"
                 android:inputType="textCapSentences"
-                android:maxHeight="100dp"
+                android:maxHeight="140dp"
                 android:textAlignment="textStart"
                 android:textSize="18sp" />
 
@@ -101,7 +107,7 @@
                 android:layout_weight="2"
                 android:background="@drawable/rounded_corners_grey"
                 android:hint="enter url"
-                android:maxHeight="100dp"
+                android:maxHeight="140dp"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 

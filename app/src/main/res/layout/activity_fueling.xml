@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background_portrait"
     android:scaleType="fitXY"
-    tools:context="com.androidandyuk.bikersbestfriend.Fuelling">
+    tools:context=".Fuelling">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -68,6 +68,7 @@
 
     </LinearLayout>
 
+
     <LinearLayout
         android:id="@+id/fuelSummary"
         android:layout_width="200dp"
@@ -100,7 +101,15 @@
             android:textAlignment="center"
             android:textSize="24sp"
             android:textStyle="bold" />
+
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/shield"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:onClick="shieldClicked"
+        android:visibility="visible" />
 
     <LinearLayout
         android:id="@+id/fuelingDetailsLayout"
@@ -131,28 +140,22 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tvFuelDate"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_corners_grey_orange"
-                android:text="Date"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-
-            <TextView
                 android:id="@+id/setFuelDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="8dp"
+                android:layout_marginBottom="8dp"
+                android:layout_marginEnd="64dp"
+                android:layout_marginLeft="64dp"
+                android:layout_marginRight="64dp"
+                android:layout_marginStart="64dp"
+                android:layout_marginTop="8dp"
                 android:layout_weight="2"
                 android:background="@drawable/rounded_corners_grey"
                 android:hint="date"
                 android:inputType="numberDecimal"
                 android:onClick="setFuelDate"
                 android:textAlignment="center"
-                android:textSize="14sp" />
+                android:textSize="18sp" />
 
         </LinearLayout>
 
@@ -161,25 +164,36 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/milesDoneTextView"
-                android:layout_width="match_parent"
+            <EditText
+                android:id="@+id/mileageET"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
                 android:layout_weight="1"
-                android:background="@drawable/rounded_corners_grey_orange"
-                android:text="Miles Done"
+                android:background="@drawable/rounded_corners_grey"
+                android:hint="Enter Mileage"
+                android:inputType="number"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:text="OR"
+                android:textAlignment="center"
+                android:textColor="@android:color/white" />
+
             <EditText
                 android:id="@+id/milesDone"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:background="@drawable/rounded_corners_grey"
-                android:hint="Enter miles"
+                android:hint="Or enter miles"
                 android:inputType="numberDecimal"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -191,14 +205,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/petrolPriceTextView"
+            <EditText
+                android:id="@+id/litresUsed"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_corners_grey_orange"
-                android:text="Petrol Price"
+                android:layout_weight="2"
+                android:background="@drawable/rounded_corners_grey"
+                android:hint="Litres"
+                android:inputType="numberDecimal"
                 android:textAlignment="center"
                 android:textSize="18sp" />
 
@@ -209,7 +224,7 @@
                 android:layout_margin="8dp"
                 android:layout_weight="2"
                 android:background="@drawable/rounded_corners_grey"
-                android:hint="Enter price"
+                android:hint="Price"
                 android:inputType="numberDecimal"
                 android:textAlignment="center"
                 android:textSize="18sp" />
@@ -220,28 +235,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_corners_grey_orange"
-                android:text="Litres"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-
-            <EditText
-                android:id="@+id/litresUsed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="2"
-                android:background="@drawable/rounded_corners_grey"
-                android:hint="Enter litres"
-                android:inputType="numberDecimal"
-                android:textAlignment="center"
-                android:textSize="18sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -249,28 +242,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/textView60"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="1"
-                android:background="@drawable/rounded_corners_grey_orange"
-                android:text="Mileage (Optional)"
-                android:textAlignment="center"
-                android:textSize="18sp" />
-
-            <EditText
-                android:id="@+id/mileageET"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="8dp"
-                android:layout_weight="2"
-                android:background="@drawable/rounded_corners_grey"
-                android:hint="Mileage"
-                android:inputType="number"
-                android:textAlignment="center"
-                android:textSize="18sp" />
         </LinearLayout>
 
         <com.google.android.gms.ads.AdView
@@ -288,7 +259,7 @@
             android:id="@+id/button6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:layout_margin="8dp"
             android:background="@drawable/rounded_corners_grey"
             android:onClick="addFuelingClicked"
             android:text="Add fueling"

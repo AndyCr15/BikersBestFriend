@@ -25,7 +25,7 @@
             android:layout_weight="0"
             android:background="@drawable/rounded_corners_grey_orange"
             android:padding="8dp"
-            android:text="Selected Vehicle"
+            android:text="Go to Garage to add a Bike"
             android:textAlignment="center"
             android:textSize="18sp" />
 
@@ -101,17 +101,6 @@
             android:text="Annual Reports"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
-
-        <Button
-            android:id="@+id/groupRideButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_weight="0"
-            android:background="@drawable/rounded_corners_reverse"
-            android:onClick="groupRideClicked"
-            android:text="Group Ride"
-            android:visibility="gone" />
 
         <LinearLayout
             android:layout_width="match_parent"
